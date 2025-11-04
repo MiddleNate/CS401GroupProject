@@ -67,5 +67,29 @@ public class SavingsAccount extends BankAccount {
 		// if no updates are needed, do nothing
 	}
 	
+	public boolean deposit(double amt) {
+		if (amt > 0) {
+			// truncate any extra decimal places
+			amt = Math.floor(amt * 100) / 100;
+			balance += amt;
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
+	public boolean withdraw(double amt) {
+		if (amt > 0
+				&& (withdrawnSinceUpdated + amt) < withdrawlLimit
+				&& balance - amt > 0) {
+			// truncate any extra decimal places
+			amt = Math.floor(amt * 100) / 100;
+			balance -= amt;
+			// add the amount towards the withdrawl limit
+			withdrawnSinceUpdated += amt;
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
