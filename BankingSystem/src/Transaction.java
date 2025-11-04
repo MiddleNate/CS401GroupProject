@@ -7,13 +7,14 @@ public class Transaction {
 	private TransactionType type; 
 	private User user;
 	
+	//Default constructor
 	public Transaction() {
 		this.amount = 0.0;
 		this.date = null;
 		this.type = null;
 		this.user = null;
 	}
-	
+	// Constructor
 	public Transaction(Double amount, TransactionType type, Date date, User user ) {
 		this.amount = amount;
 		this.date = date;
