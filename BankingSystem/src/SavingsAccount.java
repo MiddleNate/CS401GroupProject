@@ -21,5 +21,27 @@ public class SavingsAccount extends BankAccount {
 		withdrawnSinceUpdated = 0;
 	}
 	
+	public void setWithdrawlLimit(double limit) {
+		withdrawlLimit = limit;
+	}
 	
+	public double getWithdrawlLimit() {
+		return withdrawlLimit;
+	}
+	
+	public double getInterest() {
+		return interestRate;
+	}
+	
+	public void setInterest(double interest) {
+		interestRate = interest;
+	}
+	
+	public LocalDate getLastUpdated() {
+		return lastUpdated;
+	}
+	
+	public double getWithdrawnSinceUpdated() {
+		return withdrawnSinceUpdated;
+	}
 }
