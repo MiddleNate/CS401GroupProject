@@ -1,12 +1,13 @@
 import java.util.ArrayList;
 
-public class BankAccount {
-	private int id;
-	private boolean status;
-	private AccountType type;
-	private ArrayList<Customer> owners;
-	private double balance;
-	private ArrayList<Transaction> transactions;
+abstract class BankAccount {
+	protected int id;
+	protected boolean status;
+	protected AccountType type;
+	protected ArrayList<Customer> owners;
+	protected double balance;
+	protected ArrayList<Transaction> transactions;
+	protected static int count;
 
 	public void addUser(Customer cust) {
 		owners.add(cust);
@@ -27,13 +28,17 @@ public class BankAccount {
 	public int getID() {
 		return id;
 	}
-
-	public ArrayList<Customer> getUsers() {
-		return owners;
-	}
 	
 	public boolean isOpen() {
 		return status;
+	}
+	
+	public AccountType getType() {
+		return type;
+	}
+
+	public ArrayList<Customer> getOwners() {
+		return owners;
 	}
 
 	public double getBalance() {
@@ -44,12 +49,5 @@ public class BankAccount {
 		return transactions;
 	}
 	
-	public boolean closeAccount() {
-		if (status == true) {
-			status = false;
-			return true;
-		} else {
-			return false;
-		}
-	}
+	public abstract boolean closeAccount();
 }
