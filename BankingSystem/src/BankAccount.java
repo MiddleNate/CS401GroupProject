@@ -11,6 +11,10 @@ public class BankAccount {
 	public void addUser(Customer cust) {
 		owners.add(cust);
 	}
+	
+	public void setCount(int c) {
+		count = c;
+	}
 
 	public void removeUser(Customer cust) {
 		for (int i = 0; i < owners.size(); i++) {
