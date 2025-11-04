@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.ChronoUnit;
 
 public class SavingsAccount extends BankAccount {
 	private double interestRate;
@@ -44,4 +45,21 @@ public class SavingsAccount extends BankAccount {
 	public double getWithdrawnSinceUpdated() {
 		return withdrawnSinceUpdated;
 	}
+	public void update() {
+		LocalDate currentMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
+		// check if at least one month has passed since the last updated date
+		if (currentMonth.isAfter(lastUpdated)) {
+			// figure out how many months have passed (how many times we need to update)
+			int numUpdates = (int) ChronoUnit.MONTHS.between(lastUpdated, currentMonth);
+			for (int i = 0; i < numUpdates; i++) {
+				// for each update, add the interest rate to the balance
+				balance *= 1 + interestRate;
+			}
+			// reset the amount withdrawn since the last update
+			withdrawnSinceUpdated = 0;
+		}
+		// if no updates are needed, do nothing
+	}
+	
+	
 }
