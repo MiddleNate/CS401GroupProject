@@ -52,6 +52,9 @@ public class SavingsAccount extends BankAccount {
 	}
 	
 	public void update() {
+		// do not update if the account is closed
+		if (!status) return;
+		
 		LocalDate currentMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
 		// check if at least one month has passed since the last updated date
 		if (currentMonth.isAfter(lastUpdated)) {
@@ -68,6 +71,9 @@ public class SavingsAccount extends BankAccount {
 	}
 	
 	public boolean deposit(double amt) {
+		// do not deposit if the account is closed
+		if (!status) return false;
+		
 		if (amt > 0) {
 			// truncate any extra decimal places
 			amt = Math.floor(amt * 100) / 100;
@@ -79,6 +85,9 @@ public class SavingsAccount extends BankAccount {
 	}
 	
 	public boolean withdraw(double amt) {
+		// do not deposit if the account is closed
+		if (!status) return false;
+		
 		if (amt > 0
 				&& (withdrawnSinceUpdated + amt) < withdrawlLimit
 				&& balance - amt > 0) {
