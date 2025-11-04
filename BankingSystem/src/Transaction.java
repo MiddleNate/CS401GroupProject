@@ -1,11 +1,11 @@
 import java.util.*;
 
 public class Transaction {
-	private int id;
-	private Double amount;
-	private Date date;
-	private TransactionType type; 
-	private User user;
+	protected int id;
+	protected Double amount;
+	protected Date date;
+	protected TransactionType type; 
+	protected User user;
 	
 	//Default constructor
 	public Transaction() {
