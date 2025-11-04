@@ -26,6 +26,8 @@ public class CheckingAccount extends BankAccount {
 		// ensure only positive amounts are being withdrawn and
 		// that the balance will not go below zero
 		if (amt > 0 && balance - amt >= 0) {
+			// truncate any extra decimal places
+			amt = Math.floor(amt * 100) / 100;
 			balance -= amt;
 			return true;
 		} else {
