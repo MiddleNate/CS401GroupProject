@@ -11,6 +11,9 @@ public class CheckingAccount extends BankAccount {
 	}
 	
 	public boolean deposit(double amt) {
+		// do not deposit if account is closed
+		if (!status) return false;
+		
 		// ensure only positive amounts are being deposited
 		if (amt > 0) {
 			// truncate any extra decimal places
@@ -23,6 +26,9 @@ public class CheckingAccount extends BankAccount {
 	}
 	
 	public boolean withdraw(double amt) {
+		// do not withdraw if account is closed
+		if (!status) return false;
+		
 		// ensure only positive amounts are being withdrawn and
 		// that the balance will not go below zero
 		if (amt > 0 && balance - amt >= 0) {
