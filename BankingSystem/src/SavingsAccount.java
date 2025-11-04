@@ -45,6 +45,12 @@ public class SavingsAccount extends BankAccount {
 	public double getWithdrawnSinceUpdated() {
 		return withdrawnSinceUpdated;
 	}
+	
+	@Override public double getBalance() {
+		update();
+		return balance;
+	}
+	
 	public void update() {
 		LocalDate currentMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
 		// check if at least one month has passed since the last updated date
