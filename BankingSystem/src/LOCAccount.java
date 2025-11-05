@@ -23,4 +23,32 @@ public class LOCAccount extends BankAccount {
 		lastUpdated = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
 		paidSinceUpdated = 0;
 	}
+	
+	public double getLimit() {
+		return creditLimit;
+	}
+	
+	public void setCreditLimit(double limit) {
+		creditLimit = limit;
+	}
+	
+	public double getInterest() {
+		return interestRate;
+	}
+	
+	public void setInterest(double interest) {
+		interestRate = interest;
+	}
+	
+	public double getMinimumDue() {
+		return minimumDue;
+	}
+	
+	public void setMinimumDue(double minimum) {
+		minimumDue = minimum;
+	}
+	
+	public double getPaidSinceUpdated() {
+		return paidSinceUpdated;
+	}
 }
