@@ -49,5 +49,12 @@ abstract class BankAccount {
 		return transactions;
 	}
 	
-	public abstract boolean closeAccount();
+	public boolean closeAccount() {
+		if (status == true && balance == 0) {
+			status = false;
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
