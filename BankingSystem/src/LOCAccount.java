@@ -117,6 +117,7 @@ public class LOCAccount extends BankAccount {
 			// truncate any extra decimal places
 			amt = Math.floor(amt * 100) / 100;
 			balance -= amt;
+			paidSinceUpdated += amt;
 			return true;
 		} else {
 			return false;
