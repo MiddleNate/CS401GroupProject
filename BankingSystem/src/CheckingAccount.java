@@ -40,14 +40,4 @@ public class CheckingAccount extends BankAccount {
 			return false;
 		}
 	}
-	
-	public boolean closeAccount() {
-		// checking accounts can only be closed if their balance is 0
-		if (status == true && balance == 0) {
-			status = false;
-			return true;
-		} else {
-			return false;
-		}
-	}
 }

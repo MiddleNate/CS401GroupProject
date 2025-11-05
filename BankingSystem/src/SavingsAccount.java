@@ -101,13 +101,4 @@ public class SavingsAccount extends BankAccount {
 			return false;
 		}
 	}
-	
-	public boolean closeAccount() {
-		if (status == true && balance == 0) {
-			status = false;
-			return true;
-		} else {
-			return false;
-		}
-	}
 }
