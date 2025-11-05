@@ -13,7 +13,7 @@ abstract class BankAccount {
 		owners.add(cust);
 	}
 	
-	public void setCount(int c) {
+	public static void setCount(int c) {
 		count = c;
 	}
 
