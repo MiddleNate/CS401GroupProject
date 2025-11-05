@@ -74,6 +74,7 @@ public class SavingsAccount extends BankAccount {
 		// do not deposit if the account is closed
 		if (!status) return false;
 		
+		update();
 		if (amt > 0) {
 			// truncate any extra decimal places
 			amt = Math.floor(amt * 100) / 100;
@@ -88,6 +89,7 @@ public class SavingsAccount extends BankAccount {
 		// do not deposit if the account is closed
 		if (!status) return false;
 		
+		update();
 		if (amt > 0
 				&& (withdrawnSinceUpdated + amt) < withdrawlLimit
 				&& balance - amt > 0) {
