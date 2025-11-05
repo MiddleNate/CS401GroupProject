@@ -15,6 +15,7 @@ public class LOCAccount extends BankAccount {
 		status = true;
 		type = AccountType.LineOfCredit;
 		owners = owner;
+		// in a LOC account, the balance represents the amount owed
 		balance = 0;
 		transactions = new ArrayList<Transaction>();
 		creditLimit = limit;
@@ -50,5 +51,43 @@ public class LOCAccount extends BankAccount {
 	
 	public double getPaidSinceUpdated() {
 		return paidSinceUpdated;
+	}
+	
+	public boolean withdraw(double amt) {
+		// do not allow withdrawal if the account is closed
+		if (!status) return false;
+		
+		// since the balance represents debt owed, withdraw will add
+		// to the balance instead of subtracting
+		
+		// check that the provided amount was positive and that the
+		// withdrawal will not exceed the credit limit
+		if (amt > 0 && amt + balance <= creditLimit) {
+			// truncate any extra decimal places
+			amt = Math.floor(amt * 100) / 100;
+			balance += amt;
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean pay(double amt) {
+		// do not allow payment if the amount is closed
+		if (!status) return false;
+		
+		// since the balance represents debt owed, paying with subtract
+		// from the balance instead of adding
+		
+		// check that the provided amount was positive
+		// and will not pay more than the balance
+		if (amt > 0 && balance - amt >= 0) {
+			// truncate any extra decimal places
+			amt = Math.floor(amt * 100) / 100;
+			balance -= amt;
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
