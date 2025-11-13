@@ -76,7 +76,34 @@ public class Server {
 			System.out.println(e);
 		}
 		
-		
+		try {
+			// clears the users file
+			PrintWriter userWriter = new PrintWriter("users.txt");
+			userWriter.close();
+			
+			// write the users map to the file
+			FileOutputStream userFile = new FileOutputStream("users.txt");
+			ObjectOutputStream userStream = new ObjectOutputStream(userFile);
+			userStream.writeObject(users);
+			
+			
+			// clears the accounts file
+			PrintWriter accountWriter = new PrintWriter("accounts.txt");
+			accountWriter.close();
+			
+			// write the users map to the file
+			FileOutputStream accountFile = new FileOutputStream("accounts.txt");
+			ObjectOutputStream accountStream = new ObjectOutputStream(userFile);
+			userStream.writeObject(accounts);
+			
+			PrintWriter countWriter = new PrintWriter("counts.txt");
+			countWriter.write(Integer.toString(Customer.getCustomerCount()) + "\n");
+			countWriter.write(Integer.toString(Employee.getEmployeeCount()) + "\n");
+			countWriter.write(Integer.toString(BankAccount.getCount()) + "\n");
+			countWriter.write(Integer.toString(Transaction.getTransactionCount()) + "\n");
+		} catch (Exception e) {
+			
+		}
 	}
 	
 	private static class ClientHandler implements Runnable {
