@@ -100,4 +100,24 @@ public class Message implements Serializable {
 			transaction = null;
 		}
 	}
+	
+	public MessageType getType() {
+		return type;
+	}
+	
+	public User getUser() {
+		return user;
+	}
+	
+	public BankAccount getAccount() {
+		return account;
+	}
+	
+	public ArrayList<BankAccount> getAccounts() {
+		return accounts;
+	}
+	
+	public Transaction getTransaction() {
+		return transaction;
+	}
 }
