@@ -2,23 +2,28 @@ import java.util.*;
 
 public class Transaction {
 	protected int id;
-	protected Double amount;
+	protected static int count;
+	protected double amount;
 	protected Date date;
 	protected TransactionType type; 
 	protected User user;
+	protected BankAccount account;
 	
-	//Default constructor
-	public Transaction() {
-		this.amount = 0.0;
-		this.date = null;
-		this.type = null;
-		this.user = null;
+	public static void setTransactionCount(int c) {
+		count = c;
 	}
+	
+	public static int getTransactionCount() {
+		return count;
+	}
+	
 	// Constructor
-	public Transaction(Double amount, TransactionType type, Date date, User user ) {
+	public Transaction(double amount, TransactionType type, User user, BankAccount account) {
+		this.id = ++count;
 		this.amount = amount;
-		this.date = date;
+		this.date = new Date();
 		this.type = type;
-		this.user = user;	
+		this.user = user;
+		this.account = account;
 	}
 }
