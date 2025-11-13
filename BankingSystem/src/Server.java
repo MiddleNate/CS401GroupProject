@@ -4,9 +4,11 @@ import java.io.*;
 import java.lang.Integer;
 
 public class Server {
-
 	protected static Map<Integer, BankAccount> accounts;
+	// access within ClientHandler using Server.accounts
+	
 	protected static Map<String, User> users;
+	// access within ClientHandler using Server.users
 	
 	public static void main(String[] args) {
 		// loading users and accounts into memory
