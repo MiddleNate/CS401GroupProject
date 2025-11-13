@@ -45,5 +45,93 @@ public class Server {
 		}
 
 	}
+	
+	private static class ClientHandler implements Runnable {
+		private final Socket client;
+		private User user;
+		
+		public ClientHandler(Socket client) {
+			this.client = client;
+			user = null;
+		}
+		
+		public void run() {
+			ObjectOutputStream out = null;
+			ObjectInputStream in = null;
+			
+			try {
+				out = new ObjectOutputStream(client.getOutputStream());
+				in = new ObjectInputStream(client.getInputStream());
+				
+				boolean loggingout = false;
+				
+				while (!loggingout) {
+					Message m = (Message) in.readObject();
+					
+					// if we are not logged in, only accept login messages
+					if (user == null && m.getType() == MessageType.Login) {
+						
+						// await next message
+						continue;
+					}
+					
+					// if we are logged in as a customer, accept inforequests and transactions only
+					if (user != null && user instanceof Customer) {
+						switch (m.getType()) {
+						case MessageType.Logout:
+							
+							break;
+						case MessageType.InfoRequest:
+							
+							break;
+						case MessageType.Transaction:
+							
+							break;
+						default:
+							// do nothing for other message types
+							break;
+						}
+					}
+					
+					// if we are logged in as an employee, accept inforequests, transactions, and account operations
+					if (user != null && user instanceof Employee) {
+						switch (m.getType()) {
+						case MessageType.Logout:
+							
+							break;
+						case MessageType.InfoRequest:
+							
+							break;
+						case MessageType.Transaction:
+							
+							break;
+						case MessageType.CreateCustomer:
+							
+							break;
+						case MessageType.OpenAccount:
+							
+							break;
+						case MessageType.CloseAccount:
+							
+							break;
+						case MessageType.UpdateAccount:
+							
+							break;
+						default:
+							// do nothing for other message types
+							break;
+						}
+					}
+				}
+				
+			} catch (Exception e) {
+				// this will catch exceptions with the inputstream only
+				
+			} finally {
+				// close resources and set the client as not logged in since we are disconnecting
+				
+			}
+		}
+	}
 
 }
