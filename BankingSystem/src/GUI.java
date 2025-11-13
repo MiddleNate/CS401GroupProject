@@ -1,4 +1,7 @@
 
-public class GUI {
-
+public class GUI implements Runnable {
+	
+	public void run() {
+		
+	}
 }
