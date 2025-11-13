@@ -34,7 +34,15 @@ public class Server {
 			Employee.setEmployeeCount(counts.nextInt());
 			BankAccount.setCount(counts.nextInt());
 			Transaction.setTransactionCount(counts.nextInt());
-		} catch (Exception e) {
+			
+			// close files & streams
+			userFile.close();
+			accountFile.close();
+			countFile.close();
+			userStream.close();
+			accountStream.close();
+			counts.close();
+			} catch (Exception e) {
 			System.out.println("File loading error: " + e + "\nExiting...");
 			System.exit(1);
 		}
