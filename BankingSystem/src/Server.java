@@ -26,6 +26,14 @@ public class Server {
 			accounts = (HashMap<Integer, BankAccount>) accountStream.readObject();
 			// convert it to a synchronized map (prevents multithreading issues)
 			accounts = Collections.synchronizedMap(accounts);
+			
+			// get the static counters for customer, employee, and bankaccount from their file
+			FileInputStream countFile = new FileInputStream("counts.txt");
+			Scanner counts = new Scanner(countFile);
+			Customer.setCustomerCount(counts.nextInt());
+			Employee.setEmployeeCount(counts.nextInt());
+			BankAccount.setCount(counts.nextInt());
+			Transaction.setTransactionCount(counts.nextInt());
 		} catch (Exception e) {
 			System.out.println("File loading error: " + e + "\nExiting...");
 			System.exit(1);
