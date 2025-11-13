@@ -18,6 +18,10 @@ abstract class BankAccount implements Serializable {
 	public static void setCount(int c) {
 		count = c;
 	}
+	
+	public static int getCount() {
+		return count;
+	}
 
 	public void removeUser(Customer cust) {
 		for (int i = 0; i < owners.size(); i++) {
