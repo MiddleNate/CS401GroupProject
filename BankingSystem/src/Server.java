@@ -22,6 +22,27 @@ public class Server {
 			System.out.println("File loading error: " + e + "\nExiting...");
 			System.exit(1);
 		}
+		
+		
+		ServerSocket server = null;
+		
+		try {
+			server = new ServerSocket(7855);
+			server.setReuseAddress(true);
+			
+			// while running, accept connections and create
+			// a handler in its own thread for each of them
+			while (true) {
+				Socket client = server.accept();
+				
+				ClientHandler handler = new ClientHandler(client);
+				
+				new Thread(handler).start();
+			}
+			
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 
 	}
 
