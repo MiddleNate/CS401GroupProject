@@ -13,9 +13,11 @@ public class Transaction {
 	public static void setTransactionCount(int c) {
 		count = c;
 	}
+	
 	public static int getTransactionCount() {
 		return count;
 	}
+	
 	public Transaction(double amount, TransactionType type, User user, BankAccount account) {
 		this.id = ++count;
 		this.amount = amount;
@@ -23,5 +25,29 @@ public class Transaction {
 		this.type = type;
 		this.user = user;
 		this.account = account;
+	}
+	
+	public int getID() {
+		return id;
+	}
+	
+	public Double getAmount() {
+		return amount;
+	}
+	
+	public LocalDate getDate() {
+		return date;
+	}
+	
+	public TransactionType getType() {
+		return type;
+	}
+	
+	public User getUser() {
+		return user;
+	}
+	
+	public BankAccount getAccount() {
+		return account;
 	}
 }
