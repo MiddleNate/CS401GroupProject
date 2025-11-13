@@ -46,9 +46,17 @@ public class Server {
 			server = new ServerSocket(7855);
 			server.setReuseAddress(true);
 			
+			boolean running = true;
+			Scanner scan = new Scanner(System.in);
+			
 			// while running, accept connections and create
 			// a handler in its own thread for each of them
-			while (true) {
+			while (running) {
+				// exit the server if anything has been entered into the console
+				if (scan.hasNext()) {
+					running = false;
+				}
+				
 				Socket client = server.accept();
 				
 				ClientHandler handler = new ClientHandler(client);
@@ -59,7 +67,8 @@ public class Server {
 		} catch (Exception e) {
 			System.out.println(e);
 		}
-
+		
+		
 	}
 	
 	private static class ClientHandler implements Runnable {
