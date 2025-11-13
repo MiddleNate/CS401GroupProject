@@ -13,7 +13,7 @@ abstract class BankAccount {
 		owners.add(cust);
 	}
 	
-	public void setCount(int c) {
+	public static void setCount(int c) {
 		count = c;
 	}
 
@@ -49,5 +49,12 @@ abstract class BankAccount {
 		return transactions;
 	}
 	
-	public abstract boolean closeAccount();
+	public boolean closeAccount() {
+		if (status == true && balance == 0) {
+			status = false;
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
