@@ -1,14 +1,15 @@
 import java.util.*;
+import java.time.LocalDate;
 
 public class Transaction {
-	protected int id;
-	protected static int count;
-	protected double amount;
-	protected Date date;
-	protected TransactionType type; 
-	protected User user;
-	protected BankAccount account;
-	
+	private int id;
+	private static int count;
+	private Double amount;
+	private LocalDate date;
+	private TransactionType type; 
+	private User user;
+	private BankAccount account;
+
 	public static void setTransactionCount(int c) {
 		count = c;
 	}
@@ -17,13 +18,36 @@ public class Transaction {
 		return count;
 	}
 	
-	// Constructor
 	public Transaction(double amount, TransactionType type, User user, BankAccount account) {
 		this.id = ++count;
 		this.amount = amount;
-		this.date = new Date();
+		this.date = LocalDate.now();
 		this.type = type;
 		this.user = user;
 		this.account = account;
+	}
+	
+	public int getID() {
+		return id;
+	}
+	
+	public Double getAmount() {
+		return amount;
+	}
+	
+	public LocalDate getDate() {
+		return date;
+	}
+	
+	public TransactionType getType() {
+		return type;
+	}
+	
+	public User getUser() {
+		return user;
+	}
+	
+	public BankAccount getAccount() {
+		return account;
 	}
 }
