@@ -1,6 +1,6 @@
 import java.io.Serializable;
 
-public class User implements Serializable {
+public class User extends Throwable implements Serializable{
 	private static final long serialVersionUID = 250L;
 	private String username;
 	private String password;
@@ -24,7 +24,14 @@ public class User implements Serializable {
 		return this.loggedIn;
 	}
 
-	public void login(String username, String password) {
-		
+	public void tryLogin(String username, String password) throws Exception {
+		if (loggedIn) {
+			throw new Exception("Already logged in");
+		}
+		else if (username.compareTo(this.username) != 0 && password.compareTo(this.password) != 0) {
+			throw new Exception("Invalid username or password");
+		} else {
+			loggedIn = true;
+		}
 	}
 }
