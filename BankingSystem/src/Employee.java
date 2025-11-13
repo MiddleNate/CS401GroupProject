@@ -1,13 +1,14 @@
 
 public class Employee extends User {
 	private String employeeName;
-	private static int count = 0;
-	private int employeeID;
+	private static int employeeID = 0;
+	private int id;
 
 	public Employee(String username, String password, boolean loggedIn, String employeeName) {
 		super(username, password);
+		employeeID++;
 		this.employeeName = employeeName;
-		this.employeeID = count++;
+		this.id = employeeID;
 	}
 	
 	public void setEmployeeName(String employeeName) {
@@ -19,6 +20,6 @@ public class Employee extends User {
 	}
 	
 	public int getEmployeeID() {
-		return this.employeeID;
+		return this.id;
 	}
 }
