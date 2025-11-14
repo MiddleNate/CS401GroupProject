@@ -13,15 +13,18 @@ public class CheckingAccount extends BankAccount {
 	}
 	
 	public void tryTransaction(Transaction transaction) throws Exception {
+		// check that the type is either deposit or withdrawal
 		if (transaction.getType() != TransactionType.Deposit
 				&& transaction.getType() != TransactionType.Withdrawal) {
 			throw new Exception("Invalid transaction type");
+		// check that the account is not closed
 		} else if (!status) {
 			throw new Exception("Account is closed");
 		} else {
 			if (transaction.getType() == TransactionType.Deposit) {
 				try {
 					deposit(transaction.getAmount());
+					// if an exception was not thrown, log the transaction
 					transactions.add(new Transaction(transaction.getAmount(),
 							TransactionType.Deposit,
 							transaction.getUser(),
@@ -32,6 +35,7 @@ public class CheckingAccount extends BankAccount {
 			} else if (transaction.getType() == TransactionType.Withdrawal) {
 				try {
 					withdraw(transaction.getAmount());
+					// if an exception was not thrown, log the transaction
 					transactions.add(new Transaction(transaction.getAmount(),
 							TransactionType.Withdrawal,
 							transaction.getUser(),
