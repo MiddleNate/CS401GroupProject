@@ -45,17 +45,20 @@ public class GUI implements Runnable{
 		
 	}
 	public void doTransactionMessage() {
-
+	    JOptionPane transactionMsg = new JOptionPane.showMessageDialog(null, "Transaction successful");
 	}
 	public void doSuccessMessage() {
-
+		JOptionPane successMsg = new JOptionPane.showMessageDialog(null, "Successfully accessed");
+		//call client v. employee panel, based on instance of client v. employee
 	}
 	public void doFailMessage() {
+		JOptionPane failedMsg = new JOptionPane.showMessageDialog(null, "Failed Message");
 	}
 	public void doInvalidMessage() {
+		JOptionPane invalidMsg = new JOptionPane.showMessageDialog(null,"Invalid Input");
 	}
 	public void doAccountUpdatedMessage() {
-
+		JOptionPane accountUpdateMsg = new JOptionPane.showMessageDialog(null,"Account Updated successfully");
 	}
 	
 }
