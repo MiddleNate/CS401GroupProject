@@ -2,12 +2,15 @@ import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.ChronoUnit;
+import java.time.Clock;
 
 public class SavingsAccount extends BankAccount {
 	private double interestRate;
 	private double withdrawlLimit;
 	private LocalDate lastUpdated;
 	private double withdrawnSinceUpdated;
+	// for testing with certain dates
+	private static Clock clock = Clock.systemDefaultZone();
 	
 	public SavingsAccount(ArrayList<Customer> owner, double interest, double limit) {
 		id = ++count;
@@ -51,11 +54,16 @@ public class SavingsAccount extends BankAccount {
 		return balance;
 	}
 	
+	// for testing certain dates
+	public static void setClock(Clock c) {
+		clock = c;
+	}
+	
 	public void update() {
 		// do not update if the account is closed
 		if (!status) return;
 		
-		LocalDate currentMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
+		LocalDate currentMonth = LocalDate.now(clock).with(TemporalAdjusters.firstDayOfMonth());
 		// check if at least one month has passed since the last updated date
 		if (currentMonth.isAfter(lastUpdated)) {
 			// figure out how many months have passed (how many times we need to update)
