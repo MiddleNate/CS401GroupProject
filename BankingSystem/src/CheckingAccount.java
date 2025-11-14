@@ -12,34 +12,55 @@ public class CheckingAccount extends BankAccount {
 		transactions = new ArrayList<Transaction>();
 	}
 	
-	public boolean deposit(double amt) {
-		// do not deposit if account is closed
-		if (!status) return false;
-		
-		// ensure only positive amounts are being deposited
-		if (amt > 0) {
-			// truncate any extra decimal places
-			amt = Math.floor(amt * 100) / 100;
-			balance += amt;
-			return true;
+	public void tryTransaction(Transaction transaction) throws Exception {
+		if (transaction.getType() != TransactionType.Deposit
+				&& transaction.getType() != TransactionType.Withdrawal) {
+			throw new Exception("Invalid transaction type");
+		} else if (!status) {
+			throw new Exception("Account is closed");
 		} else {
-			return false;
+			if (transaction.getType() == TransactionType.Deposit) {
+				try {
+					deposit(transaction.getAmount());
+					transactions.add(new Transaction(transaction.getAmount(),
+							TransactionType.Deposit,
+							transaction.getUser(),
+							this));
+				} catch (Exception e) {
+					throw e;
+				}
+			} else if (transaction.getType() == TransactionType.Withdrawal) {
+				try {
+					withdraw(transaction.getAmount());
+					transactions.add(new Transaction(transaction.getAmount(),
+							TransactionType.Withdrawal,
+							transaction.getUser(),
+							this));
+				} catch (Exception e) {
+						throw e;
+				}
+			}
 		}
 	}
 	
-	public boolean withdraw(double amt) {
-		// do not withdraw if account is closed
-		if (!status) return false;
+	public void deposit(double amt) throws Exception {
+		// ensure only positive amounts are being deposited
+		if (amt < 0) throw new Exception("Cannot deposit negative amounts");
+
 		
+		// truncate any extra decimal places
+		amt = Math.floor(amt * 100) / 100;
+		balance += amt;
+	}
+	
+	public void withdraw(double amt) throws Exception{
 		// ensure only positive amounts are being withdrawn and
 		// that the balance will not go below zero
-		if (amt > 0 && balance - amt >= 0) {
-			// truncate any extra decimal places
-			amt = Math.floor(amt * 100) / 100;
-			balance -= amt;
-			return true;
-		} else {
-			return false;
-		}
+		if (amt < 0) throw new Exception("Cannot withdraw negative amounts");
+		if (balance - amt < 0) throw new Exception("Balance would go below zero");
+		
+		// truncate any extra decimal places
+		amt = Math.floor(amt * 100) / 100;
+		balance -= amt;
 	}
 }
