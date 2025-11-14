@@ -139,8 +139,14 @@ public class Server {
 								
 							}
 							// if no exception has been thrown, we are logged in successfully
+							
+							// set current user to the user we logged in as
+							user = Server.users.get(m.getUser().getUsername());
+							
+							// reply with a success message
 							Message reply = new Message(MessageType.Success,
 									Server.users.get(m.getUser().getUsername()));
+							out.writeObject(reply);
 							// the reply includes the user we logged in as so that the client will know
 							// if we are a customer or an employee and be able to use the correct gui
 						} catch (Exception e) {
