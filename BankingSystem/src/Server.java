@@ -259,7 +259,18 @@ public class Server {
 							out.writeObject(reply);
 							break; }
 						case MessageType.CreateCustomer: {
+							Message reply = null;
 							
+							// check that the username does not already exist in the user map
+							if (Server.users.containsKey(m.getUser().getUsername())) {
+								reply = new Message(MessageType.Fail);
+							} else {
+								// add the user to the map, and set the reply to a success
+								Server.users.put(m.getUser().getUsername(), m.getUser());
+								reply = new Message(MessageType.Success);
+							}
+							
+							out.writeObject(reply);
 							break; }
 						case MessageType.OpenAccount: {
 							
