@@ -130,7 +130,24 @@ public class Server {
 					
 					// if we are not logged in, only accept login messages
 					if (user == null && m.getType() == MessageType.Login) {
-						
+						try {
+							// try to login if the username exists in the map of users
+							if (Server.users.get(m.getUser().getUsername()) != null) {
+								
+								Server.users.get(m.getUser().getUsername()).tryLogin(
+										m.getUser().getUsername(), m.getUser().getPassword());
+								
+							}
+							// if no exception has been thrown, we are logged in successfully
+							Message reply = new Message(MessageType.Success,
+									Server.users.get(m.getUser().getUsername()));
+							// the reply includes the user we logged in as so that the client will know
+							// if we are a customer or an employee and be able to use the correct gui
+						} catch (Exception e) {
+							// if an exception is thrown by tryLogin, the login has failed
+							Message reply = new Message(MessageType.Fail);
+							out.writeObject(reply);
+						}
 						// await next message
 						continue;
 					}
