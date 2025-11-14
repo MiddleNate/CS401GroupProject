@@ -22,10 +22,10 @@ abstract class BankAccount implements Serializable {
 	public static int getCount() {
 		return count;
 	}
-
+	
 	public void removeUser(Customer cust) {
 		for (int i = 0; i < owners.size(); i++) {
-			if (owners.get(i).equals(cust)) {
+			if (owners.get(i).getCustomerID() == cust.getCustomerID()) {
 				owners.remove(i);
 			}
 		}
