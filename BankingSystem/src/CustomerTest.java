@@ -15,5 +15,6 @@ public class CustomerTest {
 		assertEquals("Password", customer.getPassword());
 		assertEquals("Name", customer.getCustomerName());
 		assertEquals(999, customer.getSocialSecNumber());
+		assertEquals(0, customer.getCustomerID());
 	}
 }
