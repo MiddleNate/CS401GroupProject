@@ -10,7 +10,7 @@ public class SavingsAccount extends BankAccount {
 	private LocalDate lastUpdated;
 	private double withdrawnSinceUpdated;
 	
-	public SavingsAccount(ArrayList<Customer> owner, double interest, double limit) {
+	public SavingsAccount(ArrayList<String> owner, double interest, double limit) {
 		id = ++count;
 		status = true;
 		type = AccountType.Savings;

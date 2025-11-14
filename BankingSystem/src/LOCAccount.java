@@ -11,7 +11,7 @@ public class LOCAccount extends BankAccount {
 	private LocalDate lastUpdated;
 	private double paidSinceUpdated;
 	
-	public LOCAccount(ArrayList<Customer> owner, double limit, double interest, double minimum) {
+	public LOCAccount(ArrayList<String> owner, double limit, double interest, double minimum) {
 		id = ++count;
 		status = true;
 		type = AccountType.LineOfCredit;

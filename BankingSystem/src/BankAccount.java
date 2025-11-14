@@ -6,13 +6,13 @@ abstract class BankAccount extends Throwable implements Serializable {
 	protected int id;
 	protected boolean status;
 	protected AccountType type;
-	protected ArrayList<Customer> owners;
+	protected ArrayList<String> owners;
 	protected double balance;
 	protected ArrayList<Transaction> transactions;
 	protected static int count;
 
-	public void addUser(Customer cust) {
-		owners.add(cust);
+	public void addUser(String username) {
+		owners.add(username);
 	}
 	
 	public static void setCount(int c) {
@@ -23,9 +23,9 @@ abstract class BankAccount extends Throwable implements Serializable {
 		return count;
 	}
 	
-	public void removeUser(Customer cust) {
+	public void removeOwner(String username) {
 		for (int i = 0; i < owners.size(); i++) {
-			if (owners.get(i).getCustomerID() == cust.getCustomerID()) {
+			if (owners.get(i).compareTo(username) == 0) {
 				owners.remove(i);
 			}
 		}
@@ -43,7 +43,7 @@ abstract class BankAccount extends Throwable implements Serializable {
 		return type;
 	}
 
-	public ArrayList<Customer> getOwners() {
+	public ArrayList<String> getOwners() {
 		return owners;
 	}
 
