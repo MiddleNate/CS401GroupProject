@@ -162,10 +162,18 @@ public class Server {
 						switch (m.getType()) {
 						case MessageType.Logout:
 							loggingout = true;
-							
 							break;
 						case MessageType.InfoRequest:
+							ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
 							
+							// for each of the account ids in the customer
+							for (int i = 0; i < ((Customer)user).getAccounts().size(); i++) {
+								// add the account to the arraylist we will send from the map 
+								accounts.add(Server.accounts.get(((Customer)user).getAccounts().get(i)));
+							}
+							
+							Message reply = new Message(MessageType.Info, accounts);
+							out.writeObject(reply);
 							break;
 						case MessageType.Transaction:
 							
