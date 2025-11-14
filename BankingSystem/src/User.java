@@ -34,4 +34,8 @@ public class User extends Throwable implements Serializable{
 			loggedIn = true;
 		}
 	}
+	
+	public void logout() {
+		loggedIn = false;
+	}
 }
