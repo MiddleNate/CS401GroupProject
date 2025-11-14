@@ -24,7 +24,7 @@ public class LOCAccount extends BankAccount {
 		creditLimit = limit;
 		interestRate = interest;
 		minimumDue = minimum;
-		lastUpdated = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
+		lastUpdated = LocalDate.now(clock).with(TemporalAdjusters.firstDayOfMonth());
 		paidSinceUpdated = 0;
 	}
 	
@@ -84,6 +84,7 @@ public class LOCAccount extends BankAccount {
 					balance *= 1 + interestRate;
 				}
 				paidSinceUpdated = 0;
+				lastUpdated = currentMonth;
 			}
 		}
 		// if no updates are needed, do nothing

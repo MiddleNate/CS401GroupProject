@@ -21,7 +21,7 @@ public class SavingsAccount extends BankAccount {
 		transactions = new ArrayList<Transaction>();
 		interestRate = interest;
 		withdrawlLimit = limit;
-		lastUpdated = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
+		lastUpdated = LocalDate.now(clock).with(TemporalAdjusters.firstDayOfMonth());
 		withdrawnSinceUpdated = 0;
 	}
 	
@@ -74,6 +74,7 @@ public class SavingsAccount extends BankAccount {
 			}
 			// reset the amount withdrawn since the last update
 			withdrawnSinceUpdated = 0;
+			lastUpdated = currentMonth;
 		}
 		// if no updates are needed, do nothing
 	}
