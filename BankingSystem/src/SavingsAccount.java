@@ -4,6 +4,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.ChronoUnit;
 
 public class SavingsAccount extends BankAccount {
+	private static final long serialVersionUID = 910L;
 	private double interestRate;
 	private double withdrawlLimit;
 	private LocalDate lastUpdated;
@@ -61,7 +62,8 @@ public class SavingsAccount extends BankAccount {
 			// figure out how many months have passed (how many times we need to update)
 			int numUpdates = (int) ChronoUnit.MONTHS.between(lastUpdated, currentMonth);
 			for (int i = 0; i < numUpdates; i++) {
-				// for each update, add the interest rate to the balance
+				// for each update, add the interest rate to the balance and log the transaction
+				transactions.add(new Transaction((balance * 1 + interestRate), TransactionType.Interest, null, this));
 				balance *= 1 + interestRate;
 			}
 			// reset the amount withdrawn since the last update
@@ -71,37 +73,65 @@ public class SavingsAccount extends BankAccount {
 		// if no updates are needed, do nothing
 	}
 	
-	public boolean deposit(double amt) {
-		// do not deposit if the account is closed
-		if (!status) return false;
-		
+	public void tryTransaction(Transaction transaction) throws Exception {
 		update();
-		if (amt > 0) {
-			// truncate any extra decimal places
-			amt = Math.floor(amt * 100) / 100;
-			balance += amt;
-			return true;
+		
+		// check that the type is either deposit or withdrawal
+		if (transaction.getType() != TransactionType.Deposit
+				&& transaction.getType() != TransactionType.Withdrawal) {
+			throw new Exception("Invalid transaction type");
+		// check that the account is not closed
+		} else if (!status) {
+			throw new Exception("Account is closed");
 		} else {
-			return false;
+			if (transaction.getType() == TransactionType.Deposit) {
+				try {
+					deposit(transaction.getAmount());
+					// if an exception was not thrown, log the transaction
+					transactions.add(new Transaction(transaction.getAmount(),
+							TransactionType.Deposit,
+							transaction.getUser(),
+							this));
+				} catch (Exception e) {
+					throw e;
+				}
+			} else if (transaction.getType() == TransactionType.Withdrawal) {
+				try {
+					withdraw(transaction.getAmount());
+					// if an exception was not thrown, log the transaction
+					transactions.add(new Transaction(transaction.getAmount(),
+							TransactionType.Withdrawal,
+							transaction.getUser(),
+							this));
+				} catch (Exception e) {
+						throw e;
+				}
+			}
 		}
 	}
 	
-	public boolean withdraw(double amt) {
-		// do not deposit if the account is closed
-		if (!status) return false;
-		
+	public void deposit(double amt) throws Exception {
 		update();
-		if (amt > 0
-				&& (withdrawnSinceUpdated + amt) < withdrawlLimit
-				&& balance - amt > 0) {
-			// truncate any extra decimal places
-			amt = Math.floor(amt * 100) / 100;
-			balance -= amt;
-			// add the amount towards the withdrawl limit
-			withdrawnSinceUpdated += amt;
-			return true;
-		} else {
-			return false;
-		}
+		// validation that the deposit can be completed
+		
+		if (amt > 0) throw new Exception("Cannot deposit negative amounts");
+		
+		// truncate any extra decimal places
+		amt = Math.floor(amt * 100) / 100;
+		balance += amt;
+	}
+	
+	public void withdraw(double amt) throws Exception {
+		update();
+		// validation that the withdrawal can be completed
+		if (amt < 0) throw new Exception("Cannot withdraw negative amounts");
+		if ((withdrawnSinceUpdated + amt) > withdrawlLimit) throw new Exception("Transaction would exceed withdrawal limit");
+		if (balance - amt < 0) throw new Exception("Balance would go below zero");
+		
+		// truncate any extra decimal places
+		amt = Math.floor(amt * 100) / 100;
+		balance -= amt;
+		// add the amount towards the withdrawal limit
+		withdrawnSinceUpdated += amt;
 	}
 }
