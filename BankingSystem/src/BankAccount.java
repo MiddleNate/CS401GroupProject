@@ -55,13 +55,11 @@ abstract class BankAccount extends Throwable implements Serializable {
 		return transactions;
 	}
 	
-	public boolean closeAccount() {
-		if (status == true && balance == 0) {
-			status = false;
-			return true;
-		} else {
-			return false;
-		}
+	public void closeAccount() throws Exception {
+		if (!status) throw new Exception("Account is already closed");
+		if (balance != 0) throw new Exception("Account balance is not zero");
+		
+		status = false;
 	}
 	
 	public void tryTransaction(Transaction transaction) throws Exception {
