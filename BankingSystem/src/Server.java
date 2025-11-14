@@ -168,10 +168,10 @@ public class Server {
 					// if we are logged in as a customer, accept inforequests and transactions only
 					if (user != null && user instanceof Customer) {
 						switch (m.getType()) {
-						case MessageType.Logout:
+						case MessageType.Logout: {
 							loggingout = true;
-							break;
-						case MessageType.InfoRequest:
+							break; }
+						case MessageType.InfoRequest: {
 							ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
 							
 							// for each of the account ids in the customer
@@ -182,10 +182,10 @@ public class Server {
 							
 							Message reply = new Message(MessageType.Info, accounts);
 							out.writeObject(reply);
-							break;
-						case MessageType.Transaction:
+							break; }
+						case MessageType.Transaction: {
 							
-							break;
+							break; }
 						default:
 							// do nothing for other message types
 							break;
@@ -195,27 +195,27 @@ public class Server {
 					// if we are logged in as an employee, accept inforequests, transactions, and account operations
 					if (user != null && user instanceof Employee) {
 						switch (m.getType()) {
-						case MessageType.Logout:
+						case MessageType.Logout: {
 							loggingout = true;
-							break;
-						case MessageType.InfoRequest:
+							break; }
+						case MessageType.InfoRequest: {
 							
-							break;
-						case MessageType.Transaction:
+							break; }
+						case MessageType.Transaction: {
 							
-							break;
-						case MessageType.CreateCustomer:
+							break; }
+						case MessageType.CreateCustomer: {
 							
-							break;
-						case MessageType.OpenAccount:
+							break; }
+						case MessageType.OpenAccount: {
 							
-							break;
-						case MessageType.CloseAccount:
+							break; }
+						case MessageType.CloseAccount: {
 							
-							break;
-						case MessageType.UpdateAccount:
+							break; }
+						case MessageType.UpdateAccount: {
 							
-							break;
+							break; }
 						default:
 							// do nothing for other message types
 							break;
