@@ -73,37 +73,28 @@ public class SavingsAccount extends BankAccount {
 		// if no updates are needed, do nothing
 	}
 	
-	public boolean deposit(double amt) {
-		// do not deposit if the account is closed
-		if (!status) return false;
-		
+	public void deposit(double amt) throws Exception {
 		update();
-		if (amt > 0) {
-			// truncate any extra decimal places
-			amt = Math.floor(amt * 100) / 100;
-			balance += amt;
-			return true;
-		} else {
-			return false;
-		}
+		// validation that the deposit can be completed
+		
+		if (amt > 0) throw new Exception("Cannot deposit negative amounts");
+		
+		// truncate any extra decimal places
+		amt = Math.floor(amt * 100) / 100;
+		balance += amt;
 	}
 	
-	public boolean withdraw(double amt) {
-		// do not deposit if the account is closed
-		if (!status) return false;
-		
+	public void withdraw(double amt) throws Exception {
 		update();
-		if (amt > 0
-				&& (withdrawnSinceUpdated + amt) < withdrawlLimit
-				&& balance - amt > 0) {
-			// truncate any extra decimal places
-			amt = Math.floor(amt * 100) / 100;
-			balance -= amt;
-			// add the amount towards the withdrawal limit
-			withdrawnSinceUpdated += amt;
-			return true;
-		} else {
-			return false;
-		}
+		// validation that the withdrawal can be completed
+		if (amt < 0) throw new Exception("Cannot withdraw negative amounts");
+		if ((withdrawnSinceUpdated + amt) > withdrawlLimit) throw new Exception("Transaction would exceed withdrawal limit");
+		if (balance - amt < 0) throw new Exception("Balance would go below zero");
+		
+		// truncate any extra decimal places
+		amt = Math.floor(amt * 100) / 100;
+		balance -= amt;
+		// add the amount towards the withdrawal limit
+		withdrawnSinceUpdated += amt;
 	}
 }
