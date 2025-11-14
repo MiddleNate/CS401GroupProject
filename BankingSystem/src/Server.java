@@ -93,8 +93,8 @@ public class Server {
 			
 			// write the users map to the file
 			FileOutputStream accountFile = new FileOutputStream("accounts.txt");
-			ObjectOutputStream accountStream = new ObjectOutputStream(userFile);
-			userStream.writeObject(accounts);
+			ObjectOutputStream accountStream = new ObjectOutputStream(accountFile);
+			accountStream.writeObject(accounts);
 			
 			PrintWriter countWriter = new PrintWriter("counts.txt");
 			countWriter.write(Integer.toString(Customer.getCustomerCount()) + "\n");
