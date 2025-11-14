@@ -14,6 +14,7 @@ public class Message implements Serializable {
 		// return an invalid message if the type does not match the valid types for this constructor
 		if (type != MessageType.Login 
 				&& type != MessageType.Logout 
+				&& type != MessageType.Success
 				&& type != MessageType.InfoRequest
 				&& type != MessageType.CreateCustomer) {
 			this.type = MessageType.Invalid;
