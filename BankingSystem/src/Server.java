@@ -273,7 +273,95 @@ public class Server {
 							out.writeObject(reply);
 							break; }
 						case MessageType.OpenAccount: {
+							Message reply = null;
 							
+							switch (m.getAccount().getType()) {
+							case AccountType.Checking: {
+								boolean invalid = false;
+								// check that the provided owners exist
+								for (int i = 0; i < m.getAccount().getOwners().size(); i++) {
+									if (!(Server.users.containsKey(m.getAccount().getOwners().get(i)))) {
+										invalid = true;
+									}
+								}
+								
+								if (invalid) {
+									reply = new Message(MessageType.Fail);
+									break;
+								}
+								
+								// put the new account if everything was valid
+								// a new object is created so that the id is set server-side
+								CheckingAccount newAcc = new CheckingAccount(m.getAccount().getOwners());
+								Server.accounts.put(newAcc.getID(), newAcc);
+								
+								reply = new Message(MessageType.Success);
+								break; }
+							case AccountType.Savings: {
+								boolean invalid = false;
+								// check that the provided owners exist
+								for (int i = 0; i < m.getAccount().getOwners().size(); i++) {
+									if (!(Server.users.containsKey(m.getAccount().getOwners().get(i)))) {
+										invalid = true;
+									}
+								}
+								
+								double interest = ((SavingsAccount) m.getAccount()).getInterest();
+								double limit = ((SavingsAccount) m.getAccount()).getWithdrawlLimit();
+								
+								
+								// check that interest and limit are positive
+								if (interest < 0 || limit < 0) {
+									invalid = true;
+								}
+								
+								if (invalid) {
+									reply = new Message(MessageType.Fail);
+									break;
+								}
+								
+								// put the new account if everything was valid
+								// a new object is created so that the id is set server-side
+								SavingsAccount newAcc = new SavingsAccount(m.getAccount().getOwners(), interest, limit);
+								Server.accounts.put(newAcc.getID(), newAcc);
+								
+								reply = new Message(MessageType.Success);
+								break ;}
+							case AccountType.LineOfCredit:  {
+								boolean invalid = false;
+								// check that the provided owners exist
+								for (int i = 0; i < m.getAccount().getOwners().size(); i++) {
+									if (!(Server.users.containsKey(m.getAccount().getOwners().get(i)))) {
+										invalid = true;
+									}
+								}
+								
+								double interest = ((LOCAccount) m.getAccount()).getInterest();
+								double limit = ((LOCAccount) m.getAccount()).getLimit();
+								double minimum = ((LOCAccount) m.getAccount()).getMinimumDue();
+								
+								
+								// check that interest, limit, and minimum due are positive
+								if (interest < 0 || limit < 0 || minimum < 0) {
+									invalid = true;
+								}
+								
+								if (invalid) {
+									reply = new Message(MessageType.Fail);
+									break;
+								}
+								
+								// put the new account if everything was valid
+								// a new object is created so that the id is set server-side
+								LOCAccount newAcc = new LOCAccount(m.getAccount().getOwners(), limit, interest, minimum);
+								Server.accounts.put(newAcc.getID(), newAcc);
+								
+								reply = new Message(MessageType.Success);
+								break ;}
+								
+							}
+							
+							out.writeObject(reply);
 							break; }
 						case MessageType.CloseAccount: {
 							
