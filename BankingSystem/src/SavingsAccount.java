@@ -99,7 +99,7 @@ public class SavingsAccount extends BankAccount {
 			// truncate any extra decimal places
 			amt = Math.floor(amt * 100) / 100;
 			balance -= amt;
-			// add the amount towards the withdrawl limit
+			// add the amount towards the withdrawal limit
 			withdrawnSinceUpdated += amt;
 			return true;
 		} else {
