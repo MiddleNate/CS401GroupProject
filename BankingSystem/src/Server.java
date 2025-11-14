@@ -364,7 +364,23 @@ public class Server {
 							out.writeObject(reply);
 							break; }
 						case MessageType.CloseAccount: {
+							Message reply = null;
 							
+							// check that the account exists
+							if (!Server.accounts.containsKey(m.getAccount().getID())) {
+								reply = new Message(MessageType.Fail);
+							} else {
+								try {
+									// try to close the account
+									Server.accounts.get(m.getAccount().getID()).closeAccount();
+									reply = new Message(MessageType.Success);
+								} catch (Exception e) {
+									// something went wrong if closeaccount throws
+									reply = new Message(MessageType.Fail);
+								}
+							}
+							
+							out.writeObject(reply);
 							break; }
 						case MessageType.UpdateAccount: {
 							
