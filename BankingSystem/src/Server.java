@@ -138,14 +138,16 @@ public class Server {
 					
 					// if we are not logged in, only accept login messages
 					if (user == null && m.getType() == MessageType.Login) {
-						Message reply;
+						Message reply = null;
 						try {
 							// try to login if the username exists in the map of users
-							if (Server.users.get(m.getUser().getUsername()) != null) {
+							if (Server.users.containsKey(m.getUser().getUsername())) {
 								
 								Server.users.get(m.getUser().getUsername()).tryLogin(
 										m.getUser().getUsername(), m.getUser().getPassword());
 								
+							} else {
+								throw new Exception("Username not found");
 							}
 							// if no exception has been thrown, we are logged in successfully
 							
@@ -161,7 +163,7 @@ public class Server {
 							reply = new Message(MessageType.Fail, e);
 						}
 						out.writeObject(reply);
-						// await next message
+						// skip to next loop so it doesn't try to handle the message twice
 						continue;
 					}
 					
@@ -289,7 +291,7 @@ public class Server {
 								// a new object is created so that the id is set server-side
 								CheckingAccount newAcc = new CheckingAccount(m.getAccount().getOwners());
 								Server.accounts.put(newAcc.getID(), newAcc);
-								
+								// TODO: NEED TO ADD THE ACCOUNT TO THE CUSTOMER'S LIST
 								reply = new Message(MessageType.Success);
 								break; }
 							case AccountType.Savings: {
@@ -314,7 +316,7 @@ public class Server {
 								// a new object is created so that the id is set server-side
 								SavingsAccount newAcc = new SavingsAccount(m.getAccount().getOwners(), interest, limit);
 								Server.accounts.put(newAcc.getID(), newAcc);
-								
+								// TODO: NEED TO ADD THE ACCOUNT TO THE CUSTOMER'S LIST
 								reply = new Message(MessageType.Success);
 								break ;}
 							case AccountType.LineOfCredit:  {
@@ -341,7 +343,7 @@ public class Server {
 								// a new object is created so that the id is set server-side
 								LOCAccount newAcc = new LOCAccount(m.getAccount().getOwners(), limit, interest, minimum);
 								Server.accounts.put(newAcc.getID(), newAcc);
-								
+								// TODO: NEED TO ADD THE ACCOUNT TO THE CUSTOMER'S LIST
 								reply = new Message(MessageType.Success);
 								break ;}
 								
@@ -359,6 +361,7 @@ public class Server {
 								try {
 									// try to close the account
 									Server.accounts.get(m.getAccount().getID()).closeAccount();
+									// TODO: NEED TO REMOVE THE ACCOUNT FROM THE CUSTOMER'S LIST
 									reply = new Message(MessageType.Success);
 								} catch (Exception e) {
 									// something went wrong if closeaccount throws
@@ -426,6 +429,7 @@ public class Server {
 								reply = new Message(MessageType.Fail, new Exception("Account is closed"));
 							} else {
 								Server.accounts.get(m.getAccount().getID()).addUser(m.getUser().getUsername());
+								// 	TODO: NEED TO ADD THE ACCOUNT ID TO CUSTOMER'S LIST
 								reply = new Message(MessageType.Success);
 							}
 							
@@ -444,6 +448,7 @@ public class Server {
 							} else {
 								// this will still return a success if the user was not on the account to begin with
 								Server.accounts.get(m.getAccount().getID()).removeOwner(m.getUser().getUsername());
+								// TODO: NEED TO REMOVE THE ACCOUNT ID TO CUSTOMER'S LIST
 								reply = new Message(MessageType.Success);
 							}
 							
