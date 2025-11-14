@@ -414,6 +414,23 @@ public class Server {
 								out.writeObject(reply);
 							}
 							break; }
+						case MessageType.AddToAccount: {
+							Message reply = null;
+							
+							// validate that the account exists and the user exists and account is not closed
+							if (!Server.accounts.containsKey(m.getAccount().getID())) {
+								reply = new Message(MessageType.Fail, new Exception("Account does not exist"));
+							} else if (!Server.users.containsKey(m.getUser().getUsername())) {
+								reply = new Message(MessageType.Fail, new Exception("User does not exist"));
+							} else if (Server.accounts.get(m.getAccount().getID()).isOpen()) {
+								reply = new Message(MessageType.Fail, new Exception("Account is closed"));
+							} else {
+								Server.accounts.get(m.getAccount().getID()).addUser(m.getUser().getUsername());
+								reply = new Message(MessageType.Success);
+							}
+							
+							out.writeObject(reply);
+						break; }
 						default:
 							// do nothing for other message types
 							break;
