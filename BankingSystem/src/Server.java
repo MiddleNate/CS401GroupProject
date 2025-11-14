@@ -184,7 +184,26 @@ public class Server {
 							out.writeObject(reply);
 							break; }
 						case MessageType.Transaction: {
+							Message reply = null;
 							
+							// check that the account specified in the message
+							// is in the list of accounts owned by the current user
+							if (!(((Customer)user).getAccounts().contains(m.getTransaction().getAccount().getID()))) {
+								reply = new Message(MessageType.Fail);
+							} else {
+								try {
+									// pass the message to the account to be tried
+									Server.accounts.get(m.getTransaction().getAccount().getID()).tryTransaction(m.getTransaction());
+									// if no exception was thrown, the transaction was successful
+									// so we can set the reply to success
+									reply = new Message(MessageType.Success);
+								} catch (Exception e) {
+									reply = new Message(MessageType.Fail);
+								}
+							}
+							
+							// send the reply
+							out.writeObject(reply);
 							break; }
 						default:
 							// do nothing for other message types
