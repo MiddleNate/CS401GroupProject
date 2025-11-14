@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.io.Serializable;
 
-abstract class BankAccount implements Serializable {
+abstract class BankAccount extends Throwable implements Serializable {
 	private static final long serialVersionUID = 870L;
 	protected int id;
 	protected boolean status;
