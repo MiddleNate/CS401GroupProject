@@ -218,7 +218,23 @@ public class Server {
 							loggingout = true;
 							break; }
 						case MessageType.InfoRequest: {
-							
+							Message reply = null;
+							// check that the user provided in the inforequest exists
+							if (Server.users.containsKey(m.getUser().getUsername())) {
+								Customer tempCustomer = (Customer) Server.users.get(m.getUser().getUsername());
+								ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
+								
+								// for each of the account ids in the customer
+								for (int i = 0; i < tempCustomer.getAccounts().size(); i++) {
+									// add the account to the arraylist we will send from the map 
+									accounts.add(Server.accounts.get(((Customer)user).getAccounts().get(i)));
+								}
+								
+								reply = new Message(MessageType.Info, accounts);
+							} else {
+								reply = new Message(MessageType.Fail);
+							}
+							out.writeObject(reply);
 							break; }
 						case MessageType.Transaction: {
 							Message reply = null;
