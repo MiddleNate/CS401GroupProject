@@ -72,6 +72,8 @@ public class Server {
 				new Thread(handler).start();
 			}
 			
+			scan.close();
+			
 		} catch (Exception e) {
 			System.out.println(e);
 		}
@@ -101,6 +103,12 @@ public class Server {
 			countWriter.write(Integer.toString(Employee.getEmployeeCount()) + "\n");
 			countWriter.write(Integer.toString(BankAccount.getCount()) + "\n");
 			countWriter.write(Integer.toString(Transaction.getTransactionCount()) + "\n");
+			
+			userFile.close();
+			accountFile.close();
+			userStream.close();
+			accountStream.close();
+			countWriter.close();
 		} catch (Exception e) {
 			
 		}
