@@ -73,6 +73,43 @@ public class SavingsAccount extends BankAccount {
 		// if no updates are needed, do nothing
 	}
 	
+	public void tryTransaction(Transaction transaction) throws Exception {
+		update();
+		
+		// check that the type is either deposit or withdrawal
+		if (transaction.getType() != TransactionType.Deposit
+				&& transaction.getType() != TransactionType.Withdrawal) {
+			throw new Exception("Invalid transaction type");
+		// check that the account is not closed
+		} else if (!status) {
+			throw new Exception("Account is closed");
+		} else {
+			if (transaction.getType() == TransactionType.Deposit) {
+				try {
+					deposit(transaction.getAmount());
+					// if an exception was not thrown, log the transaction
+					transactions.add(new Transaction(transaction.getAmount(),
+							TransactionType.Deposit,
+							transaction.getUser(),
+							this));
+				} catch (Exception e) {
+					throw e;
+				}
+			} else if (transaction.getType() == TransactionType.Withdrawal) {
+				try {
+					withdraw(transaction.getAmount());
+					// if an exception was not thrown, log the transaction
+					transactions.add(new Transaction(transaction.getAmount(),
+							TransactionType.Withdrawal,
+							transaction.getUser(),
+							this));
+				} catch (Exception e) {
+						throw e;
+				}
+			}
+		}
+	}
+	
 	public void deposit(double amt) throws Exception {
 		update();
 		// validation that the deposit can be completed
