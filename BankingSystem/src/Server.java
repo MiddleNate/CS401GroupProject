@@ -162,6 +162,7 @@ public class Server {
 					if (user != null && user instanceof Customer) {
 						switch (m.getType()) {
 						case MessageType.Logout:
+							loggingout = true;
 							
 							break;
 						case MessageType.InfoRequest:
@@ -180,7 +181,7 @@ public class Server {
 					if (user != null && user instanceof Employee) {
 						switch (m.getType()) {
 						case MessageType.Logout:
-							
+							loggingout = true;
 							break;
 						case MessageType.InfoRequest:
 							
@@ -211,8 +212,17 @@ public class Server {
 				// this will catch exceptions with the inputstream only
 				
 			} finally {
-				// close resources and set the client as not logged in since we are disconnecting
+				// make sure to logout if we are logged in
+				if (user != null) Server.users.get(user.getUsername()).logout();
 				
+				// close resources
+				try {
+					out.close();
+					in.close();
+					client.close();
+				} catch (Exception e) {
+					System.out.println("Error closing resources: " + e);
+				}
 			}
 		}
 	}
