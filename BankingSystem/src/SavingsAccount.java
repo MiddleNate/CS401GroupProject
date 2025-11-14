@@ -62,7 +62,8 @@ public class SavingsAccount extends BankAccount {
 			// figure out how many months have passed (how many times we need to update)
 			int numUpdates = (int) ChronoUnit.MONTHS.between(lastUpdated, currentMonth);
 			for (int i = 0; i < numUpdates; i++) {
-				// for each update, add the interest rate to the balance
+				// for each update, add the interest rate to the balance and log the transaction
+				transactions.add(new Transaction((balance * 1 + interestRate), TransactionType.Interest, null, this));
 				balance *= 1 + interestRate;
 			}
 			// reset the amount withdrawn since the last update

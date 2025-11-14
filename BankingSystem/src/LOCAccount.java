@@ -72,8 +72,10 @@ public class LOCAccount extends BankAccount {
 				// only charge interest if the minimum has not been paid
 				// if multiple months have elapsed, this will only apply 
 				// to the first month since paidSinceUpdated gets reset to 0
-				// if the balance is 0 no interest will be charged by the equation
-				if (paidSinceUpdated < minimumDue) {
+				// only applies if the balance is greater than 0
+				if (paidSinceUpdated < minimumDue && balance > 0) {
+					// also logs the transaction as it is applied
+					transactions.add(new Transaction((balance * 1 + interestRate), TransactionType.Interest, null, this));
 					balance *= 1 + interestRate;
 				}
 				paidSinceUpdated = 0;
