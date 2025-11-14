@@ -110,7 +110,7 @@ public class Server {
 			accountStream.close();
 			countWriter.close();
 		} catch (Exception e) {
-			
+			System.out.println("Saving error: " + e);
 		}
 	}
 	
