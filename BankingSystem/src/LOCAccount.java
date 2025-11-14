@@ -85,10 +85,7 @@ public class LOCAccount extends BankAccount {
 		// if no updates are needed, do nothing
 	}
 	
-	public boolean withdraw(double amt) {
-		// do not allow withdrawal if the account is closed
-		if (!status) return false;
-		
+	public void withdraw(double amt) throws Exception {
 		update();
 		
 		// since the balance represents debt owed, withdraw will add
@@ -96,35 +93,28 @@ public class LOCAccount extends BankAccount {
 		
 		// check that the provided amount was positive and that the
 		// withdrawal will not exceed the credit limit
-		if (amt > 0 && amt + balance <= creditLimit) {
-			// truncate any extra decimal places
-			amt = Math.floor(amt * 100) / 100;
-			balance += amt;
-			return true;
-		} else {
-			return false;
-		}
+		if (amt < 0) throw new Exception("Cannot withdraw negative amount");
+		if (amt + balance > creditLimit) throw new Exception("Withdrawal would exceed credit limit");
+
+		// truncate any extra decimal places
+		amt = Math.floor(amt * 100) / 100;
+		balance += amt;
 	}
 	
-	public boolean pay(double amt) {
-		// do not allow payment if the amount is closed
-		if (!status) return false;
-		
+	public void pay(double amt) throws Exception {
 		update();
 		
-		// since the balance represents debt owed, paying with subtract
+		// since the balance represents debt owed, paying will subtract
 		// from the balance instead of adding
 		
 		// check that the provided amount was positive
 		// and will not pay more than the balance
-		if (amt > 0 && balance - amt >= 0) {
-			// truncate any extra decimal places
-			amt = Math.floor(amt * 100) / 100;
-			balance -= amt;
-			paidSinceUpdated += amt;
-			return true;
-		} else {
-			return false;
-		}
+		if (amt < 0) throw new Exception("Cannot pay negative amount");
+		if (balance - amt < 0) throw new Exception("Balance would go below zero");
+		
+		// truncate any extra decimal places
+		amt = Math.floor(amt * 100) / 100;
+		balance -= amt;
+		paidSinceUpdated += amt;
 	}
 }
