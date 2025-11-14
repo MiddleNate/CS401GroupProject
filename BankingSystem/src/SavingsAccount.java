@@ -4,6 +4,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.ChronoUnit;
 
 public class SavingsAccount extends BankAccount {
+	private static final long serialVersionUID = 910L;
 	private double interestRate;
 	private double withdrawlLimit;
 	private LocalDate lastUpdated;

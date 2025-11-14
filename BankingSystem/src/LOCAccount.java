@@ -4,6 +4,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.ChronoUnit;
 
 public class LOCAccount extends BankAccount {
+	private static final long serialVersionUID = 970L;
 	private double creditLimit;
 	private double interestRate;
 	private double minimumDue;

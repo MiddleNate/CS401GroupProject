@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 
 public class CheckingAccount extends BankAccount {
+	private static final long serialVersionUID = 900L;
+
 	public CheckingAccount(ArrayList<Customer> owner) {
 		id = ++count;
 		status = true;
