@@ -5,14 +5,14 @@ public class Customer extends User {
 	private static int customerCount = 0;
 	private int id;
 	private int socialSecNumber;
-	private ArrayList<BankAccount> accounts;
+	private ArrayList<Integer> accounts;
 
 	public Customer(String username, String password, String customerName, int socialSecNumber) {
 		super(username, password);
 		this.customerName = customerName;
 		this.id = ++customerCount;
 		this.socialSecNumber = socialSecNumber;
-		this.accounts = new ArrayList<BankAccount>();
+		this.accounts = new ArrayList<Integer>();
 	}
 	
 	public static void setCustomerCount(int newCount) {
@@ -37,5 +37,9 @@ public class Customer extends User {
 
 	public int getSocialSecNumber() {
 		return this.socialSecNumber;
+	}
+	
+	public ArrayList<Integer> getAccounts() {
+		return accounts;
 	}
 }
