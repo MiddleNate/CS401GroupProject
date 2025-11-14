@@ -9,6 +9,7 @@ public class Message implements Serializable {
 	private BankAccount account;
 	private ArrayList<BankAccount> accounts;
 	private Transaction transaction;
+	private Exception exception;
 	
 	public Message(MessageType type, User user) {
 		// return an invalid message if the type does not match the valid types for this constructor
@@ -22,12 +23,14 @@ public class Message implements Serializable {
 			account = null;
 			accounts = null;
 			transaction = null;
+			exception = null;
 		} else {
 			this.type = type;
 			this.user = user;
 			account = null;
 			accounts = null;
 			transaction = null;
+			exception = null;
 		}
 	}
 	
@@ -39,12 +42,14 @@ public class Message implements Serializable {
 			account = null;
 			this.accounts = null;
 			transaction = null;
+			exception = null;
 		} else {
 			this.type = type;
 			user = null;
 			account = null;
 			this.accounts = accounts;
 			transaction = null;
+			exception = null;
 		}
 	}
 	
@@ -56,12 +61,14 @@ public class Message implements Serializable {
 			account = null;
 			accounts = null;
 			this.transaction = null;
+			exception = null;
 		} else {
 			this.type = type;
 			user = null;
 			account = null;
 			this.accounts = null;
 			this.transaction = transaction;
+			exception = null;
 		}
 	}
 	
@@ -74,12 +81,14 @@ public class Message implements Serializable {
 			account = null;
 			accounts = null;
 			transaction = null;
+			exception = null;
 		} else {
 			this.type = type;
 			user = null;
 			account = null;
 			accounts = null;
 			transaction = null;
+			exception = null;
 		}
 	}
 	
@@ -93,13 +102,35 @@ public class Message implements Serializable {
 			this.account = null;
 			accounts = null;
 			transaction = null;
+			exception = null;
 		} else {
-			this.type = MessageType.Invalid;
+			this.type = type;
 			user = null;
 			this.account = account;
 			accounts = null;
 			transaction = null;
+			exception = null;
 		}
+	}
+	
+	public Message(MessageType type, Exception exception) {
+		// return an invalid message if the type does not match the the valid type for this constructor
+		if (type != MessageType.Fail) {
+			this.type = MessageType.Invalid;
+			user = null;
+			account = null;
+			accounts = null;
+			transaction = null;
+			this.exception = null;
+		} else {
+			this.type = type;
+			user = null;
+			account = null;
+			accounts = null;
+			transaction = null;
+			this.exception = exception;
+		}
+	}
 	}
 	
 	public MessageType getType() {
@@ -120,5 +151,9 @@ public class Message implements Serializable {
 	
 	public Transaction getTransaction() {
 		return transaction;
+	}
+	
+	public Exception getException() {
+		return exception;
 	}
 }
