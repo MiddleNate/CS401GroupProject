@@ -66,6 +66,7 @@ public class SavingsAccount extends BankAccount {
 			}
 			// reset the amount withdrawn since the last update
 			withdrawnSinceUpdated = 0;
+			lastUpdated = currentMonth;
 		}
 		// if no updates are needed, do nothing
 	}

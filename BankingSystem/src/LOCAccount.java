@@ -76,6 +76,7 @@ public class LOCAccount extends BankAccount {
 					balance *= 1 + interestRate;
 				}
 				paidSinceUpdated = 0;
+				lastUpdated = currentMonth;
 			}
 		}
 		// if no updates are needed, do nothing
