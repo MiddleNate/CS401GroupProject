@@ -383,7 +383,50 @@ public class Server {
 							out.writeObject(reply);
 							break; }
 						case MessageType.UpdateAccount: {
+							Message reply = null;
+							int id = m.getAccount().getID();
 							
+							// check that the account exists and type matches
+							if (!Server.accounts.containsKey(id) || Server.accounts.get(id).getType() != m.getAccount().getType()) {
+								reply = new Message(MessageType.Fail);
+							} else {
+								switch (m.getAccount().getType()) {
+								case AccountType.Checking: {
+									// checking accounts have no fields to be modified, so it fails
+									reply = new Message(MessageType.Fail);
+									break; }
+								case AccountType.Savings: {
+									// validate the fields that will be modified
+									double interest = ((LOCAccount) m.getAccount()).getInterest();
+									double limit = ((LOCAccount) m.getAccount()).getLimit();
+									if (interest < 0 || limit < 0) {
+										reply = new Message(MessageType.Fail);
+										break;
+									}
+									
+									((SavingsAccount) Server.accounts.get(id)).setInterest(interest);
+									((SavingsAccount) Server.accounts.get(id)).setWithdrawlLimit(limit);
+									reply = new Message(MessageType.Success);
+									break; }
+								case AccountType.LineOfCredit: {
+									// validate the fields that will be modified
+									double interest = ((LOCAccount) m.getAccount()).getInterest();
+									double limit = ((LOCAccount) m.getAccount()).getLimit();
+									double minimum = ((LOCAccount) m.getAccount()).getMinimumDue();
+									if (interest < 0 || limit < 0 || minimum < 0) {
+										reply = new Message(MessageType.Fail);
+										break;
+									}
+									
+									((LOCAccount) Server.accounts.get(id)).setInterest(interest);
+									((LOCAccount) Server.accounts.get(id)).setCreditLimit(limit);
+									((LOCAccount) Server.accounts.get(id)).setMinimumDue(minimum);
+									reply = new Message(MessageType.Success);
+									break;}
+								}
+								
+								out.writeObject(reply);
+							}
 							break; }
 						default:
 							// do nothing for other message types
