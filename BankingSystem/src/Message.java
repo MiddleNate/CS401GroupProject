@@ -20,17 +20,17 @@ public class Message implements Serializable {
 				&& type != MessageType.CreateCustomer) {
 			this.type = MessageType.Invalid;
 			this.user = null;
-			account = null;
-			accounts = null;
-			transaction = null;
-			exception = null;
+			this.account = null;
+			this.accounts = null;
+			this.transaction = null;
+			this.exception = null;
 		} else {
 			this.type = type;
 			this.user = user;
-			account = null;
-			accounts = null;
-			transaction = null;
-			exception = null;
+			this.account = null;
+			this.accounts = null;
+			this.transaction = null;
+			this.exception = null;
 		}
 	}
 	
@@ -38,18 +38,18 @@ public class Message implements Serializable {
 		// return an invalid message if the type does not match the the valid type for this constructor
 		if (type != MessageType.Info) {
 			this.type = MessageType.Invalid;
-			user = null;
-			account = null;
+			this.user = null;
+			this.account = null;
 			this.accounts = null;
-			transaction = null;
-			exception = null;
+			this.transaction = null;
+			this.exception = null;
 		} else {
 			this.type = type;
-			user = null;
-			account = null;
+			this.user = null;
+			this.account = null;
 			this.accounts = accounts;
-			transaction = null;
-			exception = null;
+			this.transaction = null;
+			this.exception = null;
 		}
 	}
 	
@@ -57,18 +57,18 @@ public class Message implements Serializable {
 		// return an invalid message if the type does not match the the valid type for this constructor
 		if (type != MessageType.Transaction) {
 			this.type = MessageType.Invalid;
-			user = null;
-			account = null;
-			accounts = null;
+			this.user = null;
+			this.account = null;
+			this.accounts = null;
 			this.transaction = null;
-			exception = null;
+			this.exception = null;
 		} else {
 			this.type = type;
-			user = null;
-			account = null;
+			this.user = null;
+			this.account = null;
 			this.accounts = null;
 			this.transaction = transaction;
-			exception = null;
+			this.exception = null;
 		}
 	}
 	
@@ -77,18 +77,18 @@ public class Message implements Serializable {
 		if (type != MessageType.Success
 				&& type != MessageType.Fail) {
 			this.type = MessageType.Invalid;
-			user = null;
-			account = null;
-			accounts = null;
-			transaction = null;
-			exception = null;
+			this.user = null;
+			this.account = null;
+			this.accounts = null;
+			this.transaction = null;
+			this.exception = null;
 		} else {
 			this.type = type;
-			user = null;
-			account = null;
-			accounts = null;
-			transaction = null;
-			exception = null;
+			this.user = null;
+			this.account = null;
+			this.accounts = null;
+			this.transaction = null;
+			this.exception = null;
 		}
 	}
 	
@@ -98,18 +98,18 @@ public class Message implements Serializable {
 				&& type != MessageType.CloseAccount
 				&& type != MessageType.UpdateAccount) {
 			this.type = MessageType.Invalid;
-			user = null;
+			this.user = null;
 			this.account = null;
-			accounts = null;
-			transaction = null;
-			exception = null;
+			this.accounts = null;
+			this.transaction = null;
+			this.exception = null;
 		} else {
 			this.type = type;
-			user = null;
+			this.user = null;
 			this.account = account;
-			accounts = null;
-			transaction = null;
-			exception = null;
+			this.accounts = null;
+			this.transaction = null;
+			this.exception = null;
 		}
 	}
 	
@@ -117,17 +117,17 @@ public class Message implements Serializable {
 		// return an invalid message if the type does not match the the valid type for this constructor
 		if (type != MessageType.Fail) {
 			this.type = MessageType.Invalid;
-			user = null;
-			account = null;
-			accounts = null;
-			transaction = null;
+			this.user = null;
+			this.account = null;
+			this.accounts = null;
+			this.transaction = null;
 			this.exception = null;
 		} else {
 			this.type = type;
-			user = null;
-			account = null;
-			accounts = null;
-			transaction = null;
+			this.user = null;
+			this.account = null;
+			this.accounts = null;
+			this.transaction = null;
 			this.exception = exception;
 		}
 	}
@@ -139,16 +139,16 @@ public class Message implements Serializable {
 			this.type = MessageType.Invalid;
 			this.user = null;
 			this.account  = null;
-			accounts = null;
-			transaction = null;
-			exception = null;
+			this.accounts = null;
+			this.transaction = null;
+			this.exception = null;
 		} else {
 			this.type = type;
 			this.user = user;
 			this.account = account;
-			accounts = null;
-			transaction = null;
-			exception = null;
+			this.accounts = null;
+			this.transaction = null;
+			this.exception = null;
 		}
 	}
 	
