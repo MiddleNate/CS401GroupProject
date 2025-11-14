@@ -12,6 +12,7 @@ public class CheckingAccount extends BankAccount {
 		transactions = new ArrayList<Transaction>();
 	}
 	
+	@Override
 	public void tryTransaction(Transaction transaction) throws Exception {
 		// check that the type is either deposit or withdrawal
 		if (transaction.getType() != TransactionType.Deposit

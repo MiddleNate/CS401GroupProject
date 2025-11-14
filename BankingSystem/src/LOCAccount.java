@@ -85,6 +85,7 @@ public class LOCAccount extends BankAccount {
 		// if no updates are needed, do nothing
 	}
 	
+	@Override
 	public void tryTransaction(Transaction transaction) throws Exception {
 		update();
 		
