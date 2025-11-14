@@ -188,7 +188,7 @@ public class Server {
 							
 							// check that the account specified in the message
 							// is in the list of accounts owned by the current user
-							if (!(((Customer)user).getAccounts().contains(m.getTransaction().getAccount().getID()))) {
+							if (!((Customer)user).getAccounts().contains(m.getTransaction().getAccount().getID())) {
 								reply = new Message(MessageType.Fail);
 							} else {
 								try {
@@ -280,7 +280,7 @@ public class Server {
 								boolean invalid = false;
 								// check that the provided owners exist
 								for (int i = 0; i < m.getAccount().getOwners().size(); i++) {
-									if (!(Server.users.containsKey(m.getAccount().getOwners().get(i)))) {
+									if (!Server.users.containsKey(m.getAccount().getOwners().get(i))) {
 										invalid = true;
 									}
 								}
@@ -301,7 +301,7 @@ public class Server {
 								boolean invalid = false;
 								// check that the provided owners exist
 								for (int i = 0; i < m.getAccount().getOwners().size(); i++) {
-									if (!(Server.users.containsKey(m.getAccount().getOwners().get(i)))) {
+									if (!Server.users.containsKey(m.getAccount().getOwners().get(i))) {
 										invalid = true;
 									}
 								}
@@ -331,7 +331,7 @@ public class Server {
 								boolean invalid = false;
 								// check that the provided owners exist
 								for (int i = 0; i < m.getAccount().getOwners().size(); i++) {
-									if (!(Server.users.containsKey(m.getAccount().getOwners().get(i)))) {
+									if (!Server.users.containsKey(m.getAccount().getOwners().get(i))) {
 										invalid = true;
 									}
 								}
