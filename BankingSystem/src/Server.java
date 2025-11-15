@@ -476,7 +476,7 @@ public class Server {
 				
 			} catch (Exception e) {
 				// this will catch exceptions with the inputstream only
-				
+				System.out.println("ClientHandler Error: " + e);
 			} finally {
 				// make sure to logout if we are logged in
 				if (user != null) Server.users.get(user.getUsername()).logout();
