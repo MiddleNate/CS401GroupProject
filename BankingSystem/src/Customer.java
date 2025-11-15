@@ -42,4 +42,12 @@ public class Customer extends User {
 	public ArrayList<Integer> getAccounts() {
 		return accounts;
 	}
+	
+	public void addAccount(int acc) {
+		accounts.add(acc);
+	}
+	
+	public void removeAccount(int acc) {
+		accounts.remove(Integer.valueOf(acc));
+	}
 }
