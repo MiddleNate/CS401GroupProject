@@ -86,7 +86,7 @@ public class LOCAccount extends BankAccount {
 	}
 	
 	@Override
-	public void tryTransaction(Transaction transaction) throws Exception {
+	public void tryTransaction(Transaction transaction, User user) throws Exception {
 		update();
 		
 		// check that the type is either deposit or withdrawal
@@ -103,7 +103,7 @@ public class LOCAccount extends BankAccount {
 					// if an exception was not thrown, log the transaction
 					transactions.add(new Transaction(transaction.getAmount(),
 							TransactionType.Withdrawal,
-							transaction.getUser(),
+							user,
 							this));
 				} catch (Exception e) {
 					throw e;
@@ -114,7 +114,7 @@ public class LOCAccount extends BankAccount {
 					// if an exception was not thrown, log the transaction
 					transactions.add(new Transaction(transaction.getAmount(),
 							TransactionType.Payment,
-							transaction.getUser(),
+							user,
 							this));
 				} catch (Exception e) {
 						throw e;

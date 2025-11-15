@@ -195,7 +195,7 @@ public class Server {
 							} else {
 								try {
 									// pass the message to the account to be tried
-									Server.accounts.get(m.getTransaction().getAccount().getID()).tryTransaction(m.getTransaction());
+									Server.accounts.get(accountID).tryTransaction(m.getTransaction(), user);
 									// if no exception was thrown, the transaction was successful
 									// so we can set the reply to success
 									reply = new Message(MessageType.Success);
@@ -248,7 +248,7 @@ public class Server {
 							} else {
 								try {
 									// pass the message to the account to be tried
-									Server.accounts.get(m.getTransaction().getAccount().getID()).tryTransaction(m.getTransaction());
+									Server.accounts.get(accountID).tryTransaction(m.getTransaction(), user);
 									// if no exception was thrown, the transaction was successful
 									// so we can set the reply to success
 									reply = new Message(MessageType.Success);

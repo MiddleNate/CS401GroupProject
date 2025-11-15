@@ -13,7 +13,7 @@ public class CheckingAccount extends BankAccount {
 	}
 
 	@Override
-	public void tryTransaction(Transaction transaction) throws Exception {
+	public void tryTransaction(Transaction transaction, User user) throws Exception {
 		// check that the type is either deposit or withdrawal
 		if (transaction.getType() != TransactionType.Deposit
 				&& transaction.getType() != TransactionType.Withdrawal) {
@@ -28,7 +28,7 @@ public class CheckingAccount extends BankAccount {
 					// if an exception was not thrown, log the transaction
 					transactions.add(new Transaction(transaction.getAmount(),
 							TransactionType.Deposit,
-							transaction.getUser(),
+							user,
 							this));
 				} catch (Exception e) {
 					throw e;
@@ -39,7 +39,7 @@ public class CheckingAccount extends BankAccount {
 					// if an exception was not thrown, log the transaction
 					transactions.add(new Transaction(transaction.getAmount(),
 							TransactionType.Withdrawal,
-							transaction.getUser(),
+							user,
 							this));
 				} catch (Exception e) {
 						throw e;
