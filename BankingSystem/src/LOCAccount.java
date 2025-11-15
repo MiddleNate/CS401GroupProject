@@ -5,6 +5,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.Clock;
 
 public class LOCAccount extends BankAccount {
+	private static final long serialVersionUID = 970L;
 	private double creditLimit;
 	private double interestRate;
 	private double minimumDue;
@@ -79,8 +80,10 @@ public class LOCAccount extends BankAccount {
 				// only charge interest if the minimum has not been paid
 				// if multiple months have elapsed, this will only apply 
 				// to the first month since paidSinceUpdated gets reset to 0
-				// if the balance is 0 no interest will be charged by the equation
-				if (paidSinceUpdated < minimumDue) {
+				// only applies if the balance is greater than 0
+				if (paidSinceUpdated < minimumDue && balance > 0) {
+					// also logs the transaction as it is applied
+					transactions.add(new Transaction((balance * 1 + interestRate), TransactionType.Interest, null, this));
 					balance *= 1 + interestRate;
 				}
 				paidSinceUpdated = 0;
@@ -90,10 +93,44 @@ public class LOCAccount extends BankAccount {
 		// if no updates are needed, do nothing
 	}
 	
-	public boolean withdraw(double amt) {
-		// do not allow withdrawal if the account is closed
-		if (!status) return false;
+	public void tryTransaction(Transaction transaction) throws Exception {
+		update();
 		
+		// check that the type is either deposit or withdrawal
+		if (transaction.getType() != TransactionType.Withdrawal
+				&& transaction.getType() != TransactionType.Payment) {
+			throw new Exception("Invalid transaction type");
+		// check that the account is not closed
+		} else if (!status) {
+			throw new Exception("Account is closed");
+		} else {
+			if (transaction.getType() == TransactionType.Withdrawal) {
+				try {
+					withdraw(transaction.getAmount());
+					// if an exception was not thrown, log the transaction
+					transactions.add(new Transaction(transaction.getAmount(),
+							TransactionType.Withdrawal,
+							transaction.getUser(),
+							this));
+				} catch (Exception e) {
+					throw e;
+				}
+			} else if (transaction.getType() == TransactionType.Payment) {
+				try {
+					withdraw(transaction.getAmount());
+					// if an exception was not thrown, log the transaction
+					transactions.add(new Transaction(transaction.getAmount(),
+							TransactionType.Payment,
+							transaction.getUser(),
+							this));
+				} catch (Exception e) {
+						throw e;
+				}
+			}
+		}
+	}
+	
+	public void withdraw(double amt) throws Exception {
 		update();
 		
 		// since the balance represents debt owed, withdraw will add
@@ -101,35 +138,28 @@ public class LOCAccount extends BankAccount {
 		
 		// check that the provided amount was positive and that the
 		// withdrawal will not exceed the credit limit
-		if (amt > 0 && amt + balance <= creditLimit) {
-			// truncate any extra decimal places
-			amt = Math.floor(amt * 100) / 100;
-			balance += amt;
-			return true;
-		} else {
-			return false;
-		}
+		if (amt < 0) throw new Exception("Cannot withdraw negative amount");
+		if (amt + balance > creditLimit) throw new Exception("Withdrawal would exceed credit limit");
+
+		// truncate any extra decimal places
+		amt = Math.floor(amt * 100) / 100;
+		balance += amt;
 	}
 	
-	public boolean pay(double amt) {
-		// do not allow payment if the amount is closed
-		if (!status) return false;
-		
+	public void pay(double amt) throws Exception {
 		update();
 		
-		// since the balance represents debt owed, paying with subtract
+		// since the balance represents debt owed, paying will subtract
 		// from the balance instead of adding
 		
 		// check that the provided amount was positive
 		// and will not pay more than the balance
-		if (amt > 0 && balance - amt >= 0) {
-			// truncate any extra decimal places
-			amt = Math.floor(amt * 100) / 100;
-			balance -= amt;
-			paidSinceUpdated += amt;
-			return true;
-		} else {
-			return false;
-		}
+		if (amt < 0) throw new Exception("Cannot pay negative amount");
+		if (balance - amt < 0) throw new Exception("Balance would go below zero");
+		
+		// truncate any extra decimal places
+		amt = Math.floor(amt * 100) / 100;
+		balance -= amt;
+		paidSinceUpdated += amt;
 	}
 }
