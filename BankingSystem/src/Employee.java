@@ -1,5 +1,6 @@
 
 public class Employee extends User {
+	private static final long serialVersionUID = 61L;
 	private String employeeName;
 	private static int employeeCount = 0;
 	private int id;
