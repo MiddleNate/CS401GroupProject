@@ -3,7 +3,7 @@ import java.util.ArrayList;
 public class CheckingAccount extends BankAccount {
 	private static final long serialVersionUID = 900L;
 
-	public CheckingAccount(ArrayList<Customer> owner) {
+	public CheckingAccount(ArrayList<String> owner) {
 		id = ++count;
 		status = true;
 		type = AccountType.Checking;
@@ -11,8 +11,9 @@ public class CheckingAccount extends BankAccount {
 		balance = 0;
 		transactions = new ArrayList<Transaction>();
 	}
-	
-	public void tryTransaction(Transaction transaction) throws Exception {
+
+	@Override
+	public void tryTransaction(Transaction transaction, User user) throws Exception {
 		// check that the type is either deposit or withdrawal
 		if (transaction.getType() != TransactionType.Deposit
 				&& transaction.getType() != TransactionType.Withdrawal) {
@@ -27,7 +28,7 @@ public class CheckingAccount extends BankAccount {
 					// if an exception was not thrown, log the transaction
 					transactions.add(new Transaction(transaction.getAmount(),
 							TransactionType.Deposit,
-							transaction.getUser(),
+							user,
 							this));
 				} catch (Exception e) {
 					throw e;
@@ -38,7 +39,7 @@ public class CheckingAccount extends BankAccount {
 					// if an exception was not thrown, log the transaction
 					transactions.add(new Transaction(transaction.getAmount(),
 							TransactionType.Withdrawal,
-							transaction.getUser(),
+							user,
 							this));
 				} catch (Exception e) {
 						throw e;

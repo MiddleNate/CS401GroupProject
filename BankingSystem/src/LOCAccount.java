@@ -11,7 +11,7 @@ public class LOCAccount extends BankAccount {
 	private LocalDate lastUpdated;
 	private double paidSinceUpdated;
 	
-	public LOCAccount(ArrayList<Customer> owner, double limit, double interest, double minimum) {
+	public LOCAccount(ArrayList<String> owner, double limit, double interest, double minimum) {
 		id = ++count;
 		status = true;
 		type = AccountType.LineOfCredit;
@@ -85,7 +85,8 @@ public class LOCAccount extends BankAccount {
 		// if no updates are needed, do nothing
 	}
 	
-	public void tryTransaction(Transaction transaction) throws Exception {
+	@Override
+	public void tryTransaction(Transaction transaction, User user) throws Exception {
 		update();
 		
 		// check that the type is either deposit or withdrawal
@@ -102,7 +103,7 @@ public class LOCAccount extends BankAccount {
 					// if an exception was not thrown, log the transaction
 					transactions.add(new Transaction(transaction.getAmount(),
 							TransactionType.Withdrawal,
-							transaction.getUser(),
+							user,
 							this));
 				} catch (Exception e) {
 					throw e;
@@ -113,7 +114,7 @@ public class LOCAccount extends BankAccount {
 					// if an exception was not thrown, log the transaction
 					transactions.add(new Transaction(transaction.getAmount(),
 							TransactionType.Payment,
-							transaction.getUser(),
+							user,
 							this));
 				} catch (Exception e) {
 						throw e;
