@@ -291,7 +291,10 @@ public class Server {
 								// a new object is created so that the id is set server-side
 								CheckingAccount newAcc = new CheckingAccount(m.getAccount().getOwners());
 								Server.accounts.put(newAcc.getID(), newAcc);
-								// TODO: NEED TO ADD THE ACCOUNT TO THE CUSTOMER'S LIST
+								// add the new account number to the owner's records
+								for (int i = 0; i < m.getAccount().getOwners().size(); i++) {
+									((Customer) Server.users.get(m.getAccount().getOwners().get(i))).addAccount(newAcc.getID());
+								}
 								reply = new Message(MessageType.Success);
 								break; }
 							case AccountType.Savings: {
@@ -316,7 +319,10 @@ public class Server {
 								// a new object is created so that the id is set server-side
 								SavingsAccount newAcc = new SavingsAccount(m.getAccount().getOwners(), interest, limit);
 								Server.accounts.put(newAcc.getID(), newAcc);
-								// TODO: NEED TO ADD THE ACCOUNT TO THE CUSTOMER'S LIST
+								// add the new account number to the owner's records
+								for (int i = 0; i < m.getAccount().getOwners().size(); i++) {
+									((Customer) Server.users.get(m.getAccount().getOwners().get(i))).addAccount(newAcc.getID());
+								}
 								reply = new Message(MessageType.Success);
 								break ;}
 							case AccountType.LineOfCredit:  {
@@ -343,7 +349,10 @@ public class Server {
 								// a new object is created so that the id is set server-side
 								LOCAccount newAcc = new LOCAccount(m.getAccount().getOwners(), limit, interest, minimum);
 								Server.accounts.put(newAcc.getID(), newAcc);
-								// TODO: NEED TO ADD THE ACCOUNT TO THE CUSTOMER'S LIST
+								// add the new account number to the owner's records
+								for (int i = 0; i < m.getAccount().getOwners().size(); i++) {
+									((Customer) Server.users.get(m.getAccount().getOwners().get(i))).addAccount(newAcc.getID());
+								}
 								reply = new Message(MessageType.Success);
 								break ;}
 								
@@ -361,7 +370,11 @@ public class Server {
 								try {
 									// try to close the account
 									Server.accounts.get(m.getAccount().getID()).closeAccount();
-									// TODO: NEED TO REMOVE THE ACCOUNT FROM THE CUSTOMER'S LIST
+									// remove the account number from the owner's records
+									BankAccount closedAccount = Server.accounts.get(m.getAccount().getID());
+									for (int i = 0; i < closedAccount.getOwners().size(); i++) {
+										((Customer) Server.users.get(closedAccount.getOwners().get(i))).removeAccount(closedAccount.getID());
+									}
 									reply = new Message(MessageType.Success);
 								} catch (Exception e) {
 									// something went wrong if closeaccount throws
@@ -429,7 +442,7 @@ public class Server {
 								reply = new Message(MessageType.Fail, new Exception("Account is closed"));
 							} else {
 								Server.accounts.get(m.getAccount().getID()).addUser(m.getUser().getUsername());
-								// 	TODO: NEED TO ADD THE ACCOUNT ID TO CUSTOMER'S LIST
+								((Customer) Server.users.get(m.getUser().getUsername())).addAccount(m.getAccount().getID());
 								reply = new Message(MessageType.Success);
 							}
 							
@@ -448,7 +461,7 @@ public class Server {
 							} else {
 								// this will still return a success if the user was not on the account to begin with
 								Server.accounts.get(m.getAccount().getID()).removeOwner(m.getUser().getUsername());
-								// TODO: NEED TO REMOVE THE ACCOUNT ID TO CUSTOMER'S LIST
+								((Customer) Server.users.get(m.getUser().getUsername())).removeAccount(m.getAccount().getID());
 								reply = new Message(MessageType.Success);
 							}
 							
