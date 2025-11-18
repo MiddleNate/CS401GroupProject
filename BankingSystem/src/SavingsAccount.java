@@ -13,7 +13,7 @@ public class SavingsAccount extends BankAccount {
 	// for testing with certain dates
 	private static Clock clock = Clock.systemDefaultZone();
 	
-	public SavingsAccount(ArrayList<Customer> owner, double interest, double limit) {
+	public SavingsAccount(ArrayList<String> owner, double interest, double limit) {
 		id = ++count;
 		status = true;
 		type = AccountType.Savings;
@@ -81,7 +81,8 @@ public class SavingsAccount extends BankAccount {
 		// if no updates are needed, do nothing
 	}
 	
-	public void tryTransaction(Transaction transaction) throws Exception {
+	@Override
+	public void tryTransaction(Transaction transaction, User user) throws Exception {
 		update();
 		
 		// check that the type is either deposit or withdrawal
@@ -98,7 +99,7 @@ public class SavingsAccount extends BankAccount {
 					// if an exception was not thrown, log the transaction
 					transactions.add(new Transaction(transaction.getAmount(),
 							TransactionType.Deposit,
-							transaction.getUser(),
+							user,
 							this));
 				} catch (Exception e) {
 					throw e;
@@ -109,7 +110,7 @@ public class SavingsAccount extends BankAccount {
 					// if an exception was not thrown, log the transaction
 					transactions.add(new Transaction(transaction.getAmount(),
 							TransactionType.Withdrawal,
-							transaction.getUser(),
+							user,
 							this));
 				} catch (Exception e) {
 						throw e;

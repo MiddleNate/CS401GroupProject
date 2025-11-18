@@ -1,8 +1,6 @@
 import java.io.Serializable;
 
-
-public class User extends Throwable implements Serializable {
-
+public class User extends Throwable implements Serializable{
 	private static final long serialVersionUID = 250L;
 	private String username;
 	private String password;
@@ -35,5 +33,9 @@ public class User extends Throwable implements Serializable {
 		} else {
 			loggedIn = true;
 		}
+	}
+	
+	public void logout() {
+		loggedIn = false;
 	}
 }
