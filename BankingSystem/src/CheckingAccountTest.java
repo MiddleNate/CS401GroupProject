@@ -9,10 +9,10 @@ public class CheckingAccountTest {
 	@Test
 	public void test() throws Exception {
 		testDepositAndWithdraw();
+		testExceptions();
 	}
 
 	public void testDepositAndWithdraw() throws Exception {
-		// customer has a checking account
 		ArrayList<String> customers = new ArrayList<String>();
 		String customer  = "username";
 		customers.add(customer);
@@ -40,5 +40,24 @@ public class CheckingAccountTest {
 		// withdrawing 50.50 should make the balance 50
 		checkingAccount.withdraw(50.50);
 		assertTrue(checkingAccount.getBalance() == 50);
+	}
+	
+	public void testExceptions() {
+		ArrayList<String> customers = new ArrayList<String>();
+		String customer  = "username";
+		customers.add(customer);
+		CheckingAccount checkingAccount = new CheckingAccount(customers);
+		
+		// test for depositing negative amounts
+		Exception negativeException = assertThrows(Exception.class, () -> checkingAccount.deposit(-10));
+		assertEquals("Cannot deposit negative amounts", negativeException.getMessage());
+		
+		// test for withdrawing negative amounts
+		Exception withdrawLimitException = assertThrows(Exception.class, () -> checkingAccount.withdraw(-10));
+		assertEquals("Cannot withdraw negative amounts", withdrawLimitException.getMessage());
+		
+		// test for overdraft
+		Exception overDraftException = assertThrows(Exception.class, () -> checkingAccount.withdraw(1));
+		assertEquals("Balance would go below zero", overDraftException.getMessage());
 	}
 }
