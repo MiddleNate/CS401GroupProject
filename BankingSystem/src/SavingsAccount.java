@@ -123,7 +123,7 @@ public class SavingsAccount extends BankAccount {
 		update();
 		// validation that the deposit can be completed
 		
-		if (amt > 0) throw new Exception("Cannot deposit negative amounts");
+		if (amt < 0) throw new Exception("Cannot deposit negative amounts");
 		
 		// truncate any extra decimal places
 		amt = Math.floor(amt * 100) / 100;
