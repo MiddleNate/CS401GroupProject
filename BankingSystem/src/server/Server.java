@@ -20,14 +20,14 @@ public class Server {
 			// load hashmap of users from file (key is username)
 			FileInputStream userFile = new FileInputStream("users.txt");
 			ObjectInputStream userStream = new ObjectInputStream(userFile);
-			users = (HashMap<String, User>) userStream.readObject();
+			users = (Map<String, User>) userStream.readObject();
 			// convert it to a synchronized map (prevents multithreading issues)
 			users = Collections.synchronizedMap(users);
 			
 			// load hashmap of accounts from file (key is account id)
 			FileInputStream accountFile = new FileInputStream("accounts.txt");
 			ObjectInputStream accountStream = new ObjectInputStream(accountFile);
-			accounts = (HashMap<Integer, BankAccount>) accountStream.readObject();
+			accounts = (Map<Integer, BankAccount>) accountStream.readObject();
 			// convert it to a synchronized map (prevents multithreading issues)
 			accounts = Collections.synchronizedMap(accounts);
 			
