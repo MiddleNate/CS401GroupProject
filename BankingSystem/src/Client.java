@@ -19,6 +19,7 @@ public class Client {
 	private static boolean exiting = false;
 	private static ObjectInputStream in;
 	private static ObjectOutputStream out;
+	private static String response;
 
 	public static void main(String[] args) {
 		GUI gui = new GUI();
@@ -34,7 +35,7 @@ public class Client {
 		
 		
 		while (!exiting) {
-			// listen for replies and redraw gui if a reply is received
+			// listen for replies, put the reply in response, redraw gui
 			
 		}
 		
