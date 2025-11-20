@@ -1,3 +1,4 @@
+package client;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
@@ -12,6 +13,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import shared.*;
 
 public class Client {
 	

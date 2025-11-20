@@ -1,5 +1,9 @@
+package server;
 import java.net.*;
 import java.util.*;
+
+import shared.*;
+
 import java.io.*;
 import java.lang.Integer;
 
