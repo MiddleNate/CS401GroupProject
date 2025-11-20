@@ -28,15 +28,6 @@ public class Client {
 		GUI gui = new GUI();
 		new Thread(gui).start();
 		
-		try {
-			in = new ObjectInputStream(connection.getInputStream());
-			out = new ObjectOutputStream(connection.getOutputStream());
-		} catch (Exception e) {
-			// TODO: remove console output
-			System.out.println("Error creating streams: " + e);
-		}
-		
-		
 		while (!exiting) {
 			// listen for replies, put the reply in response, redraw gui
 			
@@ -53,6 +44,8 @@ public class Client {
 	private void connect(String ip, int port) {
 		try {
 			connection = new Socket(ip, port);
+			in = new ObjectInputStream(connection.getInputStream());
+			out = new ObjectOutputStream(connection.getOutputStream());
 		} catch (Exception e) {
 			// TODO: remove console output
 			System.out.println("error connecting: " + e + "\nExiting...");
