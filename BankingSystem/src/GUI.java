@@ -1,11 +1,11 @@
 import java.util.*;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,8 +38,7 @@ public class GUI implements Runnable{
     }
 	public void doLoginScreen() {
 		// --- Login Attributes ---
-		String savedUserName;
-		String savedPassword;
+		List<String>loginInputs = new ArrayList<>();
 		// --- Set up frame ---
         frame.setTitle("Switch Panel Example");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -67,16 +66,18 @@ public class GUI implements Runnable{
 
         // --- Add both panels to the main panel ---
         mainPanel.add(loginPanel,"LOGIN");
+        
         // --- Add functionality to buttons ---
-        //saves input as 2 string objects
+        //saves input as 2 string objects in a list, send loginMsg to server
         submitBtn.addActionListener(new ActionListener() {
         		@Override
-        		public void actionPreformed(ActionEvent e) {
-        			savedUserName = userNameTxtField.getText();
-        			savedPassword = passwordTxtField.getText();
-        			
+        		public void actionPerformed(ActionEvent e) {
+        			loginInputs.add(userNameTxtField.getText());
+        			loginInputs.add(passwordTxtField.getText());	
+        			//add loginMsg into list
         		}
         });
+        
         
         // --- Panel 2: Client Panel with list of available transactions ---
         JPanel clientPanel = new JPanel();
@@ -100,23 +101,23 @@ public class GUI implements Runnable{
 		
 	}
 	public void doBankAccountDetails() {
-		
+	
 	}
 	public void doTransactionMessage() {
-	    JOptionPane transactionMsg = new JOptionPane.showMessageDialog(null, "Transaction successful");
+	    JOptionPane.showMessageDialog(null, "Transaction successful");
 	}
 	public void doSuccessMessage() {
-		JOptionPane successMsg = new JOptionPane.showMessageDialog(null, "Successfully accessed");
+		JOptionPane.showMessageDialog(null, "Successfully accessed");
 		//call client v. employee panel, based on instance of client v. employee
 	}
 	public void doFailMessage() {
-		JOptionPane failedMsg = new JOptionPane.showMessageDialog(null, "Failed Message");
+		JOptionPane.showMessageDialog(null, "Failed Message");
 	}
 	public void doInvalidMessage() {
-		JOptionPane invalidMsg = new JOptionPane.showMessageDialog(null,"Invalid Input");
+		JOptionPane.showMessageDialog(null,"Invalid Input");
 	}
 	public void doAccountUpdatedMessage() {
-		JOptionPane accountUpdateMsg = new JOptionPane.showMessageDialog(null,"Account Updated successfully");
+		JOptionPane.showMessageDialog(null,"Account Updated successfully");
 	}
 	
 }
