@@ -3,6 +3,8 @@ import java.util.ArrayList;
 public class Customer extends User {
 	private static final long serialVersionUID = 60L;
 	private String customerName;
+	private static int count = 0;
+	private int customerID;
 	private static int customerCount = 0;
 	private int id;
 	private int socialSecNumber;
@@ -11,6 +13,7 @@ public class Customer extends User {
 	public Customer(String username, String password, String customerName, int socialSecNumber) {
 		super(username, password);
 		this.customerName = customerName;
+		this.customerID = count++;
 		this.id = ++customerCount;
 		this.socialSecNumber = socialSecNumber;
 		this.accounts = new ArrayList<Integer>();
@@ -33,7 +36,7 @@ public class Customer extends User {
 	}
 
 	public int getCustomerID() {
-		return this.id;
+		return this.customerID;
 	}
 
 	public int getSocialSecNumber() {

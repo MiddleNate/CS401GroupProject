@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.ChronoUnit;
+import java.time.Clock;
 
 public class LOCAccount extends BankAccount {
 	private static final long serialVersionUID = 970L;
@@ -10,6 +11,8 @@ public class LOCAccount extends BankAccount {
 	private double minimumDue;
 	private LocalDate lastUpdated;
 	private double paidSinceUpdated;
+	// for testing with certain dates
+	private static Clock clock = Clock.systemDefaultZone();
 	
 	public LOCAccount(ArrayList<String> owner, double limit, double interest, double minimum) {
 		id = ++count;
@@ -22,7 +25,7 @@ public class LOCAccount extends BankAccount {
 		creditLimit = limit;
 		interestRate = interest;
 		minimumDue = minimum;
-		lastUpdated = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
+		lastUpdated = LocalDate.now(clock).with(TemporalAdjusters.firstDayOfMonth());
 		paidSinceUpdated = 0;
 	}
 	
@@ -59,11 +62,16 @@ public class LOCAccount extends BankAccount {
 		return balance;
 	}
 	
+	// for testing with certain dates
+	public static void setClock(Clock c) {
+		clock = c;
+	}
+	
 	public void update() {
 		// do not update if the account is closed
 		if (!status) return;
 		
-		LocalDate currentMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
+		LocalDate currentMonth = LocalDate.now(clock).with(TemporalAdjusters.firstDayOfMonth());
 		// check if at least one month has passed since the last updated date
 		if (currentMonth.isAfter(lastUpdated)) {
 			// figure out how many months have passed (how many times we need to update)
