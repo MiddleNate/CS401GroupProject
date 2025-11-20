@@ -2,6 +2,9 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -11,12 +14,52 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class Client {
+	
+	private static Socket connection;
+	private static boolean exiting = false;
+	private static ObjectInputStream in;
+	private static ObjectOutputStream out;
 
 	public static void main(String[] args) {
 		GUI gui = new GUI();
 		new Thread(gui).start();
-
+		
+		try {
+			in = new ObjectInputStream(connection.getInputStream());
+			out = new ObjectOutputStream(connection.getOutputStream());
+		} catch (Exception e) {
+			// TODO: remove console output
+			System.out.println("Error creating streams: " + e);
+		}
+		
+		
+		while (!exiting) {
+			// listen for replies and redraw gui if a reply is received
+			
+		}
+		
+		try {
+			connection.close();
+		} catch (Exception e) {
+			// TODO: remove console output
+			System.out.println("Error closing connection: " + e);
+		}
 	}
+	
+	private void connect(String ip, int port) {
+		try {
+			connection = new Socket(ip, port);
+		} catch (Exception e) {
+			// TODO: remove console output
+			System.out.println("error connecting: " + e + "\nExiting...");
+		}
+	}
+	
+	private void sendLoginMessage(String username, String password) {
+		// create and send a message through the stream
+	}
+	
+	// more methods for sending other message types
 
 	private static class GUI implements Runnable {
 		private CardLayout cardLayout;
