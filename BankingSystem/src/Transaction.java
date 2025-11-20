@@ -1,24 +1,52 @@
-import java.util.*;
+import java.time.LocalDate;
 
 public class Transaction {
-	protected int id;
-	protected Double amount;
-	protected Date date;
-	protected TransactionType type; 
-	protected User user;
-	
-	//Default constructor
-	public Transaction() {
-		this.amount = 0.0;
-		this.date = null;
-		this.type = null;
-		this.user = null;
+	private int id;
+	private static int count;
+	private Double amount;
+	private LocalDate date;
+	private TransactionType type; 
+	private User user;
+	private BankAccount account;
+
+	public static void setTransactionCount(int c) {
+		count = c;
 	}
-	// Constructor
-	public Transaction(Double amount, TransactionType type, Date date, User user ) {
+	
+	public static int getTransactionCount() {
+		return count;
+	}
+	
+	public Transaction(double amount, TransactionType type, User user, BankAccount account) {
+		this.id = ++count;
 		this.amount = amount;
-		this.date = date;
+		this.date = LocalDate.now();
 		this.type = type;
-		this.user = user;	
+		this.user = user;
+		this.account = account;
+	}
+	
+	public int getID() {
+		return id;
+	}
+	
+	public Double getAmount() {
+		return amount;
+	}
+	
+	public LocalDate getDate() {
+		return date;
+	}
+	
+	public TransactionType getType() {
+		return type;
+	}
+	
+	public User getUser() {
+		return user;
+	}
+	
+	public BankAccount getAccount() {
+		return account;
 	}
 }
