@@ -66,4 +66,8 @@ public abstract class BankAccount extends Throwable implements Serializable {
 	public void tryTransaction(Transaction transaction, User user) throws Exception {
 		throw new Exception("Trying transaction on an abstract BankAccount");
 	}
+	
+	public String toString() {
+		return "Trying toString() on an abstract BankAccount\n";
+	}
 }
