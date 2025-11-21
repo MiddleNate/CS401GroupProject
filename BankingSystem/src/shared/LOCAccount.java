@@ -1,37 +1,41 @@
+package shared;
 import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.ChronoUnit;
 import java.time.Clock;
 
-public class SavingsAccount extends BankAccount {
-	private static final long serialVersionUID = 910L;
+public class LOCAccount extends BankAccount {
+	private static final long serialVersionUID = 970L;
+	private double creditLimit;
 	private double interestRate;
-	private double withdrawlLimit;
+	private double minimumDue;
 	private LocalDate lastUpdated;
-	private double withdrawnSinceUpdated;
+	private double paidSinceUpdated;
 	// for testing with certain dates
 	private static Clock clock = Clock.systemDefaultZone();
 	
-	public SavingsAccount(ArrayList<String> owner, double interest, double limit) {
+	public LOCAccount(ArrayList<String> owner, double limit, double interest, double minimum) {
 		id = ++count;
 		status = true;
-		type = AccountType.Savings;
+		type = AccountType.LineOfCredit;
 		owners = owner;
+		// in a LOC account, the balance represents the amount owed
 		balance = 0;
 		transactions = new ArrayList<Transaction>();
+		creditLimit = limit;
 		interestRate = interest;
-		withdrawlLimit = limit;
+		minimumDue = minimum;
 		lastUpdated = LocalDate.now(clock).with(TemporalAdjusters.firstDayOfMonth());
-		withdrawnSinceUpdated = 0;
+		paidSinceUpdated = 0;
 	}
 	
-	public void setWithdrawlLimit(double limit) {
-		withdrawlLimit = limit;
+	public double getLimit() {
+		return creditLimit;
 	}
 	
-	public double getWithdrawlLimit() {
-		return withdrawlLimit;
+	public void setCreditLimit(double limit) {
+		creditLimit = limit;
 	}
 	
 	public double getInterest() {
@@ -42,12 +46,16 @@ public class SavingsAccount extends BankAccount {
 		interestRate = interest;
 	}
 	
-	public LocalDate getLastUpdated() {
-		return lastUpdated;
+	public double getMinimumDue() {
+		return minimumDue;
 	}
 	
-	public double getWithdrawnSinceUpdated() {
-		return withdrawnSinceUpdated;
+	public void setMinimumDue(double minimum) {
+		minimumDue = minimum;
+	}
+	
+	public double getPaidSinceUpdated() {
+		return paidSinceUpdated;
 	}
 	
 	@Override public double getBalance() {
@@ -55,7 +63,7 @@ public class SavingsAccount extends BankAccount {
 		return balance;
 	}
 	
-	// for testing certain dates
+	// for testing with certain dates
 	public static void setClock(Clock c) {
 		clock = c;
 	}
@@ -70,13 +78,18 @@ public class SavingsAccount extends BankAccount {
 			// figure out how many months have passed (how many times we need to update)
 			int numUpdates = (int) ChronoUnit.MONTHS.between(lastUpdated, currentMonth);
 			for (int i = 0; i < numUpdates; i++) {
-				// for each update, add the interest rate to the balance and log the transaction
-				transactions.add(new Transaction((balance * 1 + interestRate), TransactionType.Interest, null, this));
-				balance *= 1 + interestRate;
+				// only charge interest if the minimum has not been paid
+				// if multiple months have elapsed, this will only apply 
+				// to the first month since paidSinceUpdated gets reset to 0
+				// only applies if the balance is greater than 0
+				if (paidSinceUpdated < minimumDue && balance > 0) {
+					// also logs the transaction as it is applied
+					transactions.add(new Transaction((balance * 1 + interestRate), TransactionType.Interest, null, this));
+					balance *= 1 + interestRate;
+				}
+				paidSinceUpdated = 0;
+				lastUpdated = currentMonth;
 			}
-			// reset the amount withdrawn since the last update
-			withdrawnSinceUpdated = 0;
-			lastUpdated = currentMonth;
 		}
 		// if no updates are needed, do nothing
 	}
@@ -86,30 +99,30 @@ public class SavingsAccount extends BankAccount {
 		update();
 		
 		// check that the type is either deposit or withdrawal
-		if (transaction.getType() != TransactionType.Deposit
-				&& transaction.getType() != TransactionType.Withdrawal) {
+		if (transaction.getType() != TransactionType.Withdrawal
+				&& transaction.getType() != TransactionType.Payment) {
 			throw new Exception("Invalid transaction type");
 		// check that the account is not closed
 		} else if (!status) {
 			throw new Exception("Account is closed");
 		} else {
-			if (transaction.getType() == TransactionType.Deposit) {
-				try {
-					deposit(transaction.getAmount());
-					// if an exception was not thrown, log the transaction
-					transactions.add(new Transaction(transaction.getAmount(),
-							TransactionType.Deposit,
-							user,
-							this));
-				} catch (Exception e) {
-					throw e;
-				}
-			} else if (transaction.getType() == TransactionType.Withdrawal) {
+			if (transaction.getType() == TransactionType.Withdrawal) {
 				try {
 					withdraw(transaction.getAmount());
 					// if an exception was not thrown, log the transaction
 					transactions.add(new Transaction(transaction.getAmount(),
 							TransactionType.Withdrawal,
+							user,
+							this));
+				} catch (Exception e) {
+					throw e;
+				}
+			} else if (transaction.getType() == TransactionType.Payment) {
+				try {
+					withdraw(transaction.getAmount());
+					// if an exception was not thrown, log the transaction
+					transactions.add(new Transaction(transaction.getAmount(),
+							TransactionType.Payment,
 							user,
 							this));
 				} catch (Exception e) {
@@ -119,28 +132,36 @@ public class SavingsAccount extends BankAccount {
 		}
 	}
 	
-	public void deposit(double amt) throws Exception {
+	public void withdraw(double amt) throws Exception {
 		update();
-		// validation that the deposit can be completed
 		
-		if (amt < 0) throw new Exception("Cannot deposit negative amounts");
+		// since the balance represents debt owed, withdraw will add
+		// to the balance instead of subtracting
 		
+		// check that the provided amount was positive and that the
+		// withdrawal will not exceed the credit limit
+		if (amt < 0) throw new Exception("Cannot withdraw negative amount");
+		if (amt + balance > creditLimit) throw new Exception("Withdrawal would exceed credit limit");
+
 		// truncate any extra decimal places
 		amt = Math.floor(amt * 100) / 100;
 		balance += amt;
 	}
 	
-	public void withdraw(double amt) throws Exception {
+	public void pay(double amt) throws Exception {
 		update();
-		// validation that the withdrawal can be completed
-		if (amt < 0) throw new Exception("Cannot withdraw negative amounts");
-		if ((withdrawnSinceUpdated + amt) > withdrawlLimit) throw new Exception("Transaction would exceed withdrawal limit");
+		
+		// since the balance represents debt owed, paying will subtract
+		// from the balance instead of adding
+		
+		// check that the provided amount was positive
+		// and will not pay more than the balance
+		if (amt < 0) throw new Exception("Cannot pay negative amount");
 		if (balance - amt < 0) throw new Exception("Balance would go below zero");
 		
 		// truncate any extra decimal places
 		amt = Math.floor(amt * 100) / 100;
 		balance -= amt;
-		// add the amount towards the withdrawal limit
-		withdrawnSinceUpdated += amt;
+		paidSinceUpdated += amt;
 	}
 }

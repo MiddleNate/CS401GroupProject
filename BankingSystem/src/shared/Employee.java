@@ -1,3 +1,4 @@
+package shared;
 
 public class Employee extends User {
 	private static final long serialVersionUID = 61L;

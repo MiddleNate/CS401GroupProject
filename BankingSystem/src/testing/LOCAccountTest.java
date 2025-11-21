@@ -1,3 +1,4 @@
+package testing;
 import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.time.Clock;
@@ -5,6 +6,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 
 import org.junit.Test;
+
+import shared.*;
 
 public class LOCAccountTest {
 
