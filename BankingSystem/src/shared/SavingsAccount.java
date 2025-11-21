@@ -136,4 +136,11 @@ public class SavingsAccount extends BankAccount {
 		// add the amount towards the withdrawal limit
 		withdrawnSinceUpdated += amt;
 	}
+	
+	@Override
+	public String toString() {
+		return ("Account ID: " + id + "\tType: Savings\tBalance: " + balance +
+				"\tInterest rate: " + interestRate + "\tWithdrawal Limit: " + withdrawlLimit
+				+ "\tWithdrawn this month: " + withdrawnSinceUpdated + "\n");
+	}
 }

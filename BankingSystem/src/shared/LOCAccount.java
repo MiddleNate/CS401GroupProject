@@ -156,4 +156,11 @@ public class LOCAccount extends BankAccount {
 		balance -= amt;
 		paidSinceUpdated += amt;
 	}
+	
+	@Override
+	public String toString() {
+		return ("Account ID: " + id + "\tType: Savings\tBalance: " + balance +
+				"\tInterest rate: " + interestRate + "\tCredit Limit: " + creditLimit + "\tMinimum Payment: "
+				+ minimumDue + "\tPaid this month: " + paidSinceUpdated + "\n");
+	}
 }
