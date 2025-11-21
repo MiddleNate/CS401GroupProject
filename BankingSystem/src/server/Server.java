@@ -187,14 +187,20 @@ public class Server {
 							break; }
 						case MessageType.InfoRequest: {
 							ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
+							String text = "";
 							
 							// for each of the account ids in the customer
 							for (int i = 0; i < ((Customer)user).getAccounts().size(); i++) {
 								// add the account to the arraylist we will send from the map 
-								accounts.add(Server.accounts.get(((Customer)user).getAccounts().get(i)));
+								BankAccount acc = Server.accounts.get(((Customer)user).getAccounts().get(i));
+								
+								accounts.add(acc);
+								
+								// put the account id, type, and balance in the text field
+								text = text + acc.toString();
 							}
 							
-							Message reply = new Message(MessageType.Info, accounts);
+							Message reply = new Message(MessageType.Info, accounts, text);
 							out.writeObject(reply);
 							break; }
 						case MessageType.Transaction: {
@@ -239,13 +245,20 @@ public class Server {
 								Customer tempCustomer = (Customer) Server.users.get(m.getUser().getUsername());
 								ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
 								
+								String text = "";
+								
 								// for each of the account ids in the customer
 								for (int i = 0; i < tempCustomer.getAccounts().size(); i++) {
+									BankAccount acc = Server.accounts.get((tempCustomer.getAccounts().get(i)));
+									
 									// add the account to the arraylist we will send from the map 
-									accounts.add(Server.accounts.get(((Customer)user).getAccounts().get(i)));
+									accounts.add(acc);
+									
+									// put the account id, type, and balance into the text field
+									text = text + acc.toString();
 								}
 								
-								reply = new Message(MessageType.Info, accounts);
+								reply = new Message(MessageType.Info, accounts, text);
 							} else {
 								reply = new Message(MessageType.Fail, "User does not exist");
 							}

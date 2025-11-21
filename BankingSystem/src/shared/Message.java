@@ -35,7 +35,7 @@ public class Message implements Serializable {
 		}
 	}
 	
-	public Message(MessageType type, ArrayList<BankAccount> accounts) {
+	public Message(MessageType type, ArrayList<BankAccount> accounts, String text) {
 		// return an invalid message if the type does not match the the valid type for this constructor
 		if (type != MessageType.Info) {
 			this.type = MessageType.Invalid;
