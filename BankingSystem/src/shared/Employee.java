@@ -6,7 +6,7 @@ public class Employee extends User {
 	private static int employeeCount = 0;
 	private int id;
 
-	public Employee(String username, String password, boolean loggedIn, String employeeName) {
+	public Employee(String username, String password, String employeeName) {
 		super(username, password);
 		this.employeeName = employeeName;
 		this.id = ++employeeCount;

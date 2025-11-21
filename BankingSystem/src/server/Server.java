@@ -1,6 +1,7 @@
 package server;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import shared.*;
 
@@ -14,20 +15,24 @@ public class Server {
 	protected static Map<String, User> users;
 	// access within ClientHandler using Server.users
 	
+	protected static AtomicBoolean running = new AtomicBoolean(true);
+	// used to stop the server from a separate thread that blocks until console input
+	
+	
 	public static void main(String[] args) {
 		// loading users and accounts into memory
 		try {
 			// load hashmap of users from file (key is username)
 			FileInputStream userFile = new FileInputStream("users.txt");
 			ObjectInputStream userStream = new ObjectInputStream(userFile);
-			users = (HashMap<String, User>) userStream.readObject();
+			users = (Map<String, User>) userStream.readObject();
 			// convert it to a synchronized map (prevents multithreading issues)
 			users = Collections.synchronizedMap(users);
 			
 			// load hashmap of accounts from file (key is account id)
 			FileInputStream accountFile = new FileInputStream("accounts.txt");
 			ObjectInputStream accountStream = new ObjectInputStream(accountFile);
-			accounts = (HashMap<Integer, BankAccount>) accountStream.readObject();
+			accounts = (Map<Integer, BankAccount>) accountStream.readObject();
 			// convert it to a synchronized map (prevents multithreading issues)
 			accounts = Collections.synchronizedMap(accounts);
 			
@@ -58,18 +63,21 @@ public class Server {
 			server = new ServerSocket(7855);
 			server.setReuseAddress(true);
 			
-			boolean running = true;
 			Scanner scan = new Scanner(System.in);
+			
+			// listener to set the running flag when something has been entered in the console
+			Stopper stopper = new Stopper();
+			new Thread(stopper).start();
 			
 			// while running, accept connections and create
 			// a handler in its own thread for each of them
-			while (running) {
-				// exit the server if anything has been entered into the console
-				if (scan.hasNext()) {
-					running = false;
-				}
+			while (running.get()) {
+				// exit the server if anything has been entered into the console (as detected by stopper)
 				
 				Socket client = server.accept();
+				
+				// doesn't start a new thread if a stop message has been sent
+				if (!running.get()) break;
 				
 				ClientHandler handler = new ClientHandler(client);
 				
@@ -515,6 +523,26 @@ public class Server {
 					System.out.println("Error closing resources: " + e);
 				}
 			}
+		}
+	}
+	
+	private static class Stopper implements Runnable {
+		public void run() {
+			Scanner scan = new Scanner(System.in);
+			// scan.hasNext() blocks until something is entered in the console, then sets the boolean
+			// so that the main will exit the loop the next time it accepts a connection
+			if (scan.hasNext()) Server.running.set(false);
+			System.out.println("Exiting");
+			// after setting the boolean to false the server sends a new connection to ITSELF
+			// so that it stops blocking on ServerSocket.accept(), and breaks out of the loop
+			// because the flag has been changed
+			try {
+				Socket self = new Socket("localhost", 7855);
+				self.close();
+			} catch (Exception e) {
+				System.out.println(e);
+			}
+			scan.close();
 		}
 	}
 
