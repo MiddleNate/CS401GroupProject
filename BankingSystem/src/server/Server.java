@@ -167,7 +167,7 @@ public class Server {
 							user = Server.users.get(m.getUser().getUsername());
 							
 							// reply with a success message
-							reply = new Message(MessageType.Success, user);
+							reply = new Message(MessageType.Success, user, ("Succesfully logged in as " + user.getUsername()));
 							// the reply includes the user we logged in as so that the client will know
 							// if we are a customer or an employee and be able to use the correct gui
 						} catch (Exception e) {
@@ -217,7 +217,7 @@ public class Server {
 									Server.accounts.get(accountID).tryTransaction(m.getTransaction(), user);
 									// if no exception was thrown, the transaction was successful
 									// so we can set the reply to success
-									reply = new Message(MessageType.Success);
+									reply = new Message(MessageType.Success, "Transaction completed successfuly");
 								} catch (Exception e) {
 									reply = new Message(MessageType.Fail, e.getMessage());
 								}
@@ -278,7 +278,7 @@ public class Server {
 									Server.accounts.get(accountID).tryTransaction(m.getTransaction(), user);
 									// if no exception was thrown, the transaction was successful
 									// so we can set the reply to success
-									reply = new Message(MessageType.Success);
+									reply = new Message(MessageType.Success, "Transaction completed successfuly");
 								} catch (Exception e) {
 									reply = new Message(MessageType.Fail, e.getMessage());
 								}
@@ -306,7 +306,7 @@ public class Server {
 										newCust.getCustomerName(),
 										newCust.getSocialSecNumber()));
 								// set the reply to success
-								reply = new Message(MessageType.Success);
+								reply = new Message(MessageType.Success, "Customer created successfuly");
 							}
 							
 							out.writeObject(reply);
@@ -333,7 +333,7 @@ public class Server {
 								for (int i = 0; i < owners.size(); i++) {
 									((Customer) Server.users.get(owners.get(i))).addAccount(newAcc.getID());
 								}
-								reply = new Message(MessageType.Success);
+								reply = new Message(MessageType.Success, "Account opened successfuly");
 								break; }
 							case AccountType.Savings: {
 								// check that the provided owners exist and are type Customer
@@ -362,7 +362,7 @@ public class Server {
 								for (int i = 0; i < owners.size(); i++) {
 									((Customer) Server.users.get(owners.get(i))).addAccount(newAcc.getID());
 								}
-								reply = new Message(MessageType.Success);
+								reply = new Message(MessageType.Success, "Account opened successfuly");
 								break ;}
 							case AccountType.LineOfCredit:  {
 								// check that the provided owners exist and are type Customer
@@ -393,7 +393,7 @@ public class Server {
 								for (int i = 0; i < owners.size(); i++) {
 									((Customer) Server.users.get(owners.get(i))).addAccount(newAcc.getID());
 								}
-								reply = new Message(MessageType.Success);
+								reply = new Message(MessageType.Success, "Account opened successfuly");
 								break ;}
 								
 							}
@@ -416,7 +416,7 @@ public class Server {
 									for (int i = 0; i < owners.size(); i++) {
 										((Customer) Server.users.get(owners.get(i))).removeAccount(closedAccount.getID());
 									}
-									reply = new Message(MessageType.Success);
+									reply = new Message(MessageType.Success, "Account closed successfuly");
 								} catch (Exception e) {
 									// the account cannot be closed if closedaccount throws
 									reply = new Message(MessageType.Fail, e.getMessage());
@@ -449,7 +449,7 @@ public class Server {
 									
 									((SavingsAccount) Server.accounts.get(accountID)).setInterest(interest);
 									((SavingsAccount) Server.accounts.get(accountID)).setWithdrawlLimit(limit);
-									reply = new Message(MessageType.Success);
+									reply = new Message(MessageType.Success, "Account updated successfuly");
 									break; }
 								case AccountType.LineOfCredit: {
 									// validate the fields that will be modified
@@ -464,7 +464,7 @@ public class Server {
 									((LOCAccount) Server.accounts.get(accountID)).setInterest(interest);
 									((LOCAccount) Server.accounts.get(accountID)).setCreditLimit(limit);
 									((LOCAccount) Server.accounts.get(accountID)).setMinimumDue(minimum);
-									reply = new Message(MessageType.Success);
+									reply = new Message(MessageType.Success, "Account updated successfuly");
 									break;}
 								}
 								
@@ -485,7 +485,7 @@ public class Server {
 							} else {
 								Server.accounts.get(accountID).addUser(username);
 								((Customer) Server.users.get(m.getUser().getUsername())).addAccount(m.getAccount().getID());
-								reply = new Message(MessageType.Success);
+								reply = new Message(MessageType.Success, "Customer added to account successfuly");
 							}
 							
 							out.writeObject(reply);
@@ -508,7 +508,7 @@ public class Server {
 							else {
 								Server.accounts.get(accountID).removeOwner(username);
 								((Customer) Server.users.get(m.getUser().getUsername())).removeAccount(m.getAccount().getID());
-								reply = new Message(MessageType.Success);
+								reply = new Message(MessageType.Success, "Customer removed from account successfuly");
 							}
 							
 							out.writeObject(reply);
