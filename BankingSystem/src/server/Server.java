@@ -172,7 +172,7 @@ public class Server {
 							// if we are a customer or an employee and be able to use the correct gui
 						} catch (Exception e) {
 							// if an exception is thrown by tryLogin, the login has failed
-							reply = new Message(MessageType.Fail, e);
+							reply = new Message(MessageType.Fail, e.getMessage());
 						}
 						out.writeObject(reply);
 						// skip to next loop so it doesn't try to handle the message twice
@@ -204,7 +204,7 @@ public class Server {
 							// check that the account specified in the message
 							// is in the list of accounts owned by the current user
 							if (!((Customer)user).getAccounts().contains(accountID)) {
-								reply = new Message(MessageType.Fail, new Exception("You do not have access to that account"));
+								reply = new Message(MessageType.Fail, "You do not have access to that account");
 							} else {
 								try {
 									// pass the message to the account to be tried
@@ -213,7 +213,7 @@ public class Server {
 									// so we can set the reply to success
 									reply = new Message(MessageType.Success);
 								} catch (Exception e) {
-									reply = new Message(MessageType.Fail, e);
+									reply = new Message(MessageType.Fail, e.getMessage());
 								}
 							}
 							
@@ -247,7 +247,7 @@ public class Server {
 								
 								reply = new Message(MessageType.Info, accounts);
 							} else {
-								reply = new Message(MessageType.Fail, new Exception("User does not exist"));
+								reply = new Message(MessageType.Fail, "User does not exist");
 							}
 							out.writeObject(reply);
 							break; }
@@ -258,7 +258,7 @@ public class Server {
 							// check that the account specified in the message
 							// is an account that exists
 							if (Server.accounts.containsKey(accountID)) {
-								reply = new Message(MessageType.Fail, new Exception("Account does not exist"));
+								reply = new Message(MessageType.Fail, "Account does not exist");
 							} else {
 								try {
 									// pass the message to the account to be tried
@@ -267,7 +267,7 @@ public class Server {
 									// so we can set the reply to success
 									reply = new Message(MessageType.Success);
 								} catch (Exception e) {
-									reply = new Message(MessageType.Fail, e);
+									reply = new Message(MessageType.Fail, e.getMessage());
 								}
 							}
 							
@@ -279,9 +279,9 @@ public class Server {
 							
 							// check that the username does not already exist in the user map
 							if (Server.users.containsKey(m.getUser().getUsername())) {
-								reply = new Message(MessageType.Fail, new Exception("Customer already exists"));
+								reply = new Message(MessageType.Fail, "Customer already exists");
 							} else if (!(m.getUser() instanceof Customer)) {
-								reply = new Message(MessageType.Fail, new Exception("Provided User was not of type Customer"));
+								reply = new Message(MessageType.Fail, "Provided User was not of type Customer");
 							} else {
 								Customer newCust = (Customer) m.getUser();
 								// add the user to the map, data is copied to ensure we
@@ -307,7 +307,7 @@ public class Server {
 								ArrayList<String> owners = m.getAccount().getOwners();
 								for (int i = 0; i < owners.size(); i++) {
 									if (!(Server.users.get(owners.get(i)) instanceof Customer)) {
-										reply = new Message(MessageType.Fail, new Exception("Owner does not exist"));
+										reply = new Message(MessageType.Fail, "Owner does not exist");
 										break;
 									}
 								}
@@ -327,7 +327,7 @@ public class Server {
 								ArrayList<String> owners = m.getAccount().getOwners();
 								for (int i = 0; i < owners.size(); i++) {
 									if (!(Server.users.get(owners.get(i)) instanceof Customer)) {
-										reply = new Message(MessageType.Fail, new Exception("Owner does not exist"));
+										reply = new Message(MessageType.Fail, "Owner does not exist");
 										break;
 									}
 								}
@@ -337,7 +337,7 @@ public class Server {
 								
 								// check that interest and limit are positive
 								if (interest < 0 || limit < 0) {
-									reply = new Message(MessageType.Fail, new Exception("Values must be above zero"));
+									reply = new Message(MessageType.Fail, "Values must be above zero");
 									break;
 								}
 								
@@ -356,7 +356,7 @@ public class Server {
 								ArrayList<String> owners = m.getAccount().getOwners();
 								for (int i = 0; i < owners.size(); i++) {
 									if (!(Server.users.get(owners.get(i)) instanceof Customer)) {
-										reply = new Message(MessageType.Fail, new Exception("Owner does not exist"));
+										reply = new Message(MessageType.Fail, "Owner does not exist");
 										break;
 									}
 								}
@@ -368,7 +368,7 @@ public class Server {
 								
 								// check that interest, limit, and minimum due are positive
 								if (interest < 0 || limit < 0 || minimum < 0) {
-									reply = new Message(MessageType.Fail, new Exception("Valies must be above zero"));
+									reply = new Message(MessageType.Fail, "Values must be above zero");
 									break;
 								}
 								
@@ -392,7 +392,7 @@ public class Server {
 							
 							// check that the account exists
 							if (!Server.accounts.containsKey(m.getAccount().getID())) {
-								reply = new Message(MessageType.Fail, new Exception("Account does not exist"));
+								reply = new Message(MessageType.Fail, "Account does not exist");
 							} else {
 								try {
 									// try to close the account
@@ -406,7 +406,7 @@ public class Server {
 									reply = new Message(MessageType.Success);
 								} catch (Exception e) {
 									// the account cannot be closed if closedaccount throws
-									reply = new Message(MessageType.Fail, e);
+									reply = new Message(MessageType.Fail, e.getMessage());
 								}
 							}
 							
@@ -418,19 +418,19 @@ public class Server {
 							
 							// check that the account exists and type matches
 							if (!Server.accounts.containsKey(accountID) || Server.accounts.get(accountID).getType() != m.getAccount().getType()) {
-								reply = new Message(MessageType.Fail, new Exception("Account of that type does not exist"));
+								reply = new Message(MessageType.Fail, "Account of that type does not exist");
 							} else {
 								switch (m.getAccount().getType()) {
 								case AccountType.Checking: {
 									// checking accounts have no fields to be modified, so it fails
-									reply = new Message(MessageType.Fail, new Exception("Checking accounts cannot be modified"));
+									reply = new Message(MessageType.Fail, "Checking accounts cannot be modified");
 									break; }
 								case AccountType.Savings: {
 									// validate the fields that will be modified
 									double interest = ((LOCAccount) m.getAccount()).getInterest();
 									double limit = ((LOCAccount) m.getAccount()).getLimit();
 									if (interest < 0 || limit < 0) {
-										reply = new Message(MessageType.Fail, new Exception("Values must be above zero"));
+										reply = new Message(MessageType.Fail, "Values must be above zero");
 										break;
 									}
 									
@@ -444,7 +444,7 @@ public class Server {
 									double limit = ((LOCAccount) m.getAccount()).getLimit();
 									double minimum = ((LOCAccount) m.getAccount()).getMinimumDue();
 									if (interest < 0 || limit < 0 || minimum < 0) {
-										reply = new Message(MessageType.Fail, new Exception ("Values must be above zero"));
+										reply = new Message(MessageType.Fail, "Values must be above zero");
 										break;
 									}
 									
@@ -464,11 +464,11 @@ public class Server {
 							String username = m.getUser().getUsername();
 							// validate that the account exists, the user exists and is type Customer, and account is not closed
 							if (!Server.accounts.containsKey(accountID)) {
-								reply = new Message(MessageType.Fail, new Exception("Account does not exist"));
+								reply = new Message(MessageType.Fail, "Account does not exist");
 							} else if (!(Server.users.get(username) instanceof Customer)) {
-								reply = new Message(MessageType.Fail, new Exception("Customer does not exist"));
+								reply = new Message(MessageType.Fail, "Customer does not exist");
 							} else if (Server.accounts.get(accountID).isOpen()) {
-								reply = new Message(MessageType.Fail, new Exception("Account is closed"));
+								reply = new Message(MessageType.Fail, "Account is closed");
 							} else {
 								Server.accounts.get(accountID).addUser(username);
 								((Customer) Server.users.get(m.getUser().getUsername())).addAccount(m.getAccount().getID());
@@ -484,13 +484,13 @@ public class Server {
 							// validate that the account exists, the user exists and is type Customer,
 							// the user is on the account, and the account is not closed
 							if (!Server.accounts.containsKey(accountID)) {
-								reply = new Message(MessageType.Fail, new Exception("Account does not exist"));
+								reply = new Message(MessageType.Fail, "Account does not exist");
 							} else if (!(Server.users.get(username) instanceof Customer)) {
-								reply = new Message(MessageType.Fail, new Exception("Customer does not exist"));
+								reply = new Message(MessageType.Fail, "Customer does not exist");
 							} else if (Server.accounts.get(accountID).isOpen()) {
-								reply = new Message(MessageType.Fail, new Exception("Account is closed"));
+								reply = new Message(MessageType.Fail, "Account is closed");
 							} else if (!Server.accounts.get(accountID).getOwners().contains(username)) {
-								reply = new Message(MessageType.Fail, new Exception("Customer is not an account owner"));
+								reply = new Message(MessageType.Fail, "Customer is not an account owner");
 							}
 							else {
 								Server.accounts.get(accountID).removeOwner(username);
