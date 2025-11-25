@@ -1,11 +1,17 @@
 package client;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.TextArea;
+import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -13,7 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
+import javax.swing.SwingUtilities;
 import shared.*;
 
 public class Client {
@@ -25,9 +31,10 @@ public class Client {
 	private static String response;
 
 	public static void main(String[] args) {
+
 		GUI gui = new GUI();
 		new Thread(gui).start();
-		
+
 		while (!exiting) {
 			// listen for replies, put the reply in response, redraw gui
 			
@@ -52,8 +59,18 @@ public class Client {
 		}
 	}
 	
-	private void sendLoginMessage(String username, String password) {
+	private static void sendLoginMessage(String username, String password) {
 		// create and send a message through the stream
+		try
+		{
+			User user = new User(username, password);
+			Message msg = new Message(MessageType.Login,user);
+			out.writeObject(msg);
+			out.flush();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	// more methods for sending other message types
@@ -71,10 +88,11 @@ public class Client {
 
 		public GUI() {
 
+			this.frame = new JFrame();
 			// --- Set up frame ---
 			frame.setTitle("Switch Panel Example");
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			frame.setSize(400, 300);
+			frame.setSize(350, 120);
 			frame.setLocationRelativeTo(null);
 
 			// --- Create card layout ---
@@ -87,10 +105,9 @@ public class Client {
 
 		public void doLoginScreen() {
 			// --- Login Attributes ---
-			String savedUserName;
-			String savedPassword;
+			TextArea tAOutput;
 			// --- Set up frame ---
-			frame.setTitle("Switch Panel Example");
+			frame.setTitle("Banking With Us");
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			frame.setSize(400, 300);
 			frame.setLocationRelativeTo(null);
@@ -101,40 +118,41 @@ public class Client {
 
 			// --- Panel 1: Login panel with textfields ---
 			JPanel loginPanel = new JPanel();
-			loginPanel.setLayout(new BorderLayout());
+			loginPanel.setLayout(new FlowLayout());
 			// --- Show 2 textFields ---
-			JTextField userNameTxtField = new JTextField(20);
+			tAOutput = new TextArea(50,50); // allocate TextField
+		    tAOutput.setEditable(false);  // read-only
+		    JTextField userNameTxtField = new JTextField(20);
 			JTextField passwordTxtField = new JTextField(20);
-			JButton submitBtn = new JButton("Enter");
+			JButton loginBtn = new JButton("Login");
 
 			// --- Add All attributes ---
-			loginPanel.add(new JLabel("Logo Here"));
-			loginPanel.add(new JLabel("Welcome! Please Login"));
+			loginPanel.add(new JLabel("Welcome!"));
+		    loginPanel.add(tAOutput);
 			loginPanel.add(userNameTxtField);
 			loginPanel.add(passwordTxtField);
-			loginPanel.add(submitBtn);
+			loginPanel.add(loginBtn);
 
 			// --- Add both panels to the main panel ---
 			mainPanel.add(loginPanel, "LOGIN");
 			// --- Add functionality to buttons ---
+			tAOutput.setText("Login to Start");
 			// saves input as 2 string objects
-			submitBtn.addActionListener(new ActionListener() {
+			loginBtn.addActionListener(new ActionListener() {
 				@Override
-				public void actionPreformed(ActionEvent e) {
-					savedUserName = userNameTxtField.getText();
-					savedPassword = passwordTxtField.getText();
-
+				public void actionPerformed(ActionEvent e) {
+					sendLoginMessage(userNameTxtField.getText(),passwordTxtField.getText());
 				}
 			});
 
 			// --- Panel 2: Client Panel with list of available transactions ---
 			JPanel clientPanel = new JPanel();
 			clientPanel.setLayout(cardLayout);
-
+			
 			// --- Panel 3: Employee Panel with list of available transactions ---
 			JPanel employeePanel = new JPanel();
 			employeePanel.setLayout(cardLayout);
-
+			
 			// --- Add both panels to the main panel ---
 			mainPanel.add(clientPanel, "CLIENT");
 			mainPanel.add(employeePanel, "EMPLOYEE");
@@ -142,6 +160,11 @@ public class Client {
 		}
 
 		public void doOpenOrCloseAccount() {
+			JPanel openCloseAccount = new JPanel();
+			openCloseAccount.setLayout(cardLayout);
+
+			
+			mainPanel.add(openCloseAccount);
 
 		}
 
@@ -154,31 +177,38 @@ public class Client {
 		}
 
 		public void doTransactionMessage() {
-			JOptionPane transactionMsg = new JOptionPane.showMessageDialog(null, "Transaction successful");
+			mainPanel.setLayout(new FlowLayout());
+			JPanel upperPanel = new JPanel();
+			
+			
+			mainPanel.add(upperPanel);
+			JButton exitBtn = new JButton("Exit");
+
 		}
 
 		public void doSuccessMessage() {
-			JOptionPane successMsg = new JOptionPane.showMessageDialog(null, "Successfully accessed");
+			JOptionPane.showMessageDialog(null, "Successfully accessed");
 			// call client v. employee panel, based on instance of client v. employee
 		}
 
 		public void doFailMessage() {
-			JOptionPane failedMsg = new JOptionPane.showMessageDialog(null, "Failed Message");
+			JPanel failMessage = new JPanel();
+			failMessage.setLayout(cardLayout);
+			JButton exitBtn = new JButton("exit");
+
 		}
 
 		public void doInvalidMessage() {
-			JOptionPane invalidMsg = new JOptionPane.showMessageDialog(null, "Invalid Input");
+			JOptionPane.showMessageDialog(null, "Invalid Input");
+			JButton backBtn = new JButton("Back");
+
 		}
 
 		public void doAccountUpdatedMessage() {
-			JOptionPane accountUpdateMsg = new JOptionPane.showMessageDialog(null, "Account Updated successfully");
+			JOptionPane.showMessageDialog(null, "Account Updated successfully");
+			JButton backBtn = new JButton("Back");
+
 		}
-
+		
 	}
-
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-	}
-
 }
