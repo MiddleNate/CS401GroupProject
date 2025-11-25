@@ -340,7 +340,7 @@ public class Server {
 								ArrayList<String> owners = m.getAccount().getOwners();
 								for (int i = 0; i < owners.size(); i++) {
 									if (!(Server.users.get(owners.get(i)) instanceof Customer)) {
-										reply = new Message(MessageType.Fail, "Owner does not exist");
+										reply = new Message(MessageType.Fail, new Exception("Owner does not exist"));
 										break;
 									}
 								}
@@ -350,7 +350,7 @@ public class Server {
 								
 								// check that interest and limit are positive
 								if (interest < 0 || limit < 0) {
-									reply = new Message(MessageType.Fail, "Values must be above zero");
+									reply = new Message(MessageType.Fail, new Exception("Values must be above zero"));
 									break;
 								}
 								
@@ -369,7 +369,7 @@ public class Server {
 								ArrayList<String> owners = m.getAccount().getOwners();
 								for (int i = 0; i < owners.size(); i++) {
 									if (!(Server.users.get(owners.get(i)) instanceof Customer)) {
-										reply = new Message(MessageType.Fail, "Owner does not exist");
+										reply = new Message(MessageType.Fail, new Exception("Owner does not exist"));
 										break;
 									}
 								}
@@ -381,7 +381,7 @@ public class Server {
 								
 								// check that interest, limit, and minimum due are positive
 								if (interest < 0 || limit < 0 || minimum < 0) {
-									reply = new Message(MessageType.Fail, "Values must be above zero");
+									reply = new Message(MessageType.Fail, new Exception("Valies must be above zero"));
 									break;
 								}
 								
@@ -405,7 +405,7 @@ public class Server {
 							
 							// check that the account exists
 							if (!Server.accounts.containsKey(m.getAccount().getID())) {
-								reply = new Message(MessageType.Fail, "Account does not exist");
+								reply = new Message(MessageType.Fail, new Exception("Account does not exist"));
 							} else {
 								try {
 									// try to close the account
@@ -431,7 +431,7 @@ public class Server {
 							
 							// check that the account exists and type matches
 							if (!Server.accounts.containsKey(accountID) || Server.accounts.get(accountID).getType() != m.getAccount().getType()) {
-								reply = new Message(MessageType.Fail, "Account of that type does not exist");
+								reply = new Message(MessageType.Fail, new Exception("Account of that type does not exist"));
 							} else {
 								switch (m.getAccount().getType()) {
 								case AccountType.Checking: {
