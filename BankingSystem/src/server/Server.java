@@ -1,6 +1,7 @@
 package server;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import shared.*;
 
@@ -14,20 +15,24 @@ public class Server {
 	protected static Map<String, User> users;
 	// access within ClientHandler using Server.users
 	
+	protected static AtomicBoolean running = new AtomicBoolean(true);
+	// used to stop the server from a separate thread that blocks until console input
+	
+	
 	public static void main(String[] args) {
 		// loading users and accounts into memory
 		try {
 			// load hashmap of users from file (key is username)
 			FileInputStream userFile = new FileInputStream("users.txt");
 			ObjectInputStream userStream = new ObjectInputStream(userFile);
-			users = (HashMap<String, User>) userStream.readObject();
+			users = (Map<String, User>) userStream.readObject();
 			// convert it to a synchronized map (prevents multithreading issues)
 			users = Collections.synchronizedMap(users);
 			
 			// load hashmap of accounts from file (key is account id)
 			FileInputStream accountFile = new FileInputStream("accounts.txt");
 			ObjectInputStream accountStream = new ObjectInputStream(accountFile);
-			accounts = (HashMap<Integer, BankAccount>) accountStream.readObject();
+			accounts = (Map<Integer, BankAccount>) accountStream.readObject();
 			// convert it to a synchronized map (prevents multithreading issues)
 			accounts = Collections.synchronizedMap(accounts);
 			
@@ -58,18 +63,21 @@ public class Server {
 			server = new ServerSocket(7855);
 			server.setReuseAddress(true);
 			
-			boolean running = true;
 			Scanner scan = new Scanner(System.in);
+			
+			// listener to set the running flag when something has been entered in the console
+			Stopper stopper = new Stopper();
+			new Thread(stopper).start();
 			
 			// while running, accept connections and create
 			// a handler in its own thread for each of them
-			while (running) {
-				// exit the server if anything has been entered into the console
-				if (scan.hasNext()) {
-					running = false;
-				}
+			while (running.get()) {
+				// exit the server if anything has been entered into the console (as detected by stopper)
 				
 				Socket client = server.accept();
+				
+				// doesn't start a new thread if a stop message has been sent
+				if (!running.get()) break;
 				
 				ClientHandler handler = new ClientHandler(client);
 				
@@ -159,12 +167,12 @@ public class Server {
 							user = Server.users.get(m.getUser().getUsername());
 							
 							// reply with a success message
-							reply = new Message(MessageType.Success, user);
+							reply = new Message(MessageType.Success, user, ("Succesfully logged in as " + user.getUsername()));
 							// the reply includes the user we logged in as so that the client will know
 							// if we are a customer or an employee and be able to use the correct gui
 						} catch (Exception e) {
 							// if an exception is thrown by tryLogin, the login has failed
-							reply = new Message(MessageType.Fail, e);
+							reply = new Message(MessageType.Fail, e.getMessage());
 						}
 						out.writeObject(reply);
 						// skip to next loop so it doesn't try to handle the message twice
@@ -179,14 +187,20 @@ public class Server {
 							break; }
 						case MessageType.InfoRequest: {
 							ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
+							String text = "";
 							
 							// for each of the account ids in the customer
 							for (int i = 0; i < ((Customer)user).getAccounts().size(); i++) {
 								// add the account to the arraylist we will send from the map 
-								accounts.add(Server.accounts.get(((Customer)user).getAccounts().get(i)));
+								BankAccount acc = Server.accounts.get(((Customer)user).getAccounts().get(i));
+								
+								accounts.add(acc);
+								
+								// put the account id, type, and balance in the text field
+								text = text + acc.toString();
 							}
 							
-							Message reply = new Message(MessageType.Info, accounts);
+							Message reply = new Message(MessageType.Info, accounts, text);
 							out.writeObject(reply);
 							break; }
 						case MessageType.Transaction: {
@@ -196,16 +210,16 @@ public class Server {
 							// check that the account specified in the message
 							// is in the list of accounts owned by the current user
 							if (!((Customer)user).getAccounts().contains(accountID)) {
-								reply = new Message(MessageType.Fail, new Exception("You do not have access to that account"));
+								reply = new Message(MessageType.Fail, "You do not have access to that account");
 							} else {
 								try {
 									// pass the message to the account to be tried
 									Server.accounts.get(accountID).tryTransaction(m.getTransaction(), user);
 									// if no exception was thrown, the transaction was successful
 									// so we can set the reply to success
-									reply = new Message(MessageType.Success);
+									reply = new Message(MessageType.Success, "Transaction completed successfuly");
 								} catch (Exception e) {
-									reply = new Message(MessageType.Fail, e);
+									reply = new Message(MessageType.Fail, e.getMessage());
 								}
 							}
 							
@@ -231,15 +245,22 @@ public class Server {
 								Customer tempCustomer = (Customer) Server.users.get(m.getUser().getUsername());
 								ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
 								
+								String text = "";
+								
 								// for each of the account ids in the customer
 								for (int i = 0; i < tempCustomer.getAccounts().size(); i++) {
+									BankAccount acc = Server.accounts.get((tempCustomer.getAccounts().get(i)));
+									
 									// add the account to the arraylist we will send from the map 
-									accounts.add(Server.accounts.get(((Customer)user).getAccounts().get(i)));
+									accounts.add(acc);
+									
+									// put the account id, type, and balance into the text field
+									text = text + acc.toString();
 								}
 								
-								reply = new Message(MessageType.Info, accounts);
+								reply = new Message(MessageType.Info, accounts, text);
 							} else {
-								reply = new Message(MessageType.Fail, new Exception("User does not exist"));
+								reply = new Message(MessageType.Fail, "User does not exist");
 							}
 							out.writeObject(reply);
 							break; }
@@ -250,16 +271,16 @@ public class Server {
 							// check that the account specified in the message
 							// is an account that exists
 							if (Server.accounts.containsKey(accountID)) {
-								reply = new Message(MessageType.Fail, new Exception("Account does not exist"));
+								reply = new Message(MessageType.Fail, "Account does not exist");
 							} else {
 								try {
 									// pass the message to the account to be tried
 									Server.accounts.get(accountID).tryTransaction(m.getTransaction(), user);
 									// if no exception was thrown, the transaction was successful
 									// so we can set the reply to success
-									reply = new Message(MessageType.Success);
+									reply = new Message(MessageType.Success, "Transaction completed successfuly");
 								} catch (Exception e) {
-									reply = new Message(MessageType.Fail, e);
+									reply = new Message(MessageType.Fail, e.getMessage());
 								}
 							}
 							
@@ -271,9 +292,9 @@ public class Server {
 							
 							// check that the username does not already exist in the user map
 							if (Server.users.containsKey(m.getUser().getUsername())) {
-								reply = new Message(MessageType.Fail, new Exception("Customer already exists"));
+								reply = new Message(MessageType.Fail, "Customer already exists");
 							} else if (!(m.getUser() instanceof Customer)) {
-								reply = new Message(MessageType.Fail, new Exception("Provided User was not of type Customer"));
+								reply = new Message(MessageType.Fail, "Provided User was not of type Customer");
 							} else {
 								Customer newCust = (Customer) m.getUser();
 								// add the user to the map, data is copied to ensure we
@@ -285,7 +306,7 @@ public class Server {
 										newCust.getCustomerName(),
 										newCust.getSocialSecNumber()));
 								// set the reply to success
-								reply = new Message(MessageType.Success);
+								reply = new Message(MessageType.Success, "Customer created successfuly");
 							}
 							
 							out.writeObject(reply);
@@ -299,7 +320,7 @@ public class Server {
 								ArrayList<String> owners = m.getAccount().getOwners();
 								for (int i = 0; i < owners.size(); i++) {
 									if (!(Server.users.get(owners.get(i)) instanceof Customer)) {
-										reply = new Message(MessageType.Fail, new Exception("Owner does not exist"));
+										reply = new Message(MessageType.Fail, "Owner does not exist");
 										break;
 									}
 								}
@@ -312,7 +333,7 @@ public class Server {
 								for (int i = 0; i < owners.size(); i++) {
 									((Customer) Server.users.get(owners.get(i))).addAccount(newAcc.getID());
 								}
-								reply = new Message(MessageType.Success);
+								reply = new Message(MessageType.Success, "Account opened successfuly");
 								break; }
 							case AccountType.Savings: {
 								// check that the provided owners exist and are type Customer
@@ -341,7 +362,7 @@ public class Server {
 								for (int i = 0; i < owners.size(); i++) {
 									((Customer) Server.users.get(owners.get(i))).addAccount(newAcc.getID());
 								}
-								reply = new Message(MessageType.Success);
+								reply = new Message(MessageType.Success, "Account opened successfuly");
 								break ;}
 							case AccountType.LineOfCredit:  {
 								// check that the provided owners exist and are type Customer
@@ -372,7 +393,7 @@ public class Server {
 								for (int i = 0; i < owners.size(); i++) {
 									((Customer) Server.users.get(owners.get(i))).addAccount(newAcc.getID());
 								}
-								reply = new Message(MessageType.Success);
+								reply = new Message(MessageType.Success, "Account opened successfuly");
 								break ;}
 								
 							}
@@ -395,10 +416,10 @@ public class Server {
 									for (int i = 0; i < owners.size(); i++) {
 										((Customer) Server.users.get(owners.get(i))).removeAccount(closedAccount.getID());
 									}
-									reply = new Message(MessageType.Success);
+									reply = new Message(MessageType.Success, "Account closed successfuly");
 								} catch (Exception e) {
 									// the account cannot be closed if closedaccount throws
-									reply = new Message(MessageType.Fail, e);
+									reply = new Message(MessageType.Fail, e.getMessage());
 								}
 							}
 							
@@ -415,20 +436,20 @@ public class Server {
 								switch (m.getAccount().getType()) {
 								case AccountType.Checking: {
 									// checking accounts have no fields to be modified, so it fails
-									reply = new Message(MessageType.Fail, new Exception("Checking accounts cannot be modified"));
+									reply = new Message(MessageType.Fail, "Checking accounts cannot be modified");
 									break; }
 								case AccountType.Savings: {
 									// validate the fields that will be modified
 									double interest = ((LOCAccount) m.getAccount()).getInterest();
 									double limit = ((LOCAccount) m.getAccount()).getLimit();
 									if (interest < 0 || limit < 0) {
-										reply = new Message(MessageType.Fail, new Exception("Values must be above zero"));
+										reply = new Message(MessageType.Fail, "Values must be above zero");
 										break;
 									}
 									
 									((SavingsAccount) Server.accounts.get(accountID)).setInterest(interest);
 									((SavingsAccount) Server.accounts.get(accountID)).setWithdrawlLimit(limit);
-									reply = new Message(MessageType.Success);
+									reply = new Message(MessageType.Success, "Account updated successfuly");
 									break; }
 								case AccountType.LineOfCredit: {
 									// validate the fields that will be modified
@@ -436,14 +457,14 @@ public class Server {
 									double limit = ((LOCAccount) m.getAccount()).getLimit();
 									double minimum = ((LOCAccount) m.getAccount()).getMinimumDue();
 									if (interest < 0 || limit < 0 || minimum < 0) {
-										reply = new Message(MessageType.Fail, new Exception ("Values must be above zero"));
+										reply = new Message(MessageType.Fail, "Values must be above zero");
 										break;
 									}
 									
 									((LOCAccount) Server.accounts.get(accountID)).setInterest(interest);
 									((LOCAccount) Server.accounts.get(accountID)).setCreditLimit(limit);
 									((LOCAccount) Server.accounts.get(accountID)).setMinimumDue(minimum);
-									reply = new Message(MessageType.Success);
+									reply = new Message(MessageType.Success, "Account updated successfuly");
 									break;}
 								}
 								
@@ -456,15 +477,15 @@ public class Server {
 							String username = m.getUser().getUsername();
 							// validate that the account exists, the user exists and is type Customer, and account is not closed
 							if (!Server.accounts.containsKey(accountID)) {
-								reply = new Message(MessageType.Fail, new Exception("Account does not exist"));
+								reply = new Message(MessageType.Fail, "Account does not exist");
 							} else if (!(Server.users.get(username) instanceof Customer)) {
-								reply = new Message(MessageType.Fail, new Exception("Customer does not exist"));
+								reply = new Message(MessageType.Fail, "Customer does not exist");
 							} else if (Server.accounts.get(accountID).isOpen()) {
-								reply = new Message(MessageType.Fail, new Exception("Account is closed"));
+								reply = new Message(MessageType.Fail, "Account is closed");
 							} else {
 								Server.accounts.get(accountID).addUser(username);
 								((Customer) Server.users.get(m.getUser().getUsername())).addAccount(m.getAccount().getID());
-								reply = new Message(MessageType.Success);
+								reply = new Message(MessageType.Success, "Customer added to account successfuly");
 							}
 							
 							out.writeObject(reply);
@@ -476,18 +497,18 @@ public class Server {
 							// validate that the account exists, the user exists and is type Customer,
 							// the user is on the account, and the account is not closed
 							if (!Server.accounts.containsKey(accountID)) {
-								reply = new Message(MessageType.Fail, new Exception("Account does not exist"));
+								reply = new Message(MessageType.Fail, "Account does not exist");
 							} else if (!(Server.users.get(username) instanceof Customer)) {
-								reply = new Message(MessageType.Fail, new Exception("Customer does not exist"));
+								reply = new Message(MessageType.Fail, "Customer does not exist");
 							} else if (Server.accounts.get(accountID).isOpen()) {
-								reply = new Message(MessageType.Fail, new Exception("Account is closed"));
+								reply = new Message(MessageType.Fail, "Account is closed");
 							} else if (!Server.accounts.get(accountID).getOwners().contains(username)) {
-								reply = new Message(MessageType.Fail, new Exception("Customer is not an account owner"));
+								reply = new Message(MessageType.Fail, "Customer is not an account owner");
 							}
 							else {
 								Server.accounts.get(accountID).removeOwner(username);
 								((Customer) Server.users.get(m.getUser().getUsername())).removeAccount(m.getAccount().getID());
-								reply = new Message(MessageType.Success);
+								reply = new Message(MessageType.Success, "Customer removed from account successfuly");
 							}
 							
 							out.writeObject(reply);
@@ -515,6 +536,26 @@ public class Server {
 					System.out.println("Error closing resources: " + e);
 				}
 			}
+		}
+	}
+	
+	private static class Stopper implements Runnable {
+		public void run() {
+			Scanner scan = new Scanner(System.in);
+			// scan.hasNext() blocks until something is entered in the console, then sets the boolean
+			// so that the main will exit the loop the next time it accepts a connection
+			if (scan.hasNext()) Server.running.set(false);
+			System.out.println("Exiting");
+			// after setting the boolean to false the server sends a new connection to ITSELF
+			// so that it stops blocking on ServerSocket.accept(), and breaks out of the loop
+			// because the flag has been changed
+			try {
+				Socket self = new Socket("localhost", 7855);
+				self.close();
+			} catch (Exception e) {
+				System.out.println(e);
+			}
+			scan.close();
 		}
 	}
 

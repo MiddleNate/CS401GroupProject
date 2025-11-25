@@ -10,7 +10,7 @@ public class Message implements Serializable {
 	private BankAccount account;
 	private ArrayList<BankAccount> accounts;
 	private Transaction transaction;
-	private Exception exception;
+	private String text;
 	
 	public Message(MessageType type, User user) {
 		// return an invalid message if the type does not match the valid types for this constructor
@@ -24,18 +24,37 @@ public class Message implements Serializable {
 			this.account = null;
 			this.accounts = null;
 			this.transaction = null;
-			this.exception = null;
+			this.text = null;
 		} else {
 			this.type = type;
 			this.user = user;
 			this.account = null;
 			this.accounts = null;
 			this.transaction = null;
-			this.exception = null;
+			this.text = null;
 		}
 	}
 	
-	public Message(MessageType type, ArrayList<BankAccount> accounts) {
+	public Message(MessageType type, User user, String text) {
+		// return an invalid message if the type does not match the valid types for this constructor
+		if (type != MessageType.Success) {
+			this.type = MessageType.Invalid;
+			this.user = null;
+			this.account = null;
+			this.accounts = null;
+			this.transaction = null;
+			this.text = null;
+		} else {
+			this.type = type;
+			this.user = user;
+			this.account = null;
+			this.accounts = null;
+			this.transaction = null;
+			this.text = null;
+		}
+	}
+	
+	public Message(MessageType type, ArrayList<BankAccount> accounts, String text) {
 		// return an invalid message if the type does not match the the valid type for this constructor
 		if (type != MessageType.Info) {
 			this.type = MessageType.Invalid;
@@ -43,14 +62,14 @@ public class Message implements Serializable {
 			this.account = null;
 			this.accounts = null;
 			this.transaction = null;
-			this.exception = null;
+			this.text = null;
 		} else {
 			this.type = type;
 			this.user = null;
 			this.account = null;
 			this.accounts = accounts;
 			this.transaction = null;
-			this.exception = null;
+			this.text = text;
 		}
 	}
 	
@@ -62,14 +81,14 @@ public class Message implements Serializable {
 			this.account = null;
 			this.accounts = null;
 			this.transaction = null;
-			this.exception = null;
+			this.text = null;
 		} else {
 			this.type = type;
 			this.user = null;
 			this.account = null;
 			this.accounts = null;
 			this.transaction = transaction;
-			this.exception = null;
+			this.text = null;
 		}
 	}
 	
@@ -82,14 +101,14 @@ public class Message implements Serializable {
 			this.account = null;
 			this.accounts = null;
 			this.transaction = null;
-			this.exception = null;
+			this.text = null;
 		} else {
 			this.type = type;
 			this.user = null;
 			this.account = null;
 			this.accounts = null;
 			this.transaction = null;
-			this.exception = null;
+			this.text = null;
 		}
 	}
 	
@@ -103,33 +122,35 @@ public class Message implements Serializable {
 			this.account = null;
 			this.accounts = null;
 			this.transaction = null;
-			this.exception = null;
+			this.text = null;
 		} else {
 			this.type = type;
 			this.user = null;
 			this.account = account;
 			this.accounts = null;
 			this.transaction = null;
-			this.exception = null;
+			this.text = null;
 		}
 	}
 	
-	public Message(MessageType type, Exception exception) {
+	public Message(MessageType type, String text) {
 		// return an invalid message if the type does not match the the valid type for this constructor
-		if (type != MessageType.Fail) {
+		if (type != MessageType.Fail
+				&& type != MessageType.Success
+				&& type != MessageType.Info) {
 			this.type = MessageType.Invalid;
 			this.user = null;
 			this.account = null;
 			this.accounts = null;
 			this.transaction = null;
-			this.exception = null;
+			this.text = null;
 		} else {
 			this.type = type;
 			this.user = null;
 			this.account = null;
 			this.accounts = null;
 			this.transaction = null;
-			this.exception = exception;
+			this.text = text;
 		}
 	}
 	
@@ -142,14 +163,14 @@ public class Message implements Serializable {
 			this.account  = null;
 			this.accounts = null;
 			this.transaction = null;
-			this.exception = null;
+			this.text = null;
 		} else {
 			this.type = type;
 			this.user = user;
 			this.account = account;
 			this.accounts = null;
 			this.transaction = null;
-			this.exception = null;
+			this.text = null;
 		}
 	}
 	
@@ -173,7 +194,7 @@ public class Message implements Serializable {
 		return transaction;
 	}
 	
-	public Exception getException() {
-		return exception;
+	public String getText() {
+		return text;
 	}
 }

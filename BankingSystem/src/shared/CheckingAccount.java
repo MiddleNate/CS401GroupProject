@@ -69,4 +69,9 @@ public class CheckingAccount extends BankAccount {
 		amt = Math.floor(amt * 100) / 100;
 		balance -= amt;
 	}
+	
+	@Override
+	public String toString() {
+		return ("Account ID: " + id + "\tType: Checking\tBalance: " + balance + "\n");
+	}
 }
