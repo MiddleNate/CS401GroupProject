@@ -41,6 +41,59 @@ public class Client {
 		GUI gui = new GUI();
 		new Thread(gui).start();
 
+		while (!exiting) {
+			response = (Message) in.readObject();
+
+			// listen for replies, put the reply in response, redraw gui
+			switch(response.getType()) {
+				case Login: 
+					gui.doLoginScreen();
+					break;
+				case Logout:
+					//method
+					break;
+				case InfoRequest:
+					//method
+					break;
+				case Info:
+					//method
+					break;
+				case Transaction:
+					gui.doTransactionMessage();
+					break;
+				case Success:
+					gui.doSuccessMessage();
+					break;
+				case Fail :
+					gui.doFailMessage();
+					break;
+				case CreateCustomer:
+					//method
+					break;
+				case OpenAccount:
+					//method
+					break;
+				case CloseAccount:
+					//method
+					break;
+				case UpdateAccount:
+					//method
+					break;
+				case AddToAccount:
+					//method
+					break;
+				case RemoveFromAccount:
+					//method
+					break;
+				case Invalid:
+					gui.doInvalidMessage();
+					break;
+				default:
+					System.out.println("Unknown Message Type: " + response.getType());
+					break;
+			}
+		}
+		
 		try {
 			connection = new Socket("localhost", 7855);
 			in = new ObjectInputStream(connection.getInputStream());
@@ -128,7 +181,7 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
-	
+	//TODO : Add Parameters
 	private static void sendTransactionMessage(String username, String password) {
 		// create and send a message through the stream
 		try {
@@ -137,6 +190,17 @@ public class Client {
 			out.writeObject(msg);
 			out.flush();
 		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	//TODO : Add parameters
+	private static void sendLogoutMessage() {
+		try {
+			User user = new User(username,password);
+			Message msg = new Message(MessageType.Logout);
+			out.writeObject(msg);
+			out.flush();
+		}catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -204,6 +268,17 @@ public class Client {
 			// --- Panel 2: Client Panel with list of available transactions ---
 			JPanel clientPanel = new JPanel();
 			clientPanel.setLayout(cardLayout);
+			frame.setLayout(new BorderLayout());
+			JLabel greetingLabel = new JLabel("Welcome");
+			tAOutput = new TextArea(5,50); // allocate TextField
+		    tAOutput.setEditable(false);  // read-only
+		    
+		    // --- Types of Transactions for Customer
+		    JButton withdrawlBtn = new JButton("Withdraw");
+		    JButton depositBtn = new JButton("Deposit");
+		    JButton seeTransactionHistoryBtn = new JButton("View Transaction History");
+		    
+		    
 			doTransactionMessage();
 			
 			// --- Panel 3: Employee Panel with list of available transactions ---
@@ -243,7 +318,7 @@ public class Client {
 
 		public void doTransactionMessage() {
 			//GUI Interface
-			mainPanel.setLayout(new FlowLayout());
+			mainPanel.setLayout(new GridLayout());
 			JPanel upperPanel = new JPanel();
 			
 			mainPanel.add(upperPanel);
