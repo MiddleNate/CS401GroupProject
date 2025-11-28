@@ -36,6 +36,8 @@ public class Client {
 		new Thread(gui).start();
 
 		while (!exiting) {
+			response = (Message) in.readObject();
+
 			// listen for replies, put the reply in response, redraw gui
 			switch(response.getType()) {
 				case Login: 
@@ -100,7 +102,6 @@ public class Client {
 			connection = new Socket(ip, port);
 			in = new ObjectInputStream(connection.getInputStream());
 			out = new ObjectOutputStream(connection.getOutputStream());
-			response = (Message) in.readObject();
 
 		} catch (Exception e) {
 			// TODO: remove console output
@@ -121,6 +122,7 @@ public class Client {
 		}
 		
 	}
+	//TODO : Add Parameters
 	private static void sendTransactionMessage(String username, String password) {
 		// create and send a message through the stream
 		try {
@@ -131,6 +133,17 @@ public class Client {
 			out.writeObject(msg);
 			out.flush();
 		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	//TODO : Add parameters
+	private static void sendLogoutMessage() {
+		try {
+			User user = new User(username,password);
+			Message msg = new Message(MessageType.Logout);
+			out.writeObject(msg);
+			out.flush();
+		}catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -208,6 +221,17 @@ public class Client {
 			// --- Panel 2: Client Panel with list of available transactions ---
 			JPanel clientPanel = new JPanel();
 			clientPanel.setLayout(cardLayout);
+			frame.setLayout(new BorderLayout());
+			JLabel greetingLabel = new JLabel("Welcome");
+			tAOutput = new TextArea(5,50); // allocate TextField
+		    tAOutput.setEditable(false);  // read-only
+		    
+		    // --- Types of Transactions for Customer
+		    JButton withdrawlBtn = new JButton("Withdraw");
+		    JButton depositBtn = new JButton("Deposit");
+		    JButton seeTransactionHistoryBtn = new JButton("View Transaction History");
+		    
+		    
 			doTransactionMessage();
 			
 			// --- Panel 3: Employee Panel with list of available transactions ---
@@ -249,7 +273,7 @@ public class Client {
 
 		public void doTransactionMessage() {
 			//GUI Interface
-			mainPanel.setLayout(new FlowLayout());
+			mainPanel.setLayout(new GridLayout());
 			JPanel upperPanel = new JPanel();
 			
 			mainPanel.add(upperPanel);
