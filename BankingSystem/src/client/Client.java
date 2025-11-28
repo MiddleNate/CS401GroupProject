@@ -28,7 +28,7 @@ public class Client {
 	private static boolean exiting = false;
 	private static ObjectInputStream in;
 	private static ObjectOutputStream out;
-	private static String response;
+	private static Message response;
 
 	public static void main(String[] args) {
 
@@ -37,28 +37,77 @@ public class Client {
 
 		while (!exiting) {
 			// listen for replies, put the reply in response, redraw gui
-			
+			switch(response.getType()) {
+				case Login: 
+					gui.doLoginScreen();
+					break;
+				case Logout:
+					//method
+					break;
+				case InfoRequest:
+					//method
+					break;
+				case Info:
+					//method
+					break;
+				case Transaction:
+					gui.doTransactionMessage();
+					break;
+				case Success:
+					gui.doSuccessMessage();
+					break;
+				case Fail :
+					gui.doFailMessage();
+					break;
+				case CreateCustomer:
+					//method
+					break;
+				case OpenAccount:
+					//method
+					break;
+				case CloseAccount:
+					//method
+					break;
+				case UpdateAccount:
+					//method
+					break;
+				case AddToAccount:
+					//method
+					break;
+				case RemoveFromAccount:
+					//method
+					break;
+				case Invalid:
+					gui.doInvalidMessage();
+					break;
+				default:
+					System.out.println("Unknown Message Type: " + response.getType());
+					break;
+			}
 		}
 		
 		try {
 			connection.close();
 		} catch (Exception e) {
-			// TODO: remove console output
 			System.out.println("Error closing connection: " + e);
 		}
 	}
-	
+
+
+
 	private void connect(String ip, int port) {
 		try {
 			connection = new Socket(ip, port);
 			in = new ObjectInputStream(connection.getInputStream());
 			out = new ObjectOutputStream(connection.getOutputStream());
+			response = (Message) in.readObject();
+
 		} catch (Exception e) {
 			// TODO: remove console output
 			System.out.println("error connecting: " + e + "\nExiting...");
 		}
 	}
-	
+
 	private static void sendLoginMessage(String username, String password) {
 		// create and send a message through the stream
 		try
@@ -71,6 +120,19 @@ public class Client {
 			e.printStackTrace();
 		}
 		
+	}
+	private static void sendTransactionMessage(String username, String password) {
+		// create and send a message through the stream
+		try {
+			User user = new User(username,password);
+			Transaction transaction = new Transaction();
+			
+			Message msg = new Message(MessageType.Transaction,user);
+			out.writeObject(msg);
+			out.flush();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	// more methods for sending other message types
@@ -98,10 +160,7 @@ public class Client {
 			// --- Create card layout ---
 			cardLayout = new CardLayout();
 			mainPanel = new JPanel(cardLayout);
-
-			doLoginScreen();
-
-		}
+		
 
 		public void doLoginScreen() {
 			// --- Login Attributes ---
@@ -112,31 +171,32 @@ public class Client {
 			frame.setSize(400, 300);
 			frame.setLocationRelativeTo(null);
 
-			// --- Create card layout ---
-			cardLayout = new CardLayout();
-			mainPanel = new JPanel(cardLayout);
-
 			// --- Panel 1: Login panel with textfields ---
 			JPanel loginPanel = new JPanel();
-			loginPanel.setLayout(new FlowLayout());
-			// --- Show 2 textFields ---
-			tAOutput = new TextArea(50,50); // allocate TextField
+			frame.setLayout(new BorderLayout());
+			// --- Show 2 textFields & Display a Text Area ---
+			tAOutput = new TextArea(5,50); // allocate TextField
 		    tAOutput.setEditable(false);  // read-only
 		    JTextField userNameTxtField = new JTextField(20);
-			JTextField passwordTxtField = new JTextField(20);
-			JButton loginBtn = new JButton("Login");
+			userNameTxtField.setText("Enter Username");
 
+			JTextField passwordTxtField = new JTextField(20);
+			passwordTxtField.setText("Enter Password");
+
+			JButton loginBtn = new JButton("Login");
+			
 			// --- Add All attributes ---
-			loginPanel.add(new JLabel("Welcome!"));
-		    loginPanel.add(tAOutput);
-			loginPanel.add(userNameTxtField);
-			loginPanel.add(passwordTxtField);
-			loginPanel.add(loginBtn);
+			loginPanel.add(new JLabel("Welcome!"), BorderLayout.NORTH);
+			loginPanel.add(userNameTxtField, BorderLayout.WEST);
+			loginPanel.add(passwordTxtField,BorderLayout.EAST);
+			loginPanel.add(loginBtn, BorderLayout.CENTER);
+		    loginPanel.add(tAOutput,BorderLayout.SOUTH);
 
 			// --- Add both panels to the main panel ---
 			mainPanel.add(loginPanel, "LOGIN");
+			
 			// --- Add functionality to buttons ---
-			tAOutput.setText("Login to Start");
+			
 			// saves input as 2 string objects
 			loginBtn.addActionListener(new ActionListener() {
 				@Override
@@ -148,6 +208,7 @@ public class Client {
 			// --- Panel 2: Client Panel with list of available transactions ---
 			JPanel clientPanel = new JPanel();
 			clientPanel.setLayout(cardLayout);
+			doTransactionMessage();
 			
 			// --- Panel 3: Employee Panel with list of available transactions ---
 			JPanel employeePanel = new JPanel();
@@ -156,7 +217,7 @@ public class Client {
 			// --- Add both panels to the main panel ---
 			mainPanel.add(clientPanel, "CLIENT");
 			mainPanel.add(employeePanel, "EMPLOYEE");
-
+			
 		}
 
 		public void doOpenOrCloseAccount() {
@@ -169,46 +230,48 @@ public class Client {
 		}
 
 		public void doBankAccounts() {
-
+			// --- Attributes ---
+			// --- Text Area : Read Only --- 
+			TextArea tAOutput;
+			tAOutput = new TextArea(5,50); // allocate TextField
+		    tAOutput.setEditable(false);  // read-only
+		    
 		}
 
 		public void doBankAccountDetails() {
+			// --- Attributes ---
+			// --- Text Area : Read Only --- 
+			TextArea tAOutput;
+			tAOutput = new TextArea(5,50); // allocate TextField
+		    tAOutput.setEditable(false);  // read-only
 
 		}
 
 		public void doTransactionMessage() {
+			//GUI Interface
 			mainPanel.setLayout(new FlowLayout());
 			JPanel upperPanel = new JPanel();
 			
-			
 			mainPanel.add(upperPanel);
-			JButton exitBtn = new JButton("Exit");
-
+			
+			
+			sendTransactionMessage();
 		}
-
+		
 		public void doSuccessMessage() {
 			JOptionPane.showMessageDialog(null, "Successfully accessed");
-			// call client v. employee panel, based on instance of client v. employee
 		}
 
 		public void doFailMessage() {
-			JPanel failMessage = new JPanel();
-			failMessage.setLayout(cardLayout);
-			JButton exitBtn = new JButton("exit");
-
+			JOptionPane.showMessageDialog(null, "Failed, Try Again or Logging Out");
 		}
 
 		public void doInvalidMessage() {
-			JOptionPane.showMessageDialog(null, "Invalid Input");
-			JButton backBtn = new JButton("Back");
-
+			JOptionPane.showMessageDialog(null, "Invalid Entry, Try Again");
 		}
 
 		public void doAccountUpdatedMessage() {
-			JOptionPane.showMessageDialog(null, "Account Updated successfully");
-			JButton backBtn = new JButton("Back");
-
+			JOptionPane.showMessageDialog(null, "Account Updated Successfully");
 		}
-		
-	}
-}
+
+		}}
