@@ -40,59 +40,6 @@ public class Client {
 
 		GUI gui = new GUI();
 		new Thread(gui).start();
-
-		while (!exiting) {
-			response = (Message) in.readObject();
-
-			// listen for replies, put the reply in response, redraw gui
-			switch(response.getType()) {
-				case Login: 
-					gui.doLoginScreen();
-					break;
-				case Logout:
-					//method
-					break;
-				case InfoRequest:
-					//method
-					break;
-				case Info:
-					//method
-					break;
-				case Transaction:
-					gui.doTransactionMessage();
-					break;
-				case Success:
-					gui.doSuccessMessage();
-					break;
-				case Fail :
-					gui.doFailMessage();
-					break;
-				case CreateCustomer:
-					//method
-					break;
-				case OpenAccount:
-					//method
-					break;
-				case CloseAccount:
-					//method
-					break;
-				case UpdateAccount:
-					//method
-					break;
-				case AddToAccount:
-					//method
-					break;
-				case RemoveFromAccount:
-					//method
-					break;
-				case Invalid:
-					gui.doInvalidMessage();
-					break;
-				default:
-					System.out.println("Unknown Message Type: " + response.getType());
-					break;
-			}
-		}
 		
 		try {
 			connection = new Socket("localhost", 7855);
@@ -194,7 +141,7 @@ public class Client {
 		}
 	}
 	//TODO : Add parameters
-	private static void sendLogoutMessage() {
+	private static void sendLogoutMessage(String username, String password) {
 		try {
 			User user = new User(username,password);
 			Message msg = new Message(MessageType.Logout);
@@ -270,14 +217,10 @@ public class Client {
 			clientPanel.setLayout(cardLayout);
 			frame.setLayout(new BorderLayout());
 			JLabel greetingLabel = new JLabel("Welcome");
-			tAOutput = new TextArea(5,50); // allocate TextField
-		    tAOutput.setEditable(false);  // read-only
-		    
 		    // --- Types of Transactions for Customer
 		    JButton withdrawlBtn = new JButton("Withdraw");
 		    JButton depositBtn = new JButton("Deposit");
 		    JButton seeTransactionHistoryBtn = new JButton("View Transaction History");
-		    
 		    
 			doTransactionMessage();
 			
@@ -288,7 +231,6 @@ public class Client {
 			// --- Add both panels to the main panel ---
 			mainPanel.add(clientPanel, "CLIENT");
 			mainPanel.add(employeePanel, "EMPLOYEE");
-			
 		}
 
 		public void doOpenOrCloseAccount() {
