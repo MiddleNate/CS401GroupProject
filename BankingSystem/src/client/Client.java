@@ -48,7 +48,7 @@ public class Client {
 			
 		while (!exiting) {
 			Message response = (Message) in.readObject();
-			response(response, gui);
+			onResponse(response, gui);
 		}
 		
 		} catch (EOFException e) {
@@ -59,6 +59,7 @@ public class Client {
 			e.printStackTrace();
 		} finally {
 			try {
+				
 				connection.close();
 			} catch (Exception e) {
 				System.out.println("Error closing connection: " + e);
@@ -66,46 +67,14 @@ public class Client {
 		}
 	}
 
-	private static void response(Message response, GUI gui) {
+	private static void onResponse(Message response, GUI gui) {
 		switch(response.getType()) {
-		case Login: 
-			gui.doLoginScreen();
-			break;
-		case Logout:
-			//method
-			break;
-		case InfoRequest:
-			//method
-			break;
-		case Info:
-			//method
-			break;
-		case Transaction:
-			gui.doTransactionMessage();
-			break;
 		case Success:
-			gui.doSuccessMessage();
+			System.out.println("Swag" + "= " + response);
+			gui.doSuccessMessage(response.getText());
 			break;
 		case Fail :
-			gui.doFailMessage();
-			break;
-		case CreateCustomer:
-			//method
-			break;
-		case OpenAccount:
-			//method
-			break;
-		case CloseAccount:
-			//method
-			break;
-		case UpdateAccount:
-			//method
-			break;
-		case AddToAccount:
-			//method
-			break;
-		case RemoveFromAccount:
-			//method
+			gui.doFailMessage(response.getText());
 			break;
 		case Invalid:
 			gui.doInvalidMessage();
@@ -128,19 +97,6 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
-	//TODO : Add Parameters
-	private static void sendTransactionMessage(String username, String password) {
-		// create and send a message through the stream
-		try {
-			User user = new User(username,password);
-			Message msg = new Message(MessageType.Transaction,user);
-			out.writeObject(msg);
-			out.flush();
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-	//TODO : Add parameters
 	private static void sendLogoutMessage(String username, String password) {
 		try {
 			User user = new User(username,password);
@@ -151,7 +107,28 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
-	
+	//TODO : Add Parameters
+	private static void sendTransactionMessage(Transaction action) {
+		// create and send a message through the stream
+		try {
+			Message msg = new Message(MessageType.Transaction,action);
+			out.writeObject(msg);
+			out.flush();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+//	private static void sendInfoRequestMessage(User user) {
+//		try {
+//			Message msg = new Message(MessageType.InfoRequest,user);
+//			out.writeObject(msg); 
+//			out.flush();
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
+
+
 	// more methods for sending other message types
 
 	private static class GUI implements Runnable {
@@ -195,7 +172,6 @@ public class Client {
 			inputGrid.add(passwordTxt);
 
 			// --- Add both panels to the main panel ---
-			
 			JButton loginBtn = new JButton("Login");
 			JPanel loginPanel = new JPanel(new BorderLayout(10, 10));
 			loginPanel.add(inputGrid, BorderLayout.CENTER);
@@ -204,7 +180,6 @@ public class Client {
 			mainPanel.add(loginPanel, "LOGIN");
 			
 			// --- Add functionality to buttons ---
-			
 			// saves input as 2 string objects
 			loginBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -212,27 +187,46 @@ public class Client {
 				}
 			});
 
+		}
+		public void doCustomerInterface() {
 			// --- Panel 2: Client Panel with list of available transactions ---
 			JPanel clientPanel = new JPanel();
 			clientPanel.setLayout(cardLayout);
-			frame.setLayout(new BorderLayout());
-			JLabel greetingLabel = new JLabel("Welcome");
-		    // --- Types of Transactions for Customer
-		    JButton withdrawlBtn = new JButton("Withdraw");
-		    JButton depositBtn = new JButton("Deposit");
-		    JButton seeTransactionHistoryBtn = new JButton("View Transaction History");
+			frame.setLayout(new GridLayout(2,2,2,2));
 		    
-			doTransactionMessage();
+			//4 button layout
+			JButton withdrawlBtn = new JButton();
+			JButton depositBtn = new JButton();
+			JButton seeTransHistoryBtn = new JButton();
 			
+			JButton logoutBtn = new JButton();
+			
+			// --- Add attributes ---
+			clientPanel.add(new JLabel("Welcome"));
+			clientPanel.add(withdrawlBtn);
+			clientPanel.add(seeTransHistoryBtn);
+			clientPanel.add(depositBtn);
+			clientPanel.add(logoutBtn);
+			mainPanel.add(clientPanel, "CUSTOMER");
+		}
+		
+		public void doEmployeeInterface() {
 			// --- Panel 3: Employee Panel with list of available transactions ---
 			JPanel employeePanel = new JPanel();
 			employeePanel.setLayout(cardLayout);
 			
-			// --- Add both panels to the main panel ---
-			mainPanel.add(clientPanel, "CLIENT");
+			
+			JButton withdrawlBtn = new JButton();
+			JButton depositBtn = new JButton();
+			JButton seeTransHistoryBtn = new JButton();
+			JButton openOrCloseAccountbtn = new JButton();
+			JButton seeBankAccountsbtn = new JButton();
+			JButton btn = new JButton();
+			JButton logoutBtn = new JButton();
+			// --- Add panel to the main panel ---
 			mainPanel.add(employeePanel, "EMPLOYEE");
 		}
-
+		
 		public void doOpenOrCloseAccount() {
 			JPanel openCloseAccount = new JPanel();
 			openCloseAccount.setLayout(cardLayout);
@@ -258,22 +252,73 @@ public class Client {
 		    tAOutput.setEditable(false);  // read-only
 		}
 
-		public void doTransactionMessage() {
+		public void doTransactionMessage(User user) {
 			//GUI Interface
 			mainPanel.setLayout(new GridLayout());
 			JPanel upperPanel = new JPanel();
-			
+			//
+			JLabel greetingLabel = new JLabel("Welcome Customer");  
+
+			JButton withdrawlBtn = new JButton("Withdraw");
+		    JButton depositBtn = new JButton("Deposit");
+		    JButton seeTransactionHistoryBtn = new JButton("View Transaction History");
+		    
+		    // --- button functionalities ---
+		    // create new transaction --> create new Message & send it
+		    withdrawlBtn.addActionListener(new ActionListener() {
+		    	public void actionPerformed(ActionEvent e) {
+		    		doWithdrawl();
+
+		    	}
+
+				private void doWithdrawl() {
+					TextField amountTxt = new TextField();
+					TextField bankAccTxt = new TextField();
+					JButton submitBtn = new JButton();
+					// TODO: add to panel
+					add(amountTxt,BorderLayout.CENTER);
+					add(bankAccTxt, BorderLayout.SOUTH);
+					
+					Double withdrawlAmount = Double.parseDouble(amountTxt.getText());
+					
+		    		// TODO : configure the string to BankAccount object
+		    		Transaction withdrawl = new Transaction(withdrawlAmount,TransactionType.Withdrawal,user,(BankAccount)bankAccTxt.getText());
+		    		sendTransactionMessage(withdrawl);
+				}
+		    });
+		    depositBtn.addActionListener(new ActionListener() {
+		    	public void actionPerformed(ActionEvent e) {
+		    		TextField amountTxt = new TextField();
+					TextField bankAccTxt = new TextField();
+					// TODO: add to panel
+					add(amountTxt,BorderLayout.CENTER);
+					add(bankAccTxt, BorderLayout.SOUTH);
+					
+					Double depositAmount = Double.parseDouble(amountTxt.getText());
+					
+		    		// TODO : configure the string to BankAccount object
+		    		Transaction deposit = new Transaction(depositAmount,TransactionType.Deposit,user,(BankAccount)bankAccTxt.getText());
+		    		sendTransactionMessage(deposit);
+		    	}
+		    });
+		    seeTransactionHistoryBtn.addActionListener(new ActionListener() {
+		    	public void actionPerformed(ActionEvent e) {
+					TextField bankAccTxt = new TextField();
+					// TODO: add to panel
+					add(bankAccTxt, BorderLayout.SOUTH);
+					
+					sendInfoRequestMessage(user);
+		    	}
+		    });
 			mainPanel.add(upperPanel);
-			
-			sendTransactionMessage(null, null);
 		}
 		
-		public void doSuccessMessage() {
-			JOptionPane.showMessageDialog(null, "Successfully accessed");
+		public void doSuccessMessage(String showTxt) {
+			JOptionPane.showMessageDialog(null, '"' + showTxt + '"');
 		}
 
-		public void doFailMessage() {
-			JOptionPane.showMessageDialog(null, "Failed, Try Again or Logging Out");
+		public void doFailMessage(String showTxt) {
+			JOptionPane.showMessageDialog(null, '"' + showTxt + '"');
 		}
 
 		public void doInvalidMessage() {

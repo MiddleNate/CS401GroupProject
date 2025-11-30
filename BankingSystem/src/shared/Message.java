@@ -50,7 +50,7 @@ public class Message implements Serializable {
 			this.account = null;
 			this.accounts = null;
 			this.transaction = null;
-			this.text = null;
+			this.text = text;
 		}
 	}
 	
