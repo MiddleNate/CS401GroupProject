@@ -8,7 +8,7 @@ public class Transaction {
 	private LocalDate date;
 	private TransactionType type; 
 	private User user;
-	private BankAccount account;
+	private int account;
 
 	public static void setTransactionCount(int c) {
 		count = c;
@@ -18,7 +18,7 @@ public class Transaction {
 		return count;
 	}
 	
-	public Transaction(double amount, TransactionType type, User user, BankAccount account) {
+	public Transaction(double amount, TransactionType type, User user, int account) {
 		this.id = ++count;
 		this.amount = amount;
 		this.date = LocalDate.now();
@@ -47,7 +47,7 @@ public class Transaction {
 		return user;
 	}
 	
-	public BankAccount getAccount() {
-		return account;
+	public int getAccount() {
+		return int;
 	}
 }

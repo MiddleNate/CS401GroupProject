@@ -205,7 +205,7 @@ public class Server {
 							break; }
 						case MessageType.Transaction: {
 							Message reply = null;
-							Integer accountID = m.getTransaction().getAccount().getID();
+							Integer accountID = m.getTransaction().getAccount();
 							
 							// check that the account specified in the message
 							// is in the list of accounts owned by the current user
