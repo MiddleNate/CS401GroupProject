@@ -176,10 +176,9 @@ public class Client {
 		}
 	}
 	
-	private static void sendLogoutMessage(String username, String password) {
+	private static void sendLogoutMessage() {
 		try {
-			User user = new User(username,password);
-			Message msg = new Message(MessageType.Logout,user);
+			Message msg = new Message(MessageType.Logout);
 			out.writeObject(msg);
 			out.flush();
 		}catch(Exception e) {
@@ -274,6 +273,13 @@ public class Client {
 			JButton logoutBtn = new JButton("Log out");
 			
 			// --- Add functions ---
+			
+			logoutBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					// TODO: needs to reset or end the program
+					sendLogoutMessage();
+				}
+			});
 			
 			// --- Add attributes ---
 			clientPanel.add(new JLabel("Welcome"));
