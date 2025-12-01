@@ -124,6 +124,7 @@ public class Client {
 						} catch (Exception close) {
 							System.out.println("Error closing connection: " + close);
 						}
+						System.exit(1);
 					}
 				}).start();
 			}
@@ -178,6 +179,7 @@ public class Client {
 	
 	private static void sendLogoutMessage() {
 		try {
+			exiting = true;
 			Message msg = new Message(MessageType.Logout);
 			out.writeObject(msg);
 			out.flush();

@@ -525,7 +525,14 @@ public class Server {
 				System.out.println("ClientHandler Error: " + e);
 			} finally {
 				// make sure to logout if we are logged in
-				if (user != null) Server.users.get(user.getUsername()).logout();
+				if (user != null) {
+					Server.users.get(user.getUsername()).logout();
+					try {
+						out.writeObject(new Message(MessageType.Success, "Logging you out"));
+					} catch (Exception e) {
+						System.out.println(e.getMessage());
+					}
+				}
 				
 				// close resources
 				try {
