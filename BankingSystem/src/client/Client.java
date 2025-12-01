@@ -68,9 +68,24 @@ public class Client {
 	}
 
 	private static void onResponse(Message response, GUI gui) {
+		
+		User data = response.getUser();
+		if(data instanceof User) {
+			if(response.getUser() instanceof Customer) {
+				SwingUtilities.invokeLater(() ->gui.showCustomerInterface());
+				return;
+			}
+			else if(response.getUser() instanceof Employee) {
+				SwingUtilities.invokeLater(() ->gui.showEmployeeInterface());
+				return;
+			}
+			else
+				gui.doFailMessage("Response went wrong");
+		}
+
+		
 		switch(response.getType()) {
 		case Success:
-			System.out.println("Swag" + "= " + response);
 			gui.doSuccessMessage(response.getText());
 			break;
 		case Fail :
@@ -97,10 +112,11 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
+	
 	private static void sendLogoutMessage(String username, String password) {
 		try {
 			User user = new User(username,password);
-			Message msg = new Message(MessageType.Logout);
+			Message msg = new Message(MessageType.Logout,user);
 			out.writeObject(msg);
 			out.flush();
 		}catch(Exception e) {
@@ -118,16 +134,6 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
-//	private static void sendInfoRequestMessage(User user) {
-//		try {
-//			Message msg = new Message(MessageType.InfoRequest,user);
-//			out.writeObject(msg); 
-//			out.flush();
-//		} catch(Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
-
 
 	// more methods for sending other message types
 
@@ -187,19 +193,24 @@ public class Client {
 				}
 			});
 
+
+		}
+		public void showCustomerInterface() {
+			doCustomerInterface();
+			cardLayout.show(mainPanel,"CUSTOMER");
 		}
 		public void doCustomerInterface() {
 			// --- Panel 2: Client Panel with list of available transactions ---
-			JPanel clientPanel = new JPanel();
-			clientPanel.setLayout(cardLayout);
-			frame.setLayout(new GridLayout(2,2,2,2));
+			JPanel clientPanel = new JPanel(new GridLayout(2,2,2,2));
 		    
 			//4 button layout
-			JButton withdrawlBtn = new JButton();
-			JButton depositBtn = new JButton();
-			JButton seeTransHistoryBtn = new JButton();
+			JButton withdrawlBtn = new JButton("Withdrawal");
+			JButton depositBtn = new JButton("Deposit");
+			JButton seeTransHistoryBtn = new JButton("See Transaction History");
 			
-			JButton logoutBtn = new JButton();
+			JButton logoutBtn = new JButton("Log out");
+			
+			// --- Add functions ---
 			
 			// --- Add attributes ---
 			clientPanel.add(new JLabel("Welcome"));
@@ -207,21 +218,23 @@ public class Client {
 			clientPanel.add(seeTransHistoryBtn);
 			clientPanel.add(depositBtn);
 			clientPanel.add(logoutBtn);
+			
 			mainPanel.add(clientPanel, "CUSTOMER");
 		}
-		
+		public void showEmployeeInterface() {
+			doEmployeeInterface();
+			cardLayout.show(mainPanel,"EMPLOYEE");
+		}
 		public void doEmployeeInterface() {
 			// --- Panel 3: Employee Panel with list of available transactions ---
 			JPanel employeePanel = new JPanel();
 			employeePanel.setLayout(cardLayout);
-			
 			
 			JButton withdrawlBtn = new JButton();
 			JButton depositBtn = new JButton();
 			JButton seeTransHistoryBtn = new JButton();
 			JButton openOrCloseAccountbtn = new JButton();
 			JButton seeBankAccountsbtn = new JButton();
-			JButton btn = new JButton();
 			JButton logoutBtn = new JButton();
 			// --- Add panel to the main panel ---
 			mainPanel.add(employeePanel, "EMPLOYEE");
@@ -281,8 +294,8 @@ public class Client {
 					
 					Double withdrawlAmount = Double.parseDouble(amountTxt.getText());
 					
-		    		// TODO : configure the string to BankAccount object
-		    		Transaction withdrawl = new Transaction(withdrawlAmount,TransactionType.Withdrawal,user,(BankAccount)bankAccTxt.getText());
+		    		// TODO : change text field to a number or add error checking for parseint
+		    		Transaction withdrawl = new Transaction(withdrawlAmount,TransactionType.Withdrawal,user,Integer.parseInt(bankAccTxt.getText()));
 		    		sendTransactionMessage(withdrawl);
 				}
 		    });
@@ -296,8 +309,8 @@ public class Client {
 					
 					Double depositAmount = Double.parseDouble(amountTxt.getText());
 					
-		    		// TODO : configure the string to BankAccount object
-		    		Transaction deposit = new Transaction(depositAmount,TransactionType.Deposit,user,(BankAccount)bankAccTxt.getText());
+		    		// TODO : change text field to a number or add error checking for parseint
+		    		Transaction deposit = new Transaction(depositAmount,TransactionType.Deposit,user,Integer.parseInt(bankAccTxt.getText()));
 		    		sendTransactionMessage(deposit);
 		    	}
 		    });
@@ -305,9 +318,8 @@ public class Client {
 		    	public void actionPerformed(ActionEvent e) {
 					TextField bankAccTxt = new TextField();
 					// TODO: add to panel
-					add(bankAccTxt, BorderLayout.SOUTH);
+					add(Integer.parseInt(bankAccTxt.getText()), BorderLayout.SOUTH);
 					
-					sendInfoRequestMessage(user);
 		    	}
 		    });
 			mainPanel.add(upperPanel);
