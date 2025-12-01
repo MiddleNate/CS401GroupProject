@@ -136,7 +136,7 @@ public class Client {
 		User data = response.getUser();
 		if(data instanceof User) {
 			if(response.getUser() instanceof Customer) {
-				SwingUtilities.invokeLater(() ->gui.showCustomerInterface());
+				SwingUtilities.invokeLater(() ->gui.showCustomerInterface(response.getUser()));
 				return;
 			}
 			else if(response.getUser() instanceof Employee) {
@@ -158,6 +158,8 @@ public class Client {
 		case Invalid:
 			gui.doInvalidMessage();
 			break;
+		case Info:
+			gui.updateEmployeeInterface();
 		default:
 			System.out.println("Unknown Message Type: " + response.getType());
 			break;
@@ -165,7 +167,6 @@ public class Client {
 	}
 	
 	private static void sendLoginMessage(String username, String password) {
-		// create and send a message through the stream
 		try
 		{
 			User user = new User(username, password);
@@ -256,14 +257,12 @@ public class Client {
 					sendLoginMessage(userNameTxt.getText(), new String(passwordTxt.getPassword()));
 				}
 			});
-
-
 		}
-		public void showCustomerInterface() {
-			doCustomerInterface();
+		public void showCustomerInterface(User user) {
+			doCustomerInterface(user);
 			cardLayout.show(mainPanel,"CUSTOMER");
 		}
-		public void doCustomerInterface() {
+		public void doCustomerInterface(User user) {
 			// --- Panel 2: Client Panel with list of available transactions ---
 			JPanel clientPanel = new JPanel(new GridLayout(2,2,2,2));
 		    
@@ -275,14 +274,27 @@ public class Client {
 			JButton logoutBtn = new JButton("Log out");
 			
 			// --- Add functions ---
-			
-			logoutBtn.addActionListener(new ActionListener() {
+			depositBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					// TODO: needs to reset or end the program
-					sendLogoutMessage();
+					showDeposit(user.getUsername());	
 				}
 			});
-			
+			withdrawlBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					showWithdrawl(user.getUsername());	
+				}
+			});
+			seeTransHistoryBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					doBankAccounts();	
+				}
+			});
+			logoutBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					sendLogoutMessage();
+					
+				}
+			});			
 			// --- Add attributes ---
 			clientPanel.add(new JLabel("Welcome"));
 			clientPanel.add(withdrawlBtn);
@@ -296,21 +308,139 @@ public class Client {
 			doEmployeeInterface();
 			cardLayout.show(mainPanel,"EMPLOYEE");
 		}
+		
 		public void doEmployeeInterface() {
 			// --- Panel 3: Employee Panel with list of available transactions ---
-			JPanel employeePanel = new JPanel();
-			employeePanel.setLayout(cardLayout);
+			JPanel employeePanel = new JPanel(new FlowLayout());
+
+			// --- Input for Customer Info ---
+			JTextField customerUsername = new JTextField("Enter Customer Username");
+			JButton infoRequestBtn = new JButton("Submit");
+			employeePanel.add(customerUsername);
+			employeePanel.add(infoRequestBtn);
 			
-			JButton withdrawlBtn = new JButton();
-			JButton depositBtn = new JButton();
-			JButton seeTransHistoryBtn = new JButton();
-			JButton openOrCloseAccountbtn = new JButton();
-			JButton seeBankAccountsbtn = new JButton();
-			JButton logoutBtn = new JButton();
+			
+			JButton withdrawlBtn = new JButton("Withdrawl");
+			JButton depositBtn = new JButton("Deposit");
+			JButton seeTransHistoryBtn = new JButton("Transaction History");
+			JButton openOrCloseAccountbtn = new JButton("Append Account");
+			JButton seeBankAccountsbtn = new JButton("See Bank Accounts");
+			JButton logoutBtn = new JButton("Log out");
+			
+			// --- Add Attributes ---
+			employeePanel.add(new JLabel("Welcome Employee"));
+			employeePanel.add(withdrawlBtn);
+			employeePanel.add(depositBtn);
+			employeePanel.add(seeTransHistoryBtn);
+			employeePanel.add(openOrCloseAccountbtn);
+			employeePanel.add(seeBankAccountsbtn);
+			employeePanel.add(logoutBtn);
+			
+			// --- Add Button functions ---
+			infoRequestBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					sendInfoRequestMessage(customerUsername.getText());
+				}
+			});
+			
+			depositBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					showDeposit(customerUsername.getText());	
+				}
+			});
+			withdrawlBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					showWithdrawl(customerUsername.getText());	
+				}
+			});
+			seeTransHistoryBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					doBankAccounts();	
+				}
+			});
+			
+			//TODO: Append methods
+			openOrCloseAccountbtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					doBankAccounts();	
+				}
+			});
+			seeBankAccountsbtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					doBankAccounts();	
+				}
+			});
+		    
+			logoutBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					sendLogoutMessage();
+				}
+			});
 			// --- Add panel to the main panel ---
 			mainPanel.add(employeePanel, "EMPLOYEE");
 		}
+		public void showWithdrawl(String username) {
+			doWithdrawl(username);
+			cardLayout.show(mainPanel,"WITHDRAWAL");
+		}
+		public void doWithdrawl(String username) {
+			JPanel withdrawlPanel = new JPanel(new GridLayout(3,1));
+			JTextField amountTxt = new JTextField();
+			JTextField bankAccTxt = new JTextField();
+			JButton submitBtn = new JButton("Submit");
+			// TODO: add to panel
+			withdrawlPanel.add(new JLabel("Enter Withdrawal Amount:"));
+			withdrawlPanel.add(new JLabel("Enter Bank Account Number:"));
+			withdrawlPanel.add(amountTxt);
+			withdrawlPanel.add(bankAccTxt);
+			withdrawlPanel.add(submitBtn);
+			
+			// --- Add Button Function ---
+			submitBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					Double withdrawlAmount = Double.parseDouble(amountTxt.getText());
+
+		    		// TODO : change text field to a number or add error checking for parseint & resolve non-serializable issue
+					User user = new User(username,null);
+		    		Transaction withdrawl = new Transaction(withdrawlAmount,TransactionType.Withdrawal,user,Integer.parseInt(bankAccTxt.getText()));
+		    		sendTransactionMessage(withdrawl);
+				}
+			});
+    		mainPanel.add(withdrawlPanel, "WITHDRAWAL");
+
+		}
 		
+		public void showDeposit(String username) {
+			doDeposit(username);
+			cardLayout.show(mainPanel,"DEPOSIT");
+		}
+		public void doDeposit(String username) {
+			JPanel depositPanel = new JPanel(new GridLayout(3,1));
+			JTextField amountTxt = new JTextField();
+			JTextField bankAccTxt = new JTextField();
+			JButton submitBtn = new JButton("Submit");
+			// TODO: add to panel
+			depositPanel.add(new JLabel("Enter Deposit Amount:"));
+			depositPanel.add(new JLabel("Enter Bank Account Number:"));
+			// TODO: add to panel
+			depositPanel.add(amountTxt);
+			depositPanel.add(bankAccTxt);
+			depositPanel.add(submitBtn);
+			
+			// --- Add Button Function ---
+			submitBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					Double depositAmount = Double.parseDouble(amountTxt.getText());
+
+		    		// TODO : change text field to a number or add error checking for parseint & resolve non-serializable issue
+					User user = new User(username,null);
+		    		Transaction deposit = new Transaction(depositAmount,TransactionType.Withdrawal,user,Integer.parseInt(bankAccTxt.getText()));
+		    		sendTransactionMessage(deposit);
+				}
+			});
+    		
+    		mainPanel.add(depositPanel, "DEPOSIT");
+		}
 		public void doOpenOrCloseAccount() {
 			JPanel openCloseAccount = new JPanel();
 			openCloseAccount.setLayout(cardLayout);
@@ -335,67 +465,6 @@ public class Client {
 			tAOutput = new TextArea(5,50); // allocate TextField
 		    tAOutput.setEditable(false);  // read-only
 		}
-
-		public void doTransactionMessage(User user) {
-			//GUI Interface
-			mainPanel.setLayout(new GridLayout());
-			JPanel upperPanel = new JPanel();
-			//
-			JLabel greetingLabel = new JLabel("Welcome Customer");  
-
-			JButton withdrawlBtn = new JButton("Withdraw");
-		    JButton depositBtn = new JButton("Deposit");
-		    JButton seeTransactionHistoryBtn = new JButton("View Transaction History");
-		    
-		    // --- button functionalities ---
-		    // create new transaction --> create new Message & send it
-		    withdrawlBtn.addActionListener(new ActionListener() {
-		    	public void actionPerformed(ActionEvent e) {
-		    		doWithdrawl();
-
-		    	}
-
-				private void doWithdrawl() {
-					TextField amountTxt = new TextField();
-					TextField bankAccTxt = new TextField();
-					JButton submitBtn = new JButton();
-					// TODO: add to panel
-					add(amountTxt,BorderLayout.CENTER);
-					add(bankAccTxt, BorderLayout.SOUTH);
-					
-					Double withdrawlAmount = Double.parseDouble(amountTxt.getText());
-					
-		    		// TODO : change text field to a number or add error checking for parseint
-		    		Transaction withdrawl = new Transaction(withdrawlAmount,TransactionType.Withdrawal,user,Integer.parseInt(bankAccTxt.getText()));
-		    		sendTransactionMessage(withdrawl);
-				}
-		    });
-		    depositBtn.addActionListener(new ActionListener() {
-		    	public void actionPerformed(ActionEvent e) {
-		    		TextField amountTxt = new TextField();
-					TextField bankAccTxt = new TextField();
-					// TODO: add to panel
-					add(amountTxt,BorderLayout.CENTER);
-					add(bankAccTxt, BorderLayout.SOUTH);
-					
-					Double depositAmount = Double.parseDouble(amountTxt.getText());
-					
-		    		// TODO : change text field to a number or add error checking for parseint
-		    		Transaction deposit = new Transaction(depositAmount,TransactionType.Deposit,user,Integer.parseInt(bankAccTxt.getText()));
-		    		sendTransactionMessage(deposit);
-		    	}
-		    });
-		    seeTransactionHistoryBtn.addActionListener(new ActionListener() {
-		    	public void actionPerformed(ActionEvent e) {
-					TextField bankAccTxt = new TextField();
-					// TODO: add to panel
-					add(Integer.parseInt(bankAccTxt.getText()), BorderLayout.SOUTH);
-					
-		    	}
-		    });
-			mainPanel.add(upperPanel);
-		}
-		
 		public void doSuccessMessage(String showTxt) {
 			JOptionPane.showMessageDialog(null, '"' + showTxt + '"');
 		}

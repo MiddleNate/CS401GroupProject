@@ -235,8 +235,9 @@ public class Server {
 							break; }
 						case MessageType.InfoRequest: {
 							Message reply = null;
-							// check that the user provided in the inforequest exists
-							if (Server.users.containsKey(m.getUser().getUsername())) {
+							// check that the user provided in the inforequest exists and is a customer
+							if (Server.users.containsKey(m.getUser().getUsername()) 
+									&& Server.users.get(m.getUser().getUsername()) instanceof Customer) {
 								Customer tempCustomer = (Customer) Server.users.get(m.getUser().getUsername());
 								ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
 								
