@@ -84,7 +84,7 @@ public class LOCAccount extends BankAccount {
 				// only applies if the balance is greater than 0
 				if (paidSinceUpdated < minimumDue && balance > 0) {
 					// also logs the transaction as it is applied
-					transactions.add(new Transaction((balance * 1 + interestRate), TransactionType.Interest, null, this));
+					transactions.add(new Transaction((balance * 1 + interestRate), TransactionType.Interest, null, this.getID()));
 					balance *= 1 + interestRate;
 				}
 				paidSinceUpdated = 0;
@@ -113,7 +113,7 @@ public class LOCAccount extends BankAccount {
 					transactions.add(new Transaction(transaction.getAmount(),
 							TransactionType.Withdrawal,
 							user,
-							this));
+							this.getID()));
 				} catch (Exception e) {
 					throw e;
 				}
@@ -124,7 +124,7 @@ public class LOCAccount extends BankAccount {
 					transactions.add(new Transaction(transaction.getAmount(),
 							TransactionType.Payment,
 							user,
-							this));
+							this.getID()));
 				} catch (Exception e) {
 						throw e;
 				}

@@ -48,6 +48,6 @@ public class Transaction {
 	}
 	
 	public int getAccount() {
-		return int;
+		return account;
 	}
 }

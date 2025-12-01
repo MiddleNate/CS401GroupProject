@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,34 +38,97 @@ public class Client {
 	private static ObjectOutputStream out;
 
 	public static void main(String[] args) {
-
-		GUI gui = new GUI();
-		new Thread(gui).start();
+		// screen to input port and host
+		JFrame frame = new JFrame("Connect");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(400, 130);
+		frame.setLayout(new GridLayout(4, 2, 2, 2));
+		frame.setLocationRelativeTo(null);
 		
-		try {
-			connection = new Socket("localhost", 7855);
-			in = new ObjectInputStream(connection.getInputStream());
-			out = new ObjectOutputStream(connection.getOutputStream());
+		// text fields
+		JTextField hostTxt = new JTextField(15);
+		JTextField portTxt = new JTextField("7855", 15);
+		JButton connectBtn = new JButton("Connect");
+		
+		// labels
+		frame.add(new JLabel("Host: "));
+		frame.add(new JLabel("Port: "));
+		frame.add(hostTxt);
+		frame.add(portTxt);
+		frame.add(connectBtn);
+		frame.setVisible(true);
 			
-		while (!exiting) {
-			Message response = (Message) in.readObject();
-			onResponse(response, gui);
-		}
-		
-		} catch (EOFException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
+		connectBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String host = hostTxt.getText();
+				String port = portTxt.getText();
 				
-				connection.close();
-			} catch (Exception e) {
-				System.out.println("Error closing connection: " + e);
-			} 
-		}
+				//check if text fields are empty
+				if (host.isEmpty() || port.isEmpty()) {
+					JOptionPane.showMessageDialog(frame, "Host/Port is empty");
+					return;
+				}
+				
+				// check if port is a number
+				try {
+					Integer.parseInt(port);
+				}
+				catch (NumberFormatException nf) {
+					JOptionPane.showMessageDialog(frame, "Port is not a number");
+					return;
+				}
+				
+				// shows what the user is connecting to
+				JOptionPane.showMessageDialog(frame, "Connecting to " + host + ":" + port);
+				
+				// separate threads
+				new Thread(() -> {
+					try {
+						connection = new Socket(host, Integer.parseInt(port));
+						in = new ObjectInputStream(connection.getInputStream());
+						out = new ObjectOutputStream(connection.getOutputStream());
+						
+						// check if user is connected, if so, display login GUI
+						if (connection.isConnected()) {
+							JOptionPane.showMessageDialog(frame, "Connection Successful :)");
+							frame.dispose();
+							GUI loginGUI = new GUI();
+							loginGUI.run();
+							while (!exiting) {
+								Message response = (Message) in.readObject();
+								onResponse(response, loginGUI);
+							}
+						}
+						else {
+							JOptionPane.showMessageDialog(frame, "Connection Unsuccessful :(");
+						}
+					
+					} catch (java.net.UnknownHostException uh) {
+						JOptionPane.showMessageDialog(frame, "Host not found");
+					} catch (ConnectException ce) {
+						JOptionPane.showMessageDialog(frame, "Port not found");
+					} catch (java.net.NoRouteToHostException nrth) {
+						JOptionPane.showMessageDialog(frame, "Connection refused");
+					} catch (IllegalArgumentException ia) {
+						JOptionPane.showMessageDialog(frame, "Port out of range");
+					} catch (EOFException eof) {
+						eof.printStackTrace();
+					} catch (ClassNotFoundException cnf) {
+						cnf.printStackTrace();
+					} catch (IOException io) {
+						io.printStackTrace();
+					} finally {
+						try {
+							if (connection != null) 
+								connection.close();
+						} catch (Exception close) {
+							System.out.println("Error closing connection: " + close);
+						}
+						System.exit(1);
+					}
+				}).start();
+			}
+		});
 	}
 
 	private static void onResponse(Message response, GUI gui) {
@@ -116,17 +180,8 @@ public class Client {
 	
 	private static void sendLogoutMessage() {
 		try {
+			exiting = true;
 			Message msg = new Message(MessageType.Logout);
-			out.writeObject(msg);
-			out.flush();
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-	private static void sendInfoRequestMessage(String customerUsername) {
-		try {
-			User user = new User(customerUsername,null);
-			Message msg = new Message(MessageType.InfoRequest,user);
 			out.writeObject(msg);
 			out.flush();
 		}catch(Exception e) {
