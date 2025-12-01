@@ -10,14 +10,8 @@ import org.junit.Test;
 import shared.*;
 
 public class LOCAccountTest {
-
-	@Test
-	public void test() throws Exception {
-		testWithdrawPay();
-		testInterest();
-		testExceptions();
-	}
 	
+	@Test
 	public void testWithdrawPay() throws Exception {
 		ArrayList<String> customers = new ArrayList<String>();
 		String customer  = "username";
@@ -52,6 +46,7 @@ public class LOCAccountTest {
 		assertTrue(locAccount.getBalance() == 450);
 	}
 	
+	@Test
 	public void testInterest() throws Exception {
 		ArrayList<String> customers = new ArrayList<String>();
 		String customer  = "username";
@@ -68,6 +63,7 @@ public class LOCAccountTest {
 		assertTrue(Math.floor(locAccount.getBalance()) == 718);
 	}
 	
+	@Test
 	public void testExceptions() {
 		ArrayList<String> customers = new ArrayList<String>();
 		String customer  = "username";

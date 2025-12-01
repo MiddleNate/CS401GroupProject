@@ -10,11 +10,6 @@ import shared.*;
 public class CheckingAccountTest {
 
 	@Test
-	public void test() throws Exception {
-		testDepositAndWithdraw();
-		testExceptions();
-	}
-
 	public void testDepositAndWithdraw() throws Exception {
 		ArrayList<String> customers = new ArrayList<String>();
 		String customer  = "username";
@@ -45,6 +40,7 @@ public class CheckingAccountTest {
 		assertTrue(checkingAccount.getBalance() == 50);
 	}
 	
+	@Test
 	public void testExceptions() {
 		ArrayList<String> customers = new ArrayList<String>();
 		String customer  = "username";

@@ -10,14 +10,8 @@ import org.junit.Test;
 import shared.*;
 
 public class SavingsAccountTest {
-
-	@Test
-	public void test() throws Exception {
-		testDepositWithdraw();
-		testInterest();
-		testExceptions();
-	}
 	
+	@Test
 	public void testDepositWithdraw() throws Exception {
 		ArrayList<String> customers = new ArrayList<String>();
 		String customer  = "username";
@@ -37,6 +31,7 @@ public class SavingsAccountTest {
 		assertTrue(savingsAccount.getBalance() == 900);
 	}
 	
+	@Test
 	public void testInterest() throws Exception {
 		ArrayList<String> customers = new ArrayList<String>();
 		String customer = "username";
@@ -54,6 +49,7 @@ public class SavingsAccountTest {
 		assertTrue(savingsAccount.getBalance() == 1102.5);
 	}
 	
+	@Test
 	public void testExceptions() { 
 		ArrayList<String> customers = new ArrayList<String>();
 		String customer  = "username";

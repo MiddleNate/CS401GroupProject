@@ -6,20 +6,15 @@ import org.junit.Test;
 import shared.*;
 
 public class UserTest {
-
-	@Test
-	public void test() throws Exception {
-		testConstructor();
-		testLoginLogout();
-		testExceptions();
-	}
 	
+	@Test
 	public void testConstructor() {
 		User user = new User("username", "password");
 		assertEquals("username", user.getUsername());
 		assertEquals("password", user.getPassword());
 	}
 	
+	@Test
 	public void testLoginLogout() throws Exception {
 		User user = new User("username", "password");
 		// user should not be logged in yet
@@ -32,6 +27,7 @@ public class UserTest {
 		assertEquals(false, user.isLoggedIn());
 	}
 	
+	@Test
 	public void testExceptions() throws Exception {
 		User user = new User("User1", "password");
 		
