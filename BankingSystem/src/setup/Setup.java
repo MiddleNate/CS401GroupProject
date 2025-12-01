@@ -11,8 +11,8 @@ import java.util.*;
 // helper class to put some starting credentials and accounts in the files so that they can be loaded by the server
 
 // customers:
-// username "customer 1" password "customerpass1"
-// username "customer 2" password "customerpass2"
+// username "customer1" password "customerpass1"
+// username "customer2" password "customerpass2"
 
 // employees:
 // username "employee" password "employeepass"
