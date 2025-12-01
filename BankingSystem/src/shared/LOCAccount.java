@@ -86,6 +86,8 @@ public class LOCAccount extends BankAccount {
 					// also logs the transaction as it is applied
 					transactions.add(new Transaction((balance * 1 + interestRate), TransactionType.Interest, null, this.getID()));
 					balance *= 1 + interestRate;
+					// truncate any extra decimal places
+					balance = Math.floor(balance * 100) / 100;
 				}
 				paidSinceUpdated = 0;
 				lastUpdated = currentMonth;
