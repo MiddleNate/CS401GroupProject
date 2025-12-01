@@ -1,7 +1,9 @@
 package shared;
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class Transaction {
+public class Transaction implements Serializable {
+	private static final long serialVersionUID = 190L;
 	private int id;
 	private static int count;
 	private Double amount;
