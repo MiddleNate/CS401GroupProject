@@ -51,18 +51,23 @@ public class LOCAccountTest {
 		ArrayList<String> customers = new ArrayList<String>();
 		String customer  = "username";
 		customers.add(customer);
-		// 500 withdrawal limit, 19.87% interest, 50 minimum due
+		// 500 withdrawal limit, 20% interest, 50 minimum due
 		LOCAccount.setClock(Clock.fixed(Instant.parse("2025-11-01T14:00:00.00Z"), ZoneId.of("UTC")));
-		LOCAccount locAccount = new LOCAccount(customers, 500, 0.1987, 50);
+		LOCAccount locAccount = new LOCAccount(customers, 500, 0.2, 50);
 		
 		
 		locAccount.withdraw(500);
-		// one month interest: 500 + 99.35 = 599.35
+		// one month interest: 500 + 100 = 600
 		LOCAccount.setClock(Clock.fixed(Instant.parse("2025-12-01T14:00:00.00Z"), ZoneId.of("UTC")));
-		assertTrue(locAccount.getBalance() == 599.35);
-		// two month interest: 599.35 + 119 = 718.35
-		LOCAccount.setClock(Clock.fixed(Instant.parse("2026-01-01T14:00:00.00Z"), ZoneId.of("UTC")));
-		assertTrue(Math.floor(locAccount.getBalance()) == 718);
+		assertTrue(locAccount.getBalance() == 600);
+		// two months at once interest: 600 * 1.2 * 1.2 = 864
+		LOCAccount.setClock(Clock.fixed(Instant.parse("2026-02-01T14:00:00.00Z"), ZoneId.of("UTC")));
+		assertTrue(locAccount.getBalance() == 864);
+		// interest not charged if minimum payment is met
+		locAccount.pay(50);
+		LOCAccount.setClock(Clock.fixed(Instant.parse("2026-03-01T14:00:00.00Z"), ZoneId.of("UTC")));
+		System.out.println(locAccount.getBalance());
+		assertTrue(locAccount.getBalance() == 814);
 	}
 	
 	@Test
