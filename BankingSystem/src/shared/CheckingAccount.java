@@ -30,7 +30,7 @@ public class CheckingAccount extends BankAccount {
 					transactions.add(new Transaction(transaction.getAmount(),
 							TransactionType.Deposit,
 							user,
-							this));
+							this.getID()));
 				} catch (Exception e) {
 					throw e;
 				}
@@ -41,7 +41,7 @@ public class CheckingAccount extends BankAccount {
 					transactions.add(new Transaction(transaction.getAmount(),
 							TransactionType.Withdrawal,
 							user,
-							this));
+							this.getID()));
 				} catch (Exception e) {
 						throw e;
 				}

@@ -72,7 +72,7 @@ public class SavingsAccount extends BankAccount {
 			int numUpdates = (int) ChronoUnit.MONTHS.between(lastUpdated, currentMonth);
 			for (int i = 0; i < numUpdates; i++) {
 				// for each update, add the interest rate to the balance and log the transaction
-				transactions.add(new Transaction((balance * 1 + interestRate), TransactionType.Interest, null, this));
+				transactions.add(new Transaction((balance * 1 + interestRate), TransactionType.Interest, null, this.getID()));
 				balance *= 1 + interestRate;
 			}
 			// reset the amount withdrawn since the last update
@@ -101,7 +101,7 @@ public class SavingsAccount extends BankAccount {
 					transactions.add(new Transaction(transaction.getAmount(),
 							TransactionType.Deposit,
 							user,
-							this));
+							this.getID()));
 				} catch (Exception e) {
 					throw e;
 				}
@@ -112,7 +112,7 @@ public class SavingsAccount extends BankAccount {
 					transactions.add(new Transaction(transaction.getAmount(),
 							TransactionType.Withdrawal,
 							user,
-							this));
+							this.getID()));
 				} catch (Exception e) {
 						throw e;
 				}
