@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,6 @@ public class Client {
 
 	public static void main(String[] args) {
 		// screen to input port and host
-		GUI connectionGUI = new GUI();
 		JFrame frame = new JFrame("Connect");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(400, 130);
@@ -105,6 +105,12 @@ public class Client {
 					
 					} catch (java.net.UnknownHostException uh) {
 						JOptionPane.showMessageDialog(frame, "Host not found");
+					} catch (ConnectException ce) {
+						JOptionPane.showMessageDialog(frame, "Port not found");
+					} catch (java.net.NoRouteToHostException nrth) {
+						JOptionPane.showMessageDialog(frame, "Connection refused");
+					} catch (IllegalArgumentException ia) {
+						JOptionPane.showMessageDialog(frame, "Port out of range");
 					} catch (EOFException eof) {
 						eof.printStackTrace();
 					} catch (ClassNotFoundException cnf) {
