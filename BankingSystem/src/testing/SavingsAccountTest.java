@@ -10,14 +10,8 @@ import org.junit.Test;
 import shared.*;
 
 public class SavingsAccountTest {
-
-	@Test
-	public void test() throws Exception {
-		testDepositWithdraw();
-		testInterest();
-		testExceptions();
-	}
 	
+	@Test
 	public void testDepositWithdraw() throws Exception {
 		ArrayList<String> customers = new ArrayList<String>();
 		String customer  = "username";
@@ -37,11 +31,13 @@ public class SavingsAccountTest {
 		assertTrue(savingsAccount.getBalance() == 900);
 	}
 	
+	@Test
 	public void testInterest() throws Exception {
 		ArrayList<String> customers = new ArrayList<String>();
 		String customer = "username";
 		customers.add(customer);
 		// savings account starts with 5% monthly interest and 500 withdrawal limit
+		SavingsAccount.setClock(Clock.fixed(Instant.parse("2025-11-01T14:00:00.00Z"), ZoneId.of("UTC")));
 		SavingsAccount savingsAccount = new SavingsAccount(customers, 0.05, 500);
 		
 		// interest is charged every 1st of the month
@@ -49,11 +45,12 @@ public class SavingsAccountTest {
 		// one month interest: 1000 + 50 = 1050.0
 		SavingsAccount.setClock(Clock.fixed(Instant.parse("2025-12-01T14:00:00.00Z"), ZoneId.of("UTC")));
 		assertTrue(savingsAccount.getBalance() == 1050.0);
-		// two month interest: 1050 + 52.5 = 1105.5
-		SavingsAccount.setClock(Clock.fixed(Instant.parse("2026-01-01T14:00:00.00Z"), ZoneId.of("UTC")));
-		assertTrue(savingsAccount.getBalance() == 1102.5);
+		// two months at once interest: 1050 * 1.05 * 1.05 = 1157.62
+		SavingsAccount.setClock(Clock.fixed(Instant.parse("2026-02-01T14:00:00.00Z"), ZoneId.of("UTC")));
+		assertTrue(savingsAccount.getBalance() == 1157.62);
 	}
 	
+	@Test
 	public void testExceptions() { 
 		ArrayList<String> customers = new ArrayList<String>();
 		String customer  = "username";

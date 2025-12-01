@@ -74,6 +74,8 @@ public class SavingsAccount extends BankAccount {
 				// for each update, add the interest rate to the balance and log the transaction
 				transactions.add(new Transaction((balance * 1 + interestRate), TransactionType.Interest, null, this.getID()));
 				balance *= 1 + interestRate;
+				// truncate any extra decimal places
+				balance = Math.floor(balance * 100) / 100;
 			}
 			// reset the amount withdrawn since the last update
 			withdrawnSinceUpdated = 0;
