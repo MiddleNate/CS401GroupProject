@@ -66,7 +66,6 @@ public class LOCAccountTest {
 		// interest not charged if minimum payment is met
 		locAccount.pay(50);
 		LOCAccount.setClock(Clock.fixed(Instant.parse("2026-03-01T14:00:00.00Z"), ZoneId.of("UTC")));
-		System.out.println(locAccount.getBalance());
 		assertTrue(locAccount.getBalance() == 814);
 		// interest charged for one month if minimum is met, but two months have passed
 		locAccount.pay(50);
