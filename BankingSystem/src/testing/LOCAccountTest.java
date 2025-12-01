@@ -52,7 +52,9 @@ public class LOCAccountTest {
 		String customer  = "username";
 		customers.add(customer);
 		// 500 withdrawal limit, 19.87% interest, 50 minimum due
+		LOCAccount.setClock(Clock.fixed(Instant.parse("2025-11-01T14:00:00.00Z"), ZoneId.of("UTC")));
 		LOCAccount locAccount = new LOCAccount(customers, 500, 0.1987, 50);
+		
 		
 		locAccount.withdraw(500);
 		// one month interest: 500 + 99.35 = 599.35

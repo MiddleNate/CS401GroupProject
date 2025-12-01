@@ -37,6 +37,7 @@ public class SavingsAccountTest {
 		String customer = "username";
 		customers.add(customer);
 		// savings account starts with 5% monthly interest and 500 withdrawal limit
+		SavingsAccount.setClock(Clock.fixed(Instant.parse("2025-11-01T14:00:00.00Z"), ZoneId.of("UTC")));
 		SavingsAccount savingsAccount = new SavingsAccount(customers, 0.05, 500);
 		
 		// interest is charged every 1st of the month
