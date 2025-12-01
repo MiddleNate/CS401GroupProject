@@ -281,8 +281,8 @@ public class Client {
 					
 					Double withdrawlAmount = Double.parseDouble(amountTxt.getText());
 					
-		    		// TODO : configure the string to BankAccount object
-		    		Transaction withdrawl = new Transaction(withdrawlAmount,TransactionType.Withdrawal,user,(BankAccount)bankAccTxt.getText());
+		    		// TODO : change text field to a number or add error checking for parseint
+		    		Transaction withdrawl = new Transaction(withdrawlAmount,TransactionType.Withdrawal,user,Integer.parseInt(bankAccTxt.getText()));
 		    		sendTransactionMessage(withdrawl);
 				}
 		    });
@@ -296,8 +296,8 @@ public class Client {
 					
 					Double depositAmount = Double.parseDouble(amountTxt.getText());
 					
-		    		// TODO : configure the string to BankAccount object
-		    		Transaction deposit = new Transaction(depositAmount,TransactionType.Deposit,user,(BankAccount)bankAccTxt.getText());
+		    		// TODO : change text field to a number or add error checking for parseint
+		    		Transaction deposit = new Transaction(depositAmount,TransactionType.Deposit,user,Integer.parseInt(bankAccTxt.getText()));
 		    		sendTransactionMessage(deposit);
 		    	}
 		    });
