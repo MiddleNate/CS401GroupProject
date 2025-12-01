@@ -94,6 +94,8 @@ public class Client {
 		case Invalid:
 			gui.doInvalidMessage();
 			break;
+		case Info:
+			gui.updateEmployeeInterface();
 		default:
 			System.out.println("Unknown Message Type: " + response.getType());
 			break;
@@ -219,7 +221,7 @@ public class Client {
 			// --- Add functions ---
 			depositBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					showDeposit(user);	
+					showDeposit(user.getUsername());	
 				}
 			});
 			withdrawlBtn.addActionListener(new ActionListener() {
@@ -293,7 +295,7 @@ public class Client {
 			});
 			withdrawlBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					showWithdrawl();	
+					showWithdrawl(customerUsername.getText());	
 				}
 			});
 			seeTransHistoryBtn.addActionListener(new ActionListener() {
@@ -324,29 +326,33 @@ public class Client {
 		}
 		public void showWithdrawl(String username) {
 			doWithdrawl(username);
-			cardLayout.show(mainPanel,"WITHDRAWL");
+			cardLayout.show(mainPanel,"WITHDRAWAL");
 		}
 		public void doWithdrawl(String username) {
-			JPanel withdrawlPanel = new JPanel(new FlowLayout());
+			JPanel withdrawlPanel = new JPanel(new GridLayout(3,1));
 			JTextField amountTxt = new JTextField();
 			JTextField bankAccTxt = new JTextField();
-			JButton submitBtn = new JButton();
+			JButton submitBtn = new JButton("Submit");
 			// TODO: add to panel
-			withdrawlPanel.add(amountTxt,BorderLayout.CENTER);
-			withdrawlPanel.add(bankAccTxt, BorderLayout.SOUTH);
-			
-			Double withdrawlAmount = Double.parseDouble(amountTxt.getText());
+			withdrawlPanel.add(new JLabel("Enter Withdrawal Amount:"));
+			withdrawlPanel.add(new JLabel("Enter Bank Account Number:"));
+			withdrawlPanel.add(amountTxt);
+			withdrawlPanel.add(bankAccTxt);
+			withdrawlPanel.add(submitBtn);
 			
 			// --- Add Button Function ---
 			submitBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-		    		// TODO : change text field to a number or add error checking for parseint
+					Double withdrawlAmount = Double.parseDouble(amountTxt.getText());
+
+		    		// TODO : change text field to a number or add error checking for parseint & resolve non-serializable issue
 					User user = new User(username,null);
 		    		Transaction withdrawl = new Transaction(withdrawlAmount,TransactionType.Withdrawal,user,Integer.parseInt(bankAccTxt.getText()));
 		    		sendTransactionMessage(withdrawl);
-		    		mainPanel.add(withdrawlPanel,"Withdrawal");
 				}
 			});
+    		mainPanel.add(withdrawlPanel, "WITHDRAWAL");
+
 		}
 		
 		public void showDeposit(String username) {
@@ -354,19 +360,29 @@ public class Client {
 			cardLayout.show(mainPanel,"DEPOSIT");
 		}
 		public void doDeposit(String username) {
-			JPanel depositPanel = new JPanel(new FlowLayout());
+			JPanel depositPanel = new JPanel(new GridLayout(3,1));
 			JTextField amountTxt = new JTextField();
 			JTextField bankAccTxt = new JTextField();
+			JButton submitBtn = new JButton("Submit");
 			// TODO: add to panel
-			depositPanel.add(amountTxt,BorderLayout.CENTER);
-			depositPanel.add(bankAccTxt, BorderLayout.SOUTH);
+			depositPanel.add(new JLabel("Enter Deposit Amount:"));
+			depositPanel.add(new JLabel("Enter Bank Account Number:"));
+			// TODO: add to panel
+			depositPanel.add(amountTxt);
+			depositPanel.add(bankAccTxt);
+			depositPanel.add(submitBtn);
 			
-			Double depositAmount = Double.parseDouble(amountTxt.getText());
-			
-    		// TODO : change text field to a number or add error checking for parseint
-			User user = new User(username,null);
-    		Transaction deposit = new Transaction(depositAmount,TransactionType.Deposit,user,Integer.parseInt(bankAccTxt.getText()));
-    		sendTransactionMessage(deposit);
+			// --- Add Button Function ---
+			submitBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					Double depositAmount = Double.parseDouble(amountTxt.getText());
+
+		    		// TODO : change text field to a number or add error checking for parseint & resolve non-serializable issue
+					User user = new User(username,null);
+		    		Transaction deposit = new Transaction(depositAmount,TransactionType.Withdrawal,user,Integer.parseInt(bankAccTxt.getText()));
+		    		sendTransactionMessage(deposit);
+				}
+			});
     		
     		mainPanel.add(depositPanel, "DEPOSIT");
 		}
@@ -411,38 +427,3 @@ public class Client {
 		}
 	}
 }
-
-
-//
-//public void doTransactionMessage(User user) {
-//	JLabel greetingLabel = new JLabel("Welcome " + user.getUsername());  
-//
-//	JButton withdrawlBtn = new JButton("Withdraw");
-//    JButton depositBtn = new JButton("Deposit");
-//    JButton seeTransactionHistoryBtn = new JButton("View Transaction History");
-//    
-//    // --- button functionalities ---
-//    // create new transaction --> create new Message & send it
-//    withdrawlBtn.addActionListener(new ActionListener() {
-//    	public void actionPerformed(ActionEvent e) {
-//    		showWithdrawl();
-//    	}
-//
-//		
-//    });
-//    depositBtn.addActionListener(new ActionListener() {
-//    	public void actionPerformed(ActionEvent e) {
-//    		
-//    	}
-//    	
-//    });
-//    seeTransactionHistoryBtn.addActionListener(new ActionListener() {
-//    	public void actionPerformed(ActionEvent e) {
-//			TextField bankAccTxt = new TextField();
-//			// TODO: add to panel
-//			add(Integer.parseInt(bankAccTxt.getText()), BorderLayout.SOUTH);
-//			
-//    	}
-//    });
-//	mainPanel.add(upperPanel);
-//}
