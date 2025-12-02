@@ -542,7 +542,8 @@ public class Client {
 			JTextField employeeUserNameTxt = new JTextField();
 			displayCustomerAccounts.append(acc + '\n');
 			JTextField customerUsername = new JTextField("Enter owner(s) name");
-			JComboBox<AccountType> accountDropdown = new JComboBox<>();		
+			AccountType[] accTypes = { AccountType.Checking,AccountType.Savings,AccountType.LineOfCredit};
+			JComboBox<AccountType> accountDropdown = new JComboBox<>(accTypes);		
 			JTextField interestTxt = new JTextField("Enter Interest");
 			JTextField limitTxt = new JTextField("Enter Limit amount");
 			JTextField miniDue = new JTextField("Enter minimum due");
