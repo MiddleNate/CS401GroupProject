@@ -188,6 +188,18 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
+	
+	// call with the current username if we are logged in as a customer
+	private static void sendInfoRequestMessage(String username) {
+		Message msg = new Message(MessageType.InfoRequest, new User(username, ""));
+		try {
+			out.writeObject(msg);
+			out.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	//TODO : Add Parameters
 	private static void sendTransactionMessage(Transaction action) {
 		// create and send a message through the stream
