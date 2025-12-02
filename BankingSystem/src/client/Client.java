@@ -22,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -159,7 +160,8 @@ public class Client {
 			gui.doInvalidMessage();
 			break;
 		case Info:
-			gui.updateEmployeeInterface();
+			SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(response));
+			break;
 		default:
 			System.out.println("Unknown Message Type: " + response.getType());
 			break;
@@ -495,6 +497,16 @@ public class Client {
 			});
 			// --- Add panel to the main panel ---
 			mainPanel.add(employeePanel, "EMPLOYEE");
+		}
+		
+		public void updateEmployeeInterface(Message response) {
+			JPanel addTextFields = new JPanel();
+			JTextArea displayCustomerInfo = new JTextArea();
+			displayCustomerInfo.setText(response.getAccount().toString());
+			System.out.println(response.getAccount().toString());
+			addTextFields.add(displayCustomerInfo);
+			
+			mainPanel.add(addTextFields,"UPDATE");
 		}
 		public void showWithdrawl(String username) {
 			doWithdrawl(username);
