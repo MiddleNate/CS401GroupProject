@@ -476,7 +476,7 @@ public class Server {
 								reply = new Message(MessageType.Fail, "Account does not exist");
 							} else if (!(Server.users.get(username) instanceof Customer)) {
 								reply = new Message(MessageType.Fail, "Customer does not exist");
-							} else if (Server.accounts.get(accountID).isOpen()) {
+							} else if (!Server.accounts.get(accountID).isOpen()) {
 								reply = new Message(MessageType.Fail, "Account is closed");
 							} else {
 								Server.accounts.get(accountID).addUser(username);
@@ -496,7 +496,7 @@ public class Server {
 								reply = new Message(MessageType.Fail, "Account does not exist");
 							} else if (!(Server.users.get(username) instanceof Customer)) {
 								reply = new Message(MessageType.Fail, "Customer does not exist");
-							} else if (Server.accounts.get(accountID).isOpen()) {
+							} else if (!Server.accounts.get(accountID).isOpen()) {
 								reply = new Message(MessageType.Fail, "Account is closed");
 							} else if (!Server.accounts.get(accountID).getOwners().contains(username)) {
 								reply = new Message(MessageType.Fail, "Customer is not an account owner");
