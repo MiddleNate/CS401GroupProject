@@ -29,7 +29,7 @@ public class User extends Throwable implements Serializable{
 		if (loggedIn) {
 			throw new Exception("Already logged in");
 		}
-		else if (username.compareTo(this.username) != 0 && password.compareTo(this.password) != 0) {
+		else if (username.compareTo(this.username) != 0 || password.compareTo(this.password) != 0) {
 			throw new Exception("Invalid username or password");
 		} else {
 			loggedIn = true;

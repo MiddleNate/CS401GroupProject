@@ -85,8 +85,8 @@ public class Client {
 				new Thread(() -> {
 					try {
 						connection = new Socket(host, Integer.parseInt(port));
-						in = new ObjectInputStream(connection.getInputStream());
 						out = new ObjectOutputStream(connection.getOutputStream());
+						in = new ObjectInputStream(connection.getInputStream());
 						
 						// check if user is connected, if so, display login GUI
 						if (connection.isConnected()) {
@@ -124,7 +124,6 @@ public class Client {
 						} catch (Exception close) {
 							System.out.println("Error closing connection: " + close);
 						}
-						System.exit(1);
 					}
 				}).start();
 			}
@@ -184,6 +183,7 @@ public class Client {
 			Message msg = new Message(MessageType.Logout);
 			out.writeObject(msg);
 			out.flush();
+			System.exit(1);
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
