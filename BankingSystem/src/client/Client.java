@@ -39,6 +39,7 @@ public class Client {
 	private static boolean exiting = false;
 	private static boolean showTransactions = false;
 	private static int accToCheck = 0;
+	private static User currentUser = null;
 	private static ObjectInputStream in;
 	private static ObjectOutputStream out;
 
@@ -142,10 +143,12 @@ public class Client {
 		if(data instanceof User) {
 			if(response.getUser() instanceof Customer) {
 				SwingUtilities.invokeLater(() ->gui.showCustomerInterface(response.getUser()));
+				currentUser = response.getUser();
 				return;
 			}
 			else if(response.getUser() instanceof Employee) {
 				SwingUtilities.invokeLater(() ->gui.showEmployeeInterface());
+				currentUser = response.getUser();
 				return;
 			}
 			else
@@ -165,7 +168,11 @@ public class Client {
 			break;
 		case Info:
 			if (!showTransactions) {
-				SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(response.getText()));
+				if (currentUser instanceof Customer) {
+					SwingUtilities.invokeLater(() ->gui.updateCustomerInterface(response.text()));
+				} else if (currentUser instanceof Employee) {
+					SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(response.text()));
+				}
 			} else {
 				ArrayList<BankAccount> accs = response.getAccounts();
 				BankAccount acc;
@@ -176,7 +183,9 @@ public class Client {
 				}
 				if (acc == null) {
 					SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface("Account not found for current user"));
-				} else {
+				} else if (currentUser instanceof Customer) {
+					SwingUtilities.invokeLater(() ->gui.updateCustomerInterface(getAccountTransactions(acc)));
+				} else if (currentUser instanceof Employee) {
 					SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(getAccountTransactions(acc)));
 				}
 				showTransactions = false;
@@ -418,6 +427,7 @@ public class Client {
 			JButton depositBtn = new JButton("Deposit");
 			JTextField accForTransactions = new JTextField("Account number");
 			JButton seeTransHistoryBtn = new JButton("See Transaction History");
+			JButton showAccountsBtn = new JButton("Show Accounts");
 			
 			JButton logoutBtn = new JButton("Log out");
 			
@@ -430,6 +440,11 @@ public class Client {
 			withdrawlBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					showWithdrawl(user.getUsername());	
+				}
+			});
+			showAccountsBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					sendInfoRequestMessage(user.getUsername());
 				}
 			});
 			seeTransHistoryBtn.addActionListener(new ActionListener() {
@@ -554,8 +569,31 @@ public class Client {
 					doBankAccounts();	
 				}
 			});
-
-			mainPanel.add(addTextArea,"UPDATE");
+		    
+			logoutBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					sendLogoutMessage();
+				}
+			});
+			// --- Add panel to the main panel ---
+			mainPanel.add(employeePanel, "EMPLOYEE");
+		}
+		
+		public void updateCustomerInterface(String text) {
+			JPanel addResponseText = new JPanel();
+			JTextArea displayText = new JTextArea();
+			displayText.setText(text);
+			mainPanel.add(displayText);
+		}
+		
+		public void updateEmployeeInterface(Message response) {
+			JPanel addTextFields = new JPanel();
+			JTextArea displayCustomerInfo = new JTextArea();
+			displayCustomerInfo.setText(response.getAccount().toString());
+			System.out.println(response.getAccount().toString());
+			addTextFields.add(displayCustomerInfo);
+			
+			mainPanel.add(addTextFields,"UPDATE");
 		}
 		public void showWithdrawl(String username) {
 			doWithdrawl(username);
