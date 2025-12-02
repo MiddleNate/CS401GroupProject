@@ -292,7 +292,9 @@ public class Server {
 							} else if (!(m.getUser() instanceof Customer)) {
 								reply = new Message(MessageType.Fail, "Provided User was not of type Customer");
 							} else {
-								Customer newCust = (Customer) m.getUser();
+								Customer tempCust = (Customer) m.getUser();
+								Customer newCust = new Customer(tempCust.getUsername(), tempCust.getPassword(), 
+										tempCust.getCustomerName(), tempCust.getSocialSecNumber());
 								// add the user to the map, data is copied to ensure we
 								// use the server-side customerCount (not that customer id gets
 								// used anywhere since users is mapped to the username)
