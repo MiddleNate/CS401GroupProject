@@ -416,6 +416,7 @@ public class Client {
 			//4 button layout
 			JButton withdrawlBtn = new JButton("Withdrawal");
 			JButton depositBtn = new JButton("Deposit");
+			JTextField accForTransactions = new JTextField("Account number");
 			JButton seeTransHistoryBtn = new JButton("See Transaction History");
 			
 			JButton logoutBtn = new JButton("Log out");
@@ -433,7 +434,13 @@ public class Client {
 			});
 			seeTransHistoryBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					doBankAccounts();	
+					try {
+						accToCheck = Integer.parseInt(accForTransactions.getText());
+						showTransactions = true;
+						sendInfoRequestMessage(user.getUsername());
+					} catch (NumberFormatException NaN) {
+						doInvalidMessage();
+					}
 				}
 			});
 			logoutBtn.addActionListener(new ActionListener() {
@@ -444,6 +451,7 @@ public class Client {
 			// --- Add attributes ---
 			clientPanel.add(new JLabel("Welcome"));
 			clientPanel.add(withdrawlBtn);
+			clientPanel.add(accForTransactions);
 			clientPanel.add(seeTransHistoryBtn);
 			clientPanel.add(depositBtn);
 			clientPanel.add(logoutBtn);
