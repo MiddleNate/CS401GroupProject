@@ -277,6 +277,20 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
+	
+	private static void sendAddToAccountMessage(int id, String username) {
+		// type does not matter for this input
+		// savings is used because it has an id constructor
+		SavingsAccount acc = new SavingsAccount(id, 0 , 0);
+		User user = new User(username, "");
+		Message msg = new Message(MessageType.AddToAccount, acc, user);
+		try {
+			out.writeObject(msg);
+			out.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	// more methods for sending other message types
 
