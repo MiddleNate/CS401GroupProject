@@ -604,17 +604,21 @@ public class Client {
 			});
 			openAccountBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					if(accountDropdown.getSelectedItem() == AccountType.Savings) {
+					try {
+						if(accountDropdown.getSelectedItem() == AccountType.Savings) {
 
-						sendOpenAccountMessage(AccountType.Savings,owners,Double.parseDouble(interestTxt.getText()),Double.parseDouble(limitTxt.getText()), Double.parseDouble(miniDue.getText()));	
+							sendOpenAccountMessage(AccountType.Savings,owners,Double.parseDouble(interestTxt.getText()),Double.parseDouble(limitTxt.getText()),0);	
 
-					}
-					else if(accountDropdown.getSelectedItem() == AccountType.LineOfCredit) {
-						sendOpenAccountMessage(AccountType.LineOfCredit,owners,Double.parseDouble(interestTxt.getText()),Double.parseDouble(limitTxt.getText()), Double.parseDouble(miniDue.getText()));	
+						}
+						else if(accountDropdown.getSelectedItem() == AccountType.LineOfCredit) {
+							sendOpenAccountMessage(AccountType.LineOfCredit,owners,Double.parseDouble(interestTxt.getText()),Double.parseDouble(limitTxt.getText()), Double.parseDouble(miniDue.getText()));	
 
-					}
-					else {
-						sendOpenAccountMessage(AccountType.Checking,owners,Double.parseDouble(interestTxt.getText()),Double.parseDouble(limitTxt.getText()), Double.parseDouble(miniDue.getText()));	
+						}
+						else {
+							sendOpenAccountMessage(AccountType.Checking,owners,0,0,0);	
+						}
+					} catch (NumberFormatException NaN) {
+						doInvalidMessage();
 					}
 				}
 			});
