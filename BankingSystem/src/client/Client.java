@@ -263,6 +263,20 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
+	
+	private static void sendCloseAccountMessage(int id) {
+		// type does not matter for this input
+		// savings is used because it has an id constructor
+		SavingsAccount acc = new SavingsAccount(id, 0, 0);
+		
+		Message msg = new Message(MessageType.CloseAccount, acc);
+		try {
+			out.writeObject(msg);
+			out.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	// more methods for sending other message types
 
