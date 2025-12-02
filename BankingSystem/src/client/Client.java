@@ -305,6 +305,17 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
+	
+	private static void sendCreateCustomerMessage(String username, String password, String customerName, int socialSecNumber) {
+		Customer cust = new Customer(username, password, customerName, socialSecNumber);
+		Message msg = new Message(MessageType.CreateCustomer, cust);
+		try {
+			out.writeObject(msg);
+			out.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	// more methods for sending other message types
 
