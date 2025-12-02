@@ -786,9 +786,5 @@ public class Client {
 		public void doInvalidMessage() {
 			JOptionPane.showMessageDialog(null, "Invalid Entry, Try Again");
 		}
-
-		public void doAccountUpdatedMessage() {
-			JOptionPane.showMessageDialog(null, "Account Updated Successfully");
-		}
 	}
 }
