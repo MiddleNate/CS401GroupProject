@@ -474,9 +474,10 @@ public class Client {
 			// --- Add attributes ---
 			clientPanel.add(new JLabel("Welcome"));
 			clientPanel.add(withdrawlBtn);
+			clientPanel.add(depositBtn);
 			clientPanel.add(accForTransactions);
 			clientPanel.add(seeTransHistoryBtn);
-			clientPanel.add(depositBtn);
+			clientPanel.add(showAccountsBtn);
 			clientPanel.add(logoutBtn);
 			
 			mainPanel.add(clientPanel, "CUSTOMER");
@@ -629,7 +630,16 @@ public class Client {
 			JPanel addResponseText = new JPanel();
 			JTextArea displayText = new JTextArea();
 			displayText.setText(text);
-			mainPanel.add(displayText);
+			JButton backBtn = new JButton("Back");
+			backBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					cardLayout.show(mainPanel, "CUSTOMER");
+				}
+			});
+			addResponseText.add(displayText);
+			addResponseText.add(backBtn);
+			mainPanel.add(addResponseText, "UPDATE");
+			cardLayout.show(mainPanel, "UPDATE");
 		}
 		
 		public void updateEmployeeInterface(Message response) {
