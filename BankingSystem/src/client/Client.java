@@ -37,6 +37,8 @@ public class Client {
 	
 	private static Socket connection;
 	private static boolean exiting = false;
+	private static boolean showTransactions = false;
+	private static int accToCheck = 0;
 	private static ObjectInputStream in;
 	private static ObjectOutputStream out;
 
@@ -162,7 +164,24 @@ public class Client {
 			gui.doInvalidMessage();
 			break;
 		case Info:
-			SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface());
+			if (!showTransactions) {
+				SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(response.text()));
+			} else {
+				ArrayList<BankAccount> accs = response.getAccounts();
+				BankAccount acc;
+				for (int i = 0; i < accs.size(); i++) {
+					if (accs.get(i).getID() == accToCheck) {
+						acc = accs.get(i);
+					}
+				}
+				if (acc == null) {
+					SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface("Account not found for current user"));
+				} else {
+					SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(getAccountTransactions(acc)));
+				}
+				showTransactions = false;
+				accToCheck = 0;
+			}
 			break;
 		default:
 			System.out.println("Unknown Message Type: " + response.getType());
@@ -320,7 +339,15 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
-	// more methods for sending other message types
+
+	private static String getAccountTransactions(BankAccount acc) {
+		String output = "";
+		ArrayList<Transaction> transactions = acc.getTransactions();
+		for (int i = 0; i < transactions.size(); i++) {
+			output += transactions.get(i).toString();
+		}
+		return output;
+	}
 
 	private static class GUI implements Runnable {
 		private CardLayout cardLayout;
