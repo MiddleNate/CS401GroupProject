@@ -496,35 +496,44 @@ public class Client {
 		
 		public void updateEmployeeInterface(String acc) {
 			//display everything
-			JPanel addTextArea = new JPanel();
+			JPanel addTextArea = new JPanel(new FlowLayout());
 			JTextArea displayCustomerAccounts = new JTextArea(10,5);
 			displayCustomerAccounts.setEditable(false);
 			JScrollPane scrollPane = new JScrollPane(displayCustomerAccounts);
-//			JComboBox<AccountType> accountDropdown = new JComboBox<>();
 			JTextField employeeUserNameTxt = new JTextField();
 			displayCustomerAccounts.append(acc + '\n');
+			JTextField customerUsername = new JTextField("Enter customer username");
+			JComboBox<AccountType> accountDropdown = new JComboBox<>();		
+			JTextField interestTxt = new JTextField("Enter Interest");
+			JTextField limitTxt = new JTextField("Enter Limit amount");
+
+
 			
-			
+			JButton createCustomerBtn = new JButton("Create Customer");
 			JButton withdrawlBtn = new JButton("Withdrawl");
 			JButton depositBtn = new JButton("Deposit");
 			JButton seeTransHistoryBtn = new JButton("Transaction History");
-			JButton openOrCloseAccountbtn = new JButton("Append Account");
-			JButton seeBankAccountsbtn = new JButton("See Bank Accounts");
+			JButton openAccountBtn = new JButton("Open Account");
+			JButton closeAccountBtn = new JButton("Close Account");
 			JButton backBtn = new JButton("Back");
 			JButton logoutBtn = new JButton("Log out");
 			
 			addTextArea.add(displayCustomerAccounts);
+			addTextArea.add(scrollPane);
+			addTextArea.add(customerUsername);
+			addTextArea.add(accountDropdown);
+			addTextArea.add(createCustomerBtn);
 			addTextArea.add(withdrawlBtn);
 			addTextArea.add(depositBtn);
 			addTextArea.add(seeTransHistoryBtn);
-			addTextArea.add(openOrCloseAccountbtn);
-			addTextArea.add(seeBankAccountsbtn);
+			addTextArea.add(openAccountBtn);
+			addTextArea.add(closeAccountBtn);
 			addTextArea.add(backBtn);
 			addTextArea.add(logoutBtn);
 			
 			backBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					showEmployeeInterface();
+					cardLayout.show(mainPanel, "CUSTOMER");
 				}
 			});
 			depositBtn.addActionListener(new ActionListener() {
@@ -539,19 +548,32 @@ public class Client {
 			});
 			seeTransHistoryBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					doBankAccountDetails();	
+					try {
+						showTransactions = true;
+						sendInfoRequestMessage(customerUsername.getText());
+					} catch (NumberFormatException NaN) {
+						doInvalidMessage();
+					}
 				}
 			});
-			
-			//TODO: Append methods
-			openOrCloseAccountbtn.addActionListener(new ActionListener() {
+			openAccountBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					doBankAccounts();	
+					if(accountDropdown.getSelectedItem() == AccountType.Savings) {
+						sendOpenAccountMessage(AccountType.Savings,customerUsername.getText(),interestTxt.getText(),);	
+
+					}
+					else if(accountDropdown.getSelectedItem() == AccountType.LineOfCredit) {
+						sendOpenAccountMessage(AccountType.LineOfCredit,customerUsername.getText());	
+
+					}
+					else {
+						sendOpenAccountMessage(AccountType.Checking,customerUsername.getText());	
+					}
 				}
 			});
-			seeBankAccountsbtn.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					doBankAccounts();	
+			closeAccountBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {					
+					sendCloseAccountMessage(accountDropdown.getSelectedItem(),customerUsername.getText());	
 				}
 			});
 
@@ -586,7 +608,6 @@ public class Client {
 					} catch (NumberFormatException NaN) {
 						doInvalidMessage();
 					}
-					
 				}
 			});
     		mainPanel.add(withdrawlPanel, "WITHDRAWAL");
@@ -615,49 +636,16 @@ public class Client {
 					try {
 						Double depositAmount = Double.parseDouble(amountTxt.getText());
 						User user = new User(username,null);
-			    		Transaction deposit = new Transaction(depositAmount,TransactionType.Withdrawal,user,Integer.parseInt(bankAccTxt.getText()));
+			    		Transaction deposit = new Transaction(depositAmount,TransactionType.Deposit,user,Integer.parseInt(bankAccTxt.getText()));
 			    		sendTransactionMessage(deposit);
 					} catch (NumberFormatException NaN) {
 						doInvalidMessage();
-					}
-					
+					}	
 				}
 			});
     		
     		mainPanel.add(depositPanel, "DEPOSIT");
-		}
-		public void doOpenOrCloseAccount() {
-			JPanel openCloseAccount = new JPanel();
-			openCloseAccount.setLayout(cardLayout);
-			
-			JComboBox<AccountType> accountDropdown = new JComboBox<>(AccountType.values());
-			
-			// --- Add Attributes --- 
-			openCloseAccount.add(new JLabel("Opening or Closing an Account"));
-			openCloseAccount.add(new JLabel("Select Type of account"));
-			openCloseAccount.add(accountDropdown);
-			
-			
-			mainPanel.add(openCloseAccount);
-
-		}
-
-		public void doBankAccounts() {
-			// --- Attributes ---
-			// --- Text Area : Read Only --- 
-			TextArea tAOutput;
-			tAOutput = new TextArea(5,50); // allocate TextField
-		    tAOutput.setEditable(false);  // read-only
-		    
-		}
-
-		public void doBankAccountDetails() {
-			// --- Attributes ---
-			// --- Text Area : Read Only --- 
-			TextArea tAOutput;
-			tAOutput = new TextArea(5,50); // allocate TextField
-		    tAOutput.setEditable(false);  // read-only
-		}
+		}		
 		public void doSuccessMessage(String showTxt) {
 			JOptionPane.showMessageDialog(null, '"' + showTxt + '"');
 		}
