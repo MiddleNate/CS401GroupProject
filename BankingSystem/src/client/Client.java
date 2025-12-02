@@ -17,11 +17,13 @@ import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -160,7 +162,7 @@ public class Client {
 			gui.doInvalidMessage();
 			break;
 		case Info:
-			SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(response));
+			SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface());
 			break;
 		default:
 			System.out.println("Unknown Message Type: " + response.getType());
@@ -318,7 +320,6 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
-
 	// more methods for sending other message types
 
 	private static class GUI implements Runnable {
@@ -411,7 +412,6 @@ public class Client {
 			logoutBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					sendLogoutMessage();
-					
 				}
 			});			
 			// --- Add attributes ---
@@ -433,26 +433,14 @@ public class Client {
 			JPanel employeePanel = new JPanel(new FlowLayout());
 
 			// --- Input for Customer Info ---
-			JTextField customerUsername = new JTextField("Enter Customer Username");
+			JTextField customerUsername = new JTextField();
 			JButton infoRequestBtn = new JButton("Submit");
-			employeePanel.add(customerUsername);
-			employeePanel.add(infoRequestBtn);
-			
-			
-			JButton withdrawlBtn = new JButton("Withdrawl");
-			JButton depositBtn = new JButton("Deposit");
-			JButton seeTransHistoryBtn = new JButton("Transaction History");
-			JButton openOrCloseAccountbtn = new JButton("Append Account");
-			JButton seeBankAccountsbtn = new JButton("See Bank Accounts");
 			JButton logoutBtn = new JButton("Log out");
-			
+
 			// --- Add Attributes ---
 			employeePanel.add(new JLabel("Welcome Employee"));
-			employeePanel.add(withdrawlBtn);
-			employeePanel.add(depositBtn);
-			employeePanel.add(seeTransHistoryBtn);
-			employeePanel.add(openOrCloseAccountbtn);
-			employeePanel.add(seeBankAccountsbtn);
+			employeePanel.add(customerUsername);
+			employeePanel.add(infoRequestBtn);
 			employeePanel.add(logoutBtn);
 			
 			// --- Add Button functions ---
@@ -461,20 +449,63 @@ public class Client {
 					sendInfoRequestMessage(customerUsername.getText());
 				}
 			});
+
+			logoutBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					sendLogoutMessage();
+				}
+			});
+			// --- Add panel to the main panel ---
+			mainPanel.add(employeePanel, "EMPLOYEE");
+		}
+		
+		public void updateEmployeeInterface() {
+			//display everything
+			JPanel addTextArea = new JPanel();
+			JTextArea displayCustomerAccounts = new JTextArea(10,5);
+			displayCustomerAccounts.setEditable(false);
+			JScrollPane scrollPane = new JScrollPane(displayCustomerAccounts);
+			JComboBox<AccountType> accountDropdown = new JComboBox<>(AccountType.values());
+
+//			displayCustomerInfo.setText();
+//			System.out.println(response.getAccount().getID());
 			
+			
+			JButton withdrawlBtn = new JButton("Withdrawl");
+			JButton depositBtn = new JButton("Deposit");
+			JButton seeTransHistoryBtn = new JButton("Transaction History");
+			JButton openOrCloseAccountbtn = new JButton("Append Account");
+			JButton seeBankAccountsbtn = new JButton("See Bank Accounts");
+			JButton backBtn = new JButton("Back");
+			JButton logoutBtn = new JButton("Log out");
+			
+			addTextArea.add(displayCustomerAccounts);
+			addTextArea.add(withdrawlBtn);
+			addTextArea.add(depositBtn);
+			addTextArea.add(seeTransHistoryBtn);
+			addTextArea.add(openOrCloseAccountbtn);
+			addTextArea.add(seeBankAccountsbtn);
+			addTextArea.add(backBtn);
+			addTextArea.add(logoutBtn);
+			
+			backBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					showEmployeeInterface();
+				}
+			});
 			depositBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					showDeposit(customerUsername.getText());	
+					showDeposit();	
 				}
 			});
 			withdrawlBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					showWithdrawl(customerUsername.getText());	
+					showWithdrawl();	
 				}
 			});
 			seeTransHistoryBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					doBankAccounts();	
+					doBankAccountDetails();	
 				}
 			});
 			
@@ -489,24 +520,8 @@ public class Client {
 					doBankAccounts();	
 				}
 			});
-		    
-			logoutBtn.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					sendLogoutMessage();
-				}
-			});
-			// --- Add panel to the main panel ---
-			mainPanel.add(employeePanel, "EMPLOYEE");
-		}
-		
-		public void updateEmployeeInterface(Message response) {
-			JPanel addTextFields = new JPanel();
-			JTextArea displayCustomerInfo = new JTextArea();
-			displayCustomerInfo.setText(response.getAccount().toString());
-			System.out.println(response.getAccount().toString());
-			addTextFields.add(displayCustomerInfo);
-			
-			mainPanel.add(addTextFields,"UPDATE");
+
+			mainPanel.add(addTextArea,"UPDATE");
 		}
 		public void showWithdrawl(String username) {
 			doWithdrawl(username);
@@ -517,6 +532,8 @@ public class Client {
 			JTextField amountTxt = new JTextField();
 			JTextField bankAccTxt = new JTextField();
 			JButton submitBtn = new JButton("Submit");
+			JButton backBtn = new JButton("Back");
+
 			// TODO: add to panel
 			withdrawlPanel.add(new JLabel("Enter Withdrawal Amount:"));
 			withdrawlPanel.add(new JLabel("Enter Bank Account Number:"));
@@ -528,7 +545,6 @@ public class Client {
 			submitBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					Double withdrawlAmount = Double.parseDouble(amountTxt.getText());
-
 		    		// TODO : change text field to a number or add error checking for parseint & resolve non-serializable issue
 					User user = new User(username,null);
 		    		Transaction withdrawl = new Transaction(withdrawlAmount,TransactionType.Withdrawal,user,Integer.parseInt(bankAccTxt.getText()));
@@ -536,7 +552,6 @@ public class Client {
 				}
 			});
     		mainPanel.add(withdrawlPanel, "WITHDRAWAL");
-
 		}
 		
 		public void showDeposit(String username) {
@@ -573,7 +588,16 @@ public class Client {
 		public void doOpenOrCloseAccount() {
 			JPanel openCloseAccount = new JPanel();
 			openCloseAccount.setLayout(cardLayout);
-
+			
+			JComboBox<AccountType> accountDropdown = new JComboBox<>(AccountType.values());
+			
+			
+			// --- Add Attributes --- 
+			openCloseAccount.add(new JLabel("Opening or Closing an Account"));
+			openCloseAccount.add(new JLabel("Select Type of account"));
+			openCloseAccount.add(accountDropdown);
+			
+			
 			mainPanel.add(openCloseAccount);
 
 		}
