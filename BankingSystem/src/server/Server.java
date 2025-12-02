@@ -293,16 +293,11 @@ public class Server {
 								reply = new Message(MessageType.Fail, "Provided User was not of type Customer");
 							} else {
 								Customer tempCust = (Customer) m.getUser();
-								Customer newCust = new Customer(tempCust.getUsername(), tempCust.getPassword(), 
-										tempCust.getCustomerName(), tempCust.getSocialSecNumber());
+								Customer newCust = new Customer(tempCust.getUsername(), tempCust.getPassword());
 								// add the user to the map, data is copied to ensure we
 								// use the server-side customerCount (not that customer id gets
 								// used anywhere since users is mapped to the username)
-								Server.users.put(newCust.getUsername(), new Customer(
-										newCust.getUsername(),
-										newCust.getPassword(),
-										newCust.getCustomerName(),
-										newCust.getSocialSecNumber()));
+								Server.users.put(newCust.getUsername(), newCust);
 								// set the reply to success
 								reply = new Message(MessageType.Success, "Customer created successfuly");
 							}
@@ -441,8 +436,8 @@ public class Server {
 									break; }
 								case AccountType.Savings: {
 									// validate the fields that will be modified
-									double interest = ((LOCAccount) m.getAccount()).getInterest();
-									double limit = ((LOCAccount) m.getAccount()).getLimit();
+									double interest = ((SavingsAccount) m.getAccount()).getInterest();
+									double limit = ((SavingsAccount) m.getAccount()).getWithdrawlLimit();
 									if (interest < 0 || limit < 0) {
 										reply = new Message(MessageType.Fail, "Values must be above zero");
 										break;
@@ -481,7 +476,7 @@ public class Server {
 								reply = new Message(MessageType.Fail, "Account does not exist");
 							} else if (!(Server.users.get(username) instanceof Customer)) {
 								reply = new Message(MessageType.Fail, "Customer does not exist");
-							} else if (Server.accounts.get(accountID).isOpen()) {
+							} else if (!Server.accounts.get(accountID).isOpen()) {
 								reply = new Message(MessageType.Fail, "Account is closed");
 							} else {
 								Server.accounts.get(accountID).addUser(username);
@@ -501,7 +496,7 @@ public class Server {
 								reply = new Message(MessageType.Fail, "Account does not exist");
 							} else if (!(Server.users.get(username) instanceof Customer)) {
 								reply = new Message(MessageType.Fail, "Customer does not exist");
-							} else if (Server.accounts.get(accountID).isOpen()) {
+							} else if (!Server.accounts.get(accountID).isOpen()) {
 								reply = new Message(MessageType.Fail, "Account is closed");
 							} else if (!Server.accounts.get(accountID).getOwners().contains(username)) {
 								reply = new Message(MessageType.Fail, "Customer is not an account owner");

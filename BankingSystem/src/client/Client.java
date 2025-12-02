@@ -345,8 +345,8 @@ public class Client {
 		}
 	}
 	
-	private static void sendCreateCustomerMessage(String username, String password, String customerName, int socialSecNumber) {
-		Customer cust = new Customer(username, password, customerName, socialSecNumber);
+	private static void sendCreateCustomerMessage(String username, String password) {
+		Customer cust = new Customer(username, password);
 		Message msg = new Message(MessageType.CreateCustomer, cust);
 		try {
 			out.writeObject(msg);
@@ -541,7 +541,8 @@ public class Client {
 			JScrollPane scrollPane = new JScrollPane(displayCustomerAccounts);
 			JTextField employeeUserNameTxt = new JTextField();
 			displayCustomerAccounts.append(acc + '\n');
-			JTextField customerUsername = new JTextField("Enter owner(s) name");
+			JTextField customerUsername = new JTextField("Enter customer name");
+			JTextField newPassword = new JTextField("new customer's password");
 			AccountType[] accTypes = { AccountType.Checking,AccountType.Savings,AccountType.LineOfCredit};
 			JComboBox<AccountType> accountDropdown = new JComboBox<>(accTypes);		
 			JTextField interestTxt = new JTextField("Enter Interest");
@@ -556,12 +557,15 @@ public class Client {
 			JButton openAccountBtn = new JButton("Open Account");
 			JButton closeAccountBtn = new JButton("Close Account");
 			JButton modifyAccountBtn = new JButton("Modify Account");
+			JButton addToAccBtn = new JButton("Add to Account");
+			JButton removeFromAccBtn = new JButton("Remove from Account");
 			JButton backBtn = new JButton("Back");
 			JButton logoutBtn = new JButton("Log out");
 			
 			addTextArea.add(displayCustomerAccounts);
 			addTextArea.add(scrollPane);
 			addTextArea.add(customerUsername);
+			addTextArea.add(newPassword);
 			addTextArea.add(accountDropdown);
 			addTextArea.add(interestTxt);
 			addTextArea.add(limitTxt);
@@ -572,7 +576,9 @@ public class Client {
 			addTextArea.add(seeTransHistoryBtn);
 			addTextArea.add(openAccountBtn);
 			addTextArea.add(closeAccountBtn);
-			addTextArea.add(modifyAccountBtn);			
+			addTextArea.add(modifyAccountBtn);	
+			addTextArea.add(addToAccBtn);
+			addTextArea.add(removeFromAccBtn);	
 			addTextArea.add(backBtn);
 			addTextArea.add(logoutBtn);
 			
@@ -601,7 +607,29 @@ public class Client {
 						doInvalidMessage();
 					}
 				}});
-			
+			addToAccBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					try {
+						sendAddToAccountMessage( Integer.parseInt(accountId.getText()), customerUsername.getText());
+					} catch (NumberFormatException NaN) {
+						doInvalidMessage();
+					}
+				}
+			});
+			removeFromAccBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					try {
+						sendRemoveFromAccountMessage(Integer.parseInt(accountId.getText()), customerUsername.getText());
+					} catch (NumberFormatException NaN) {
+						doInvalidMessage();
+					}
+				}
+			});
+			createCustomerBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					sendCreateCustomerMessage(customerUsername.getText(), newPassword.getText());
+				}
+			});
 			backBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					cardLayout.show(mainPanel, "EMPLOYEE");
@@ -783,10 +811,6 @@ public class Client {
 
 		public void doInvalidMessage() {
 			JOptionPane.showMessageDialog(null, "Invalid Entry, Try Again");
-		}
-
-		public void doAccountUpdatedMessage() {
-			JOptionPane.showMessageDialog(null, "Account Updated Successfully");
 		}
 	}
 }
