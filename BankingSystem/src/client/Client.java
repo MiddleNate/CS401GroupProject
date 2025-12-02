@@ -165,7 +165,7 @@ public class Client {
 			break;
 		case Info:
 			if (!showTransactions) {
-				SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(response.text()));
+				SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(response.getText()));
 			} else {
 				ArrayList<BankAccount> accs = response.getAccounts();
 				BankAccount acc;
@@ -486,16 +486,15 @@ public class Client {
 			mainPanel.add(employeePanel, "EMPLOYEE");
 		}
 		
-		public void updateEmployeeInterface() {
+		public void updateEmployeeInterface(String acc) {
 			//display everything
 			JPanel addTextArea = new JPanel();
 			JTextArea displayCustomerAccounts = new JTextArea(10,5);
 			displayCustomerAccounts.setEditable(false);
 			JScrollPane scrollPane = new JScrollPane(displayCustomerAccounts);
-			JComboBox<AccountType> accountDropdown = new JComboBox<>(AccountType.values());
-
-//			displayCustomerInfo.setText();
-//			System.out.println(response.getAccount().getID());
+//			JComboBox<AccountType> accountDropdown = new JComboBox<>();
+			JTextField employeeUserNameTxt = new JTextField();
+			displayCustomerAccounts.append(acc + '\n');
 			
 			
 			JButton withdrawlBtn = new JButton("Withdrawl");
@@ -522,12 +521,12 @@ public class Client {
 			});
 			depositBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					showDeposit();	
+					showDeposit(employeeUserNameTxt.getText());	
 				}
 			});
 			withdrawlBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					showWithdrawl();	
+					showWithdrawl(employeeUserNameTxt.getText());	
 				}
 			});
 			seeTransHistoryBtn.addActionListener(new ActionListener() {
@@ -624,7 +623,6 @@ public class Client {
 			openCloseAccount.setLayout(cardLayout);
 			
 			JComboBox<AccountType> accountDropdown = new JComboBox<>(AccountType.values());
-			
 			
 			// --- Add Attributes --- 
 			openCloseAccount.add(new JLabel("Opening or Closing an Account"));
