@@ -666,7 +666,7 @@ public class Client {
 					try {
 						Double depositAmount = Double.parseDouble(amountTxt.getText());
 						User user = new User(username,null);
-			    		Transaction deposit = new Transaction(depositAmount,TransactionType.Withdrawal,user,Integer.parseInt(bankAccTxt.getText()));
+			    		Transaction deposit = new Transaction(depositAmount,TransactionType.Deposit,user,Integer.parseInt(bankAccTxt.getText()));
 			    		sendTransactionMessage(deposit);
 					} catch (NumberFormatException NaN) {
 						doInvalidMessage();
