@@ -3,17 +3,13 @@ import java.util.ArrayList;
 
 public class Customer extends User {
 	private static final long serialVersionUID = 60L;
-	private String customerName;
 	private static int customerCount = 0;
 	private int id;
-	private int socialSecNumber;
 	private ArrayList<Integer> accounts;
 
-	public Customer(String username, String password, String customerName, int socialSecNumber) {
+	public Customer(String username, String password) {
 		super(username, password);
-		this.customerName = customerName;
 		this.id = ++customerCount;
-		this.socialSecNumber = socialSecNumber;
 		this.accounts = new ArrayList<Integer>();
 	}
 	
@@ -25,20 +21,8 @@ public class Customer extends User {
 		return customerCount;
 	}
 
-	public void setCustomerName(String customerName) {
-		this.customerName = customerName;
-	}
-
-	public String getCustomerName() {
-		return this.customerName;
-	}
-
 	public int getCustomerID() {
 		return this.id;
-	}
-
-	public int getSocialSecNumber() {
-		return this.socialSecNumber;
 	}
 	
 	public ArrayList<Integer> getAccounts() {

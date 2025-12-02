@@ -345,8 +345,8 @@ public class Client {
 		}
 	}
 	
-	private static void sendCreateCustomerMessage(String username, String password, String customerName, int socialSecNumber) {
-		Customer cust = new Customer(username, password, customerName, socialSecNumber);
+	private static void sendCreateCustomerMessage(String username, String password) {
+		Customer cust = new Customer(username, password);
 		Message msg = new Message(MessageType.CreateCustomer, cust);
 		try {
 			out.writeObject(msg);
