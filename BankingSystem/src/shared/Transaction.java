@@ -52,4 +52,10 @@ public class Transaction implements Serializable {
 	public int getAccount() {
 		return account;
 	}
+	
+	public String toString() {
+		String output = "Transaction ID: " + id + "\tType: " + type.name() + "\tAmount: " + amount
+				+ "\tDate: " + date + "\tUser: " + user.getUsername() + "\tAccount ID: " + id + "\n";
+		return output;
+	}
 }
