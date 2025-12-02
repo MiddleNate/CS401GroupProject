@@ -130,6 +130,7 @@ public class Client {
 						} catch (Exception close) {
 							System.out.println("Error closing connection: " + close);
 						}
+						System.exit(1);
 					}
 				}).start();
 			}
@@ -219,7 +220,6 @@ public class Client {
 			Message msg = new Message(MessageType.Logout);
 			out.writeObject(msg);
 			out.flush();
-			System.exit(1);
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
