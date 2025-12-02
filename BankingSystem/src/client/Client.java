@@ -214,34 +214,30 @@ public class Client {
 	
 	// minimum is ignored if updating a savings account
 	private static void sendUpdateAccountMessage(int id, AccountType type, double interest, double limit, double minimum) {
+		Message msg = new Message(MessageType.Invalid);
 		switch (type) {
 		case AccountType.Checking: {
 			// checking accounts cannot be modified
-			break;
+			return;
 		}
 		case AccountType.Savings: {
 			SavingsAccount acc = new SavingsAccount(id, interest, limit);
-			Message msg = new Message(MessageType.UpdateAccount, acc);
-			try {
-				out.writeObject(msg);
-				out.flush();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			msg = new Message(MessageType.UpdateAccount, acc);
 			break;
 		}
 		case AccountType.LineOfCredit: {
 			LOCAccount acc = new LOCAccount(id, limit, interest, minimum);
-			Message msg = new Message(MessageType.UpdateAccount, acc);
-			try {
-				out.writeObject(msg);
-				out.flush();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			msg = new Message(MessageType.UpdateAccount, acc);
 			break;
 		}
 		}
+		try {
+			out.writeObject(msg);
+			out.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	}
 
 	// more methods for sending other message types
