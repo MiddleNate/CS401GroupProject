@@ -8,7 +8,7 @@ import java.time.Clock;
 public class SavingsAccount extends BankAccount {
 	private static final long serialVersionUID = 910L;
 	private double interestRate;
-	private double withdrawlLimit;
+	private double withdrawalLimit;
 	private LocalDate lastUpdated;
 	private double withdrawnSinceUpdated;
 	// for testing with certain dates
@@ -22,17 +22,31 @@ public class SavingsAccount extends BankAccount {
 		balance = 0;
 		transactions = new ArrayList<Transaction>();
 		interestRate = interest;
-		withdrawlLimit = limit;
+		withdrawalLimit = limit;
 		lastUpdated = LocalDate.now(clock).with(TemporalAdjusters.firstDayOfMonth());
 		withdrawnSinceUpdated = 0;
 	}
 	
+	// alternate version used for UpdateAccount messages
+	public SavingsAccount(int id, double interest, double limit) {
+		this.id = id;
+		status = false;
+		type = AccountType.Savings;
+		owners = null;
+		balance = 0;
+		transactions = null;
+		interestRate = interest;
+		withdrawalLimit = limit;
+		lastUpdated = null;
+		withdrawnSinceUpdated = 0;
+	}
+	
 	public void setWithdrawlLimit(double limit) {
-		withdrawlLimit = limit;
+		withdrawalLimit = limit;
 	}
 	
 	public double getWithdrawlLimit() {
-		return withdrawlLimit;
+		return withdrawalLimit;
 	}
 	
 	public double getInterest() {
@@ -137,7 +151,7 @@ public class SavingsAccount extends BankAccount {
 		update();
 		// validation that the withdrawal can be completed
 		if (amt < 0) throw new Exception("Cannot withdraw negative amounts");
-		if ((withdrawnSinceUpdated + amt) > withdrawlLimit) throw new Exception("Transaction would exceed withdrawal limit");
+		if ((withdrawnSinceUpdated + amt) > withdrawalLimit) throw new Exception("Transaction would exceed withdrawal limit");
 		if (balance - amt < 0) throw new Exception("Balance would go below zero");
 		
 		// truncate any extra decimal places
@@ -149,8 +163,8 @@ public class SavingsAccount extends BankAccount {
 	
 	@Override
 	public String toString() {
-		return ("Account ID: " + id + "\tType: Savings\tBalance: " + balance +
-				"\tInterest rate: " + interestRate + "\tWithdrawal Limit: " + withdrawlLimit
+		return ("Account ID: " + id + "\tType: Savings" + "\t\tBalance: " + balance +
+				"\tInterest rate: " + interestRate + "\tWithdrawal Limit: " + withdrawalLimit
 				+ "\tWithdrawn this month: " + withdrawnSinceUpdated + "\n");
 	}
 }

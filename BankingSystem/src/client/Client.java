@@ -17,11 +17,14 @@ import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -34,6 +37,9 @@ public class Client {
 	
 	private static Socket connection;
 	private static boolean exiting = false;
+	private static boolean showTransactions = false;
+	private static int accToCheck = 0;
+	private static User currentUser = null;
 	private static ObjectInputStream in;
 	private static ObjectOutputStream out;
 
@@ -136,10 +142,12 @@ public class Client {
 		if(data instanceof User) {
 			if(response.getUser() instanceof Customer) {
 				SwingUtilities.invokeLater(() ->gui.showCustomerInterface(response.getUser()));
+				currentUser = response.getUser();
 				return;
 			}
 			else if(response.getUser() instanceof Employee) {
 				SwingUtilities.invokeLater(() ->gui.showEmployeeInterface());
+				currentUser = response.getUser();
 				return;
 			}
 			else
@@ -158,7 +166,35 @@ public class Client {
 			gui.doInvalidMessage();
 			break;
 		case Info:
-			gui.updateEmployeeInterface();
+			if (!showTransactions) {
+				if (currentUser instanceof Customer) {
+					SwingUtilities.invokeLater(() ->gui.updateCustomerInterface(response.getText()));
+				} else if (currentUser instanceof Employee) {
+					SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(response.getText()));
+				}
+			} else {
+				ArrayList<BankAccount> accs = response.getAccounts();
+				BankAccount acc = null;
+				final String output;
+				for (int i = 0; i < accs.size(); i++) {
+					if (accs.get(i).getID() == accToCheck) {
+						acc = accs.get(i);
+					}
+				}
+				if (acc == null) {
+					output = "Account not found for selected user";
+				} else {
+					output = getAccountTransactions(acc);
+				}
+				if (currentUser instanceof Customer) {
+					SwingUtilities.invokeLater(() ->gui.updateCustomerInterface(output));
+				} else if (currentUser instanceof Employee) {
+					SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(output));
+				}
+				showTransactions = false;
+				accToCheck = 0;
+			}
+			break;
 		default:
 			System.out.println("Unknown Message Type: " + response.getType());
 			break;
@@ -188,7 +224,18 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
-	//TODO : Add Parameters
+	
+	// call with the current username if we are logged in as a customer
+	private static void sendInfoRequestMessage(String username) {
+		Message msg = new Message(MessageType.InfoRequest, new User(username, ""));
+		try {
+			out.writeObject(msg);
+			out.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private static void sendTransactionMessage(Transaction action) {
 		// create and send a message through the stream
 		try {
@@ -199,8 +246,120 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
+	
+	// minimum is ignored if updating a savings account
+	private static void sendUpdateAccountMessage(int id, AccountType type, double interest, double limit, double minimum) {
+		Message msg = new Message(MessageType.Invalid);
+		switch (type) {
+		case AccountType.Checking: {
+			// checking accounts cannot be modified
+			return;
+		}
+		case AccountType.Savings: {
+			SavingsAccount acc = new SavingsAccount(id, interest, limit);
+			msg = new Message(MessageType.UpdateAccount, acc);
+			break;
+		}
+		case AccountType.LineOfCredit: {
+			LOCAccount acc = new LOCAccount(id, limit, interest, minimum);
+			msg = new Message(MessageType.UpdateAccount, acc);
+			break;
+		}
+		}
+		try {
+			out.writeObject(msg);
+			out.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// parameters that don't apply to the type will be ignored
+	private static void sendOpenAccountMessage(AccountType type, ArrayList<String> owners, 
+			double interest, double limit, double minimum) {
+		Message msg = new Message(MessageType.Invalid);
+		switch (type) {
+		case AccountType.Checking: {
+			CheckingAccount acc = new CheckingAccount(owners);
+			msg = new Message(MessageType.OpenAccount, acc);
+		break;}
+		case AccountType.Savings: {
+			SavingsAccount acc = new SavingsAccount(owners, interest, limit);
+			msg = new Message(MessageType.OpenAccount, acc);
+		break;}
+		case AccountType.LineOfCredit: {
+			LOCAccount acc = new LOCAccount(owners, limit, interest, minimum);
+			msg = new Message(MessageType.OpenAccount, acc);
+		}
+		}
+		try {
+			out.writeObject(msg);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static void sendCloseAccountMessage(int id) {
+		// type does not matter for this input
+		// savings is used because it has an id constructor
+		SavingsAccount acc = new SavingsAccount(id, 0, 0);
+		
+		Message msg = new Message(MessageType.CloseAccount, acc);
+		try {
+			out.writeObject(msg);
+			out.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static void sendAddToAccountMessage(int id, String username) {
+		// type does not matter for this input
+		// savings is used because it has an id constructor
+		SavingsAccount acc = new SavingsAccount(id, 0 , 0);
+		User user = new User(username, "");
+		Message msg = new Message(MessageType.AddToAccount, acc, user);
+		try {
+			out.writeObject(msg);
+			out.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static void sendRemoveFromAccountMessage(int id, String username) {
+		// type does not matter for this input
+		// savings is used because it has an id constructor
+		SavingsAccount acc = new SavingsAccount(id, 0 , 0);
+		User user = new User(username, "");
+		Message msg = new Message(MessageType.RemoveFromAccount, acc, user);
+		try {
+			out.writeObject(msg);
+			out.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static void sendCreateCustomerMessage(String username, String password, String customerName, int socialSecNumber) {
+		Customer cust = new Customer(username, password, customerName, socialSecNumber);
+		Message msg = new Message(MessageType.CreateCustomer, cust);
+		try {
+			out.writeObject(msg);
+			out.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-	// more methods for sending other message types
+	private static String getAccountTransactions(BankAccount acc) {
+		String output = "";
+		ArrayList<Transaction> transactions = acc.getTransactions();
+		for (int i = 0; i < transactions.size(); i++) {
+			output += transactions.get(i).toString();
+		}
+		return output;
+	}
 
 	private static class GUI implements Runnable {
 		private CardLayout cardLayout;
@@ -269,11 +428,18 @@ public class Client {
 			//4 button layout
 			JButton withdrawlBtn = new JButton("Withdrawal");
 			JButton depositBtn = new JButton("Deposit");
-			JButton seeTransHistoryBtn = new JButton("See Transaction History");
-			
+			JTextField accForTransactions = new JTextField("Account number");
+			JButton seeTransHistoryBtn = new JButton("Transaction History");
+			JButton showAccountsBtn = new JButton("Show Accounts");
+			JButton backBtn = new JButton("Back");
 			JButton logoutBtn = new JButton("Log out");
 			
 			// --- Add functions ---
+			backBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					cardLayout.show(mainPanel, "CUSTOMER");
+				}
+			});
 			depositBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					showDeposit(user.getUsername());	
@@ -284,22 +450,34 @@ public class Client {
 					showWithdrawl(user.getUsername());	
 				}
 			});
+			showAccountsBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					sendInfoRequestMessage(user.getUsername());
+				}
+			});
 			seeTransHistoryBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					doBankAccounts();	
+					try {
+						accToCheck = Integer.parseInt(accForTransactions.getText());
+						showTransactions = true;
+						sendInfoRequestMessage(user.getUsername());
+					} catch (NumberFormatException NaN) {
+						doInvalidMessage();
+					}
 				}
 			});
 			logoutBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					sendLogoutMessage();
-					
 				}
 			});			
 			// --- Add attributes ---
 			clientPanel.add(new JLabel("Welcome"));
 			clientPanel.add(withdrawlBtn);
-			clientPanel.add(seeTransHistoryBtn);
 			clientPanel.add(depositBtn);
+			clientPanel.add(accForTransactions);
+			clientPanel.add(seeTransHistoryBtn);
+			clientPanel.add(showAccountsBtn);
 			clientPanel.add(logoutBtn);
 			
 			mainPanel.add(clientPanel, "CUSTOMER");
@@ -314,60 +492,128 @@ public class Client {
 			JPanel employeePanel = new JPanel(new FlowLayout());
 
 			// --- Input for Customer Info ---
-			JTextField customerUsername = new JTextField("Enter Customer Username");
+			JTextField customerUsername = new JTextField();
 			JButton infoRequestBtn = new JButton("Submit");
-			employeePanel.add(customerUsername);
-			employeePanel.add(infoRequestBtn);
-			
-			
-			JButton withdrawlBtn = new JButton("Withdrawl");
-			JButton depositBtn = new JButton("Deposit");
-			JButton seeTransHistoryBtn = new JButton("Transaction History");
-			JButton openOrCloseAccountbtn = new JButton("Append Account");
-			JButton seeBankAccountsbtn = new JButton("See Bank Accounts");
 			JButton logoutBtn = new JButton("Log out");
-			
+
 			// --- Add Attributes ---
 			employeePanel.add(new JLabel("Welcome Employee"));
-			employeePanel.add(withdrawlBtn);
-			employeePanel.add(depositBtn);
-			employeePanel.add(seeTransHistoryBtn);
-			employeePanel.add(openOrCloseAccountbtn);
-			employeePanel.add(seeBankAccountsbtn);
+			employeePanel.add(customerUsername);
+			employeePanel.add(infoRequestBtn);
 			employeePanel.add(logoutBtn);
 			
 			// --- Add Button functions ---
 			infoRequestBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					sendInfoRequestMessage(customerUsername.getText());
+					cardLayout.show(mainPanel, "UPDATE");
+
 				}
 			});
+
+			logoutBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					sendLogoutMessage();
+				}
+			});
+			// --- Add panel to the main panel ---
+			mainPanel.add(employeePanel, "EMPLOYEE");
+			cardLayout.show(mainPanel, "UPDATE");
+
+		}
+		
+		public void updateEmployeeInterface(String acc) {
+			//display everything
+			JPanel addTextArea = new JPanel(new FlowLayout());
+			JTextArea displayCustomerAccounts = new JTextArea(10,5);
+			displayCustomerAccounts.setEditable(false);
+			JScrollPane scrollPane = new JScrollPane(displayCustomerAccounts);
+			JTextField employeeUserNameTxt = new JTextField();
+			displayCustomerAccounts.append(acc + '\n');
+			JTextField customerUsername = new JTextField("Enter owner(s) name");
+			JComboBox<AccountType> accountDropdown = new JComboBox<>();		
+			JTextField interestTxt = new JTextField("Enter Interest");
+			JTextField limitTxt = new JTextField("Enter Limit amount");
+			JTextField miniDue = new JTextField("Enter minimum due");
+			JTextField accountId = new JTextField("Enter account Id");
+
+			JButton createCustomerBtn = new JButton("Create Customer");
+			JButton withdrawlBtn = new JButton("Withdrawl");
+			JButton depositBtn = new JButton("Deposit");
+			JButton seeTransHistoryBtn = new JButton("Transaction History");
+			JButton openAccountBtn = new JButton("Open Account");
+			JButton closeAccountBtn = new JButton("Close Account");
+			JButton backBtn = new JButton("Back");
+			JButton logoutBtn = new JButton("Log out");
 			
+			String input = customerUsername.getText();
+			String[] parts = input.split(",");
+
+			ArrayList<String> owners = new ArrayList<>();
+			for(String p : parts) {
+				owners.add(p);
+			}
+			
+			addTextArea.add(displayCustomerAccounts);
+			addTextArea.add(scrollPane);
+			addTextArea.add(customerUsername);
+			addTextArea.add(accountDropdown);
+			addTextArea.add(interestTxt);
+			addTextArea.add(limitTxt);
+			addTextArea.add(accountId);
+			addTextArea.add(createCustomerBtn);
+			addTextArea.add(withdrawlBtn);
+			addTextArea.add(depositBtn);
+			addTextArea.add(seeTransHistoryBtn);
+			addTextArea.add(openAccountBtn);
+			addTextArea.add(closeAccountBtn);
+			addTextArea.add(backBtn);
+			addTextArea.add(logoutBtn);
+			
+			backBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					cardLayout.show(mainPanel, "EMPLOYEE");
+				}
+			});
 			depositBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					showDeposit(customerUsername.getText());	
+					showDeposit(employeeUserNameTxt.getText());	
 				}
 			});
 			withdrawlBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					showWithdrawl(customerUsername.getText());	
+					showWithdrawl(employeeUserNameTxt.getText());	
 				}
 			});
 			seeTransHistoryBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					doBankAccounts();	
+					try {
+						showTransactions = true;
+						sendInfoRequestMessage(customerUsername.getText());
+					} catch (NumberFormatException NaN) {
+						doInvalidMessage();
+					}
 				}
 			});
-			
-			//TODO: Append methods
-			openOrCloseAccountbtn.addActionListener(new ActionListener() {
+			openAccountBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					doBankAccounts();	
+					if(accountDropdown.getSelectedItem() == AccountType.Savings) {
+
+						sendOpenAccountMessage(AccountType.Savings,owners,Double.parseDouble(interestTxt.getText()),Double.parseDouble(limitTxt.getText()), Double.parseDouble(miniDue.getText()));	
+
+					}
+					else if(accountDropdown.getSelectedItem() == AccountType.LineOfCredit) {
+						sendOpenAccountMessage(AccountType.LineOfCredit,owners,Double.parseDouble(interestTxt.getText()),Double.parseDouble(limitTxt.getText()), Double.parseDouble(miniDue.getText()));	
+
+					}
+					else {
+						sendOpenAccountMessage(AccountType.Checking,owners,Double.parseDouble(interestTxt.getText()),Double.parseDouble(limitTxt.getText()), Double.parseDouble(miniDue.getText()));	
+					}
 				}
 			});
-			seeBankAccountsbtn.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					doBankAccounts();	
+			closeAccountBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {					
+					sendCloseAccountMessage(Integer.parseInt(accountId.getText()));	
 				}
 			});
 		    
@@ -377,8 +623,26 @@ public class Client {
 				}
 			});
 			// --- Add panel to the main panel ---
-			mainPanel.add(employeePanel, "EMPLOYEE");
+			mainPanel.add(addTextArea, "UPDATE");
+			cardLayout.show(mainPanel, "UPDATE");
 		}
+		
+		public void updateCustomerInterface(String text) {
+			JPanel addResponseText = new JPanel();
+			JTextArea displayText = new JTextArea();
+			displayText.setText(text);
+			JButton backBtn = new JButton("Back");
+			backBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					cardLayout.show(mainPanel, "CUSTOMER");
+				}
+			});
+			addResponseText.add(displayText);
+			addResponseText.add(backBtn);
+			mainPanel.add(addResponseText, "UPDATE");
+			cardLayout.show(mainPanel, "UPDATE");
+		}
+		
 		public void showWithdrawl(String username) {
 			doWithdrawl(username);
 			cardLayout.show(mainPanel,"WITHDRAWAL");
@@ -388,26 +652,39 @@ public class Client {
 			JTextField amountTxt = new JTextField();
 			JTextField bankAccTxt = new JTextField();
 			JButton submitBtn = new JButton("Submit");
-			// TODO: add to panel
+			JButton backBtn = new JButton("Back");
+
 			withdrawlPanel.add(new JLabel("Enter Withdrawal Amount:"));
 			withdrawlPanel.add(new JLabel("Enter Bank Account Number:"));
 			withdrawlPanel.add(amountTxt);
 			withdrawlPanel.add(bankAccTxt);
 			withdrawlPanel.add(submitBtn);
+			withdrawlPanel.add(backBtn);
 			
 			// --- Add Button Function ---
 			submitBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					Double withdrawlAmount = Double.parseDouble(amountTxt.getText());
-
-		    		// TODO : change text field to a number or add error checking for parseint & resolve non-serializable issue
-					User user = new User(username,null);
-		    		Transaction withdrawl = new Transaction(withdrawlAmount,TransactionType.Withdrawal,user,Integer.parseInt(bankAccTxt.getText()));
-		    		sendTransactionMessage(withdrawl);
+					try {
+						Double withdrawlAmount = Double.parseDouble(amountTxt.getText());
+						User user = new User(username,null);
+			    		Transaction withdrawl = new Transaction(withdrawlAmount,TransactionType.Withdrawal,user,Integer.parseInt(bankAccTxt.getText()));
+			    		sendTransactionMessage(withdrawl);
+					} catch (NumberFormatException NaN) {
+						doInvalidMessage();
+					}
 				}
 			});
+			backBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					if (currentUser instanceof Customer) {
+						cardLayout.show(mainPanel, "CUSTOMER");
+					} else {
+						cardLayout.show(mainPanel, "EMPLOYEE");
+					}
+				}
+			});
+			
     		mainPanel.add(withdrawlPanel, "WITHDRAWAL");
-
 		}
 		
 		public void showDeposit(String username) {
@@ -419,52 +696,39 @@ public class Client {
 			JTextField amountTxt = new JTextField();
 			JTextField bankAccTxt = new JTextField();
 			JButton submitBtn = new JButton("Submit");
-			// TODO: add to panel
+			JButton backBtn = new JButton("Back");
 			depositPanel.add(new JLabel("Enter Deposit Amount:"));
 			depositPanel.add(new JLabel("Enter Bank Account Number:"));
-			// TODO: add to panel
 			depositPanel.add(amountTxt);
 			depositPanel.add(bankAccTxt);
 			depositPanel.add(submitBtn);
+			depositPanel.add(backBtn);
 			
 			// --- Add Button Function ---
 			submitBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					Double depositAmount = Double.parseDouble(amountTxt.getText());
-
-		    		// TODO : change text field to a number or add error checking for parseint & resolve non-serializable issue
-					User user = new User(username,null);
-		    		Transaction deposit = new Transaction(depositAmount,TransactionType.Withdrawal,user,Integer.parseInt(bankAccTxt.getText()));
-		    		sendTransactionMessage(deposit);
+					try {
+						Double depositAmount = Double.parseDouble(amountTxt.getText());
+						User user = new User(username,null);
+			    		Transaction deposit = new Transaction(depositAmount,TransactionType.Deposit,user,Integer.parseInt(bankAccTxt.getText()));
+			    		sendTransactionMessage(deposit);
+					} catch (NumberFormatException NaN) {
+						doInvalidMessage();
+					}	
+				}
+			});
+			backBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					if (currentUser instanceof Customer) {
+						cardLayout.show(mainPanel, "CUSTOMER");
+					} else {
+						cardLayout.show(mainPanel, "EMPLOYEE");
+					}
 				}
 			});
     		
     		mainPanel.add(depositPanel, "DEPOSIT");
-		}
-		public void doOpenOrCloseAccount() {
-			JPanel openCloseAccount = new JPanel();
-			openCloseAccount.setLayout(cardLayout);
-
-			mainPanel.add(openCloseAccount);
-
-		}
-
-		public void doBankAccounts() {
-			// --- Attributes ---
-			// --- Text Area : Read Only --- 
-			TextArea tAOutput;
-			tAOutput = new TextArea(5,50); // allocate TextField
-		    tAOutput.setEditable(false);  // read-only
-		    
-		}
-
-		public void doBankAccountDetails() {
-			// --- Attributes ---
-			// --- Text Area : Read Only --- 
-			TextArea tAOutput;
-			tAOutput = new TextArea(5,50); // allocate TextField
-		    tAOutput.setEditable(false);  // read-only
-		}
+		}		
 		public void doSuccessMessage(String showTxt) {
 			JOptionPane.showMessageDialog(null, '"' + showTxt + '"');
 		}

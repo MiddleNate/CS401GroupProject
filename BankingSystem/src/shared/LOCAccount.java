@@ -30,6 +30,21 @@ public class LOCAccount extends BankAccount {
 		paidSinceUpdated = 0;
 	}
 	
+	// alternate constructor used for UpdateAccount messages
+	public LOCAccount(int id, double limit, double interest, double minimum) {
+		this.id = id;
+		status = false;
+		type = AccountType.LineOfCredit;
+		owners = null;
+		balance = 0;
+		transactions = null;
+		creditLimit = limit;
+		interestRate = interest;
+		minimumDue = minimum;
+		lastUpdated = null;
+		paidSinceUpdated = 0;
+	}
+	
 	public double getLimit() {
 		return creditLimit;
 	}

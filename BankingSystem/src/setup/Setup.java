@@ -29,7 +29,10 @@ public class Setup {
 		Map<String, User> users = new HashMap<String, User>();
 		
 		User cust1 = new Customer("customer1", "customerpass1", "customer name 1", 12345678);
+		((Customer)cust1).addAccount(1);
+		((Customer)cust1).addAccount(2);
 		User cust2 = new Customer("customer2", "customerpass2", "customer name 2", 23456789);
+		((Customer)cust2).addAccount(2);
 		users.put("customer1", cust1);
 		users.put("customer2", cust2);
 		
