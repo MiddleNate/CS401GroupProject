@@ -478,11 +478,11 @@ public class Client {
 			});
 			
 			// --- Add attributes ---
+			clientPanel.add(showAccountsBtn);
 			clientPanel.add(withdrawlBtn);
 			clientPanel.add(depositBtn);
 			clientPanel.add(accForTransactions);
 			clientPanel.add(seeTransHistoryBtn);
-			clientPanel.add(showAccountsBtn);
 			clientPanel.add(logoutBtn);
 			
 			mainPanel.add(clientPanel, "CUSTOMER");
