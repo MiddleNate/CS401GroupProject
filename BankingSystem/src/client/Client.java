@@ -558,14 +558,6 @@ public class Client {
 			JButton backBtn = new JButton("Back");
 			JButton logoutBtn = new JButton("Log out");
 			
-			String input = customerUsername.getText();
-			String[] parts = input.split(",");
-
-			ArrayList<String> owners = new ArrayList<>();
-			for(String p : parts) {
-				owners.add(p);
-			}
-			
 			addTextArea.add(displayCustomerAccounts);
 			addTextArea.add(scrollPane);
 			addTextArea.add(customerUsername);
@@ -610,6 +602,13 @@ public class Client {
 			});
 			openAccountBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					String input = customerUsername.getText();
+					String[] parts = input.split(",");
+
+					ArrayList<String> owners = new ArrayList<>();
+					for(String p : parts) {
+						owners.add(p);
+					}
 					try {
 						if(accountDropdown.getSelectedItem() == AccountType.Savings) {
 

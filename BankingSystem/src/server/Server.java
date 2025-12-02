@@ -262,7 +262,7 @@ public class Server {
 							break; }
 						case MessageType.Transaction: {
 							Message reply = null;
-							Integer accountID = m.getTransaction().getID();
+							Integer accountID = m.getTransaction().getAccount();
 							
 							// check that the account specified in the message
 							// is an account that exists
@@ -316,12 +316,15 @@ public class Server {
 							case AccountType.Checking: {
 								// check that the provided owners exist and are type Customer
 								ArrayList<String> owners = m.getAccount().getOwners();
+								boolean bad = false;
 								for (int i = 0; i < owners.size(); i++) {
 									if (!(Server.users.get(owners.get(i)) instanceof Customer)) {
 										reply = new Message(MessageType.Fail, "Owner does not exist");
+										bad = true;
 										break;
 									}
 								}
+								if (bad) break;
 
 								// put the new account if everything was valid
 								// a new object is created so that the id is set server-side
