@@ -417,18 +417,23 @@ public class Client {
 				}
 			});
 		}
+		
 		public void showCustomerInterface(User user) {
 			doCustomerInterface(user);
 			cardLayout.show(mainPanel,"CUSTOMER");
 		}
+		
 		public void doCustomerInterface(User user) {
 			// --- Panel 2: Client Panel with list of available transactions ---
+			frame.setSize(1000,550);
+			frame.setLocationRelativeTo(null);
 			JPanel clientPanel = new JPanel(new GridLayout(2,2,2,2));
 		    
 			//4 button layout
 			JButton withdrawlBtn = new JButton("Withdrawal");
 			JButton depositBtn = new JButton("Deposit");
 			JTextField accForTransactions = new JTextField("Account number");
+			accForTransactions.setHorizontalAlignment(JTextField.CENTER);
 			JButton seeTransHistoryBtn = new JButton("Transaction History");
 			JButton showAccountsBtn = new JButton("Show Accounts");
 			JButton backBtn = new JButton("Back");
@@ -470,9 +475,9 @@ public class Client {
 				public void actionPerformed(ActionEvent e) {
 					sendLogoutMessage();
 				}
-			});			
+			});
+			
 			// --- Add attributes ---
-			clientPanel.add(new JLabel("Welcome"));
 			clientPanel.add(withdrawlBtn);
 			clientPanel.add(depositBtn);
 			clientPanel.add(accForTransactions);
@@ -482,6 +487,7 @@ public class Client {
 			
 			mainPanel.add(clientPanel, "CUSTOMER");
 		}
+		
 		public void showEmployeeInterface() {
 			doEmployeeInterface();
 			cardLayout.show(mainPanel,"EMPLOYEE");
@@ -490,9 +496,8 @@ public class Client {
 		public void doEmployeeInterface() {
 			// --- Panel 3: Employee Panel with list of available transactions ---
 			JPanel employeePanel = new JPanel(new FlowLayout());
-
 			// --- Input for Customer Info ---
-			JTextField customerUsername = new JTextField();
+			JTextField customerUsername = new JTextField(7);
 			JButton infoRequestBtn = new JButton("Submit");
 			JButton logoutBtn = new JButton("Log out");
 
@@ -507,7 +512,6 @@ public class Client {
 				public void actionPerformed(ActionEvent e) {
 					sendInfoRequestMessage(customerUsername.getText());
 					cardLayout.show(mainPanel, "UPDATE");
-
 				}
 			});
 
@@ -516,6 +520,7 @@ public class Client {
 					sendLogoutMessage();
 				}
 			});
+			
 			// --- Add panel to the main panel ---
 			mainPanel.add(employeePanel, "EMPLOYEE");
 			cardLayout.show(mainPanel, "UPDATE");
@@ -524,6 +529,8 @@ public class Client {
 		
 		public void updateEmployeeInterface(String acc) {
 			//display everything
+			frame.setSize(1000,550);
+			frame.setLocationRelativeTo(null);
 			JPanel addTextArea = new JPanel(new FlowLayout());
 			JTextArea displayCustomerAccounts = new JTextArea(10,5);
 			displayCustomerAccounts.setEditable(false);
