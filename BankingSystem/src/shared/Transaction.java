@@ -54,8 +54,20 @@ public class Transaction implements Serializable {
 	}
 	
 	public String toString() {
-		String output = "Transaction ID: " + id + "\tType: " + type.name() + "\tAmount: " + amount
-				+ "\tDate: " + date + "\tUser: " + user.getUsername() + "\tAccount ID: " + id + "\n";
+		String output = "Transaction ID: " + id + "\tType: " + type.name();
+		// this is for formatting i swear its important
+		switch (type) {
+		case TransactionType.Deposit:
+		case TransactionType.Interest:
+		case TransactionType.Payment:
+			output += "\t\t";
+			break;
+		case TransactionType.Withdrawal:
+			output += "\t";
+			break;
+		}
+		
+		output += "Amount: " + amount + "\tDate: " + date + "\tUser: " + user.getUsername() + "\tAccount ID: " + account + "\n";
 		return output;
 	}
 }

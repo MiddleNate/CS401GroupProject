@@ -161,7 +161,7 @@ public class SavingsAccount extends BankAccount {
 	
 	@Override
 	public String toString() {
-		return ("Account ID: " + id + "\tType: Savings\tBalance: " + balance +
+		return ("Account ID: " + id + "\tType: Savings" + "\t\tBalance: " + balance +
 				"\tInterest rate: " + interestRate + "\tWithdrawal Limit: " + withdrawalLimit
 				+ "\tWithdrawn this month: " + withdrawnSinceUpdated + "\n");
 	}
