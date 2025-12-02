@@ -169,24 +169,28 @@ public class Client {
 		case Info:
 			if (!showTransactions) {
 				if (currentUser instanceof Customer) {
-					SwingUtilities.invokeLater(() ->gui.updateCustomerInterface(response.text()));
+					SwingUtilities.invokeLater(() ->gui.updateCustomerInterface(response.getText()));
 				} else if (currentUser instanceof Employee) {
-					SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(response.text()));
+					SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(response.getText()));
 				}
 			} else {
 				ArrayList<BankAccount> accs = response.getAccounts();
-				BankAccount acc;
+				BankAccount acc = null;
+				final String output;
 				for (int i = 0; i < accs.size(); i++) {
 					if (accs.get(i).getID() == accToCheck) {
 						acc = accs.get(i);
 					}
 				}
 				if (acc == null) {
-					SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface("Account not found for current user"));
-				} else if (currentUser instanceof Customer) {
-					SwingUtilities.invokeLater(() ->gui.updateCustomerInterface(getAccountTransactions(acc)));
+					output = "Account not found for selected user";
+				} else {
+					output = getAccountTransactions(acc);
+				}
+				if (currentUser instanceof Customer) {
+					SwingUtilities.invokeLater(() ->gui.updateCustomerInterface(output));
 				} else if (currentUser instanceof Employee) {
-					SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(getAccountTransactions(acc)));
+					SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(output));
 				}
 				showTransactions = false;
 				accToCheck = 0;
@@ -576,7 +580,7 @@ public class Client {
 				}
 			});
 			// --- Add panel to the main panel ---
-			mainPanel.add(employeePanel, "EMPLOYEE");
+			mainPanel.add(addTextArea, "EMPLOYEE");
 		}
 		
 		public void updateCustomerInterface(String text) {
