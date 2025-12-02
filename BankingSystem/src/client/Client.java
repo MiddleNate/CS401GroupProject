@@ -541,7 +541,8 @@ public class Client {
 			JScrollPane scrollPane = new JScrollPane(displayCustomerAccounts);
 			JTextField employeeUserNameTxt = new JTextField();
 			displayCustomerAccounts.append(acc + '\n');
-			JTextField customerUsername = new JTextField("Enter owner(s) name");
+			JTextField customerUsername = new JTextField("Enter customer name");
+			JTextField newPassword = new JTextField("new customer's password");
 			AccountType[] accTypes = { AccountType.Checking,AccountType.Savings,AccountType.LineOfCredit};
 			JComboBox<AccountType> accountDropdown = new JComboBox<>(accTypes);		
 			JTextField interestTxt = new JTextField("Enter Interest");
@@ -561,6 +562,7 @@ public class Client {
 			addTextArea.add(displayCustomerAccounts);
 			addTextArea.add(scrollPane);
 			addTextArea.add(customerUsername);
+			addTextArea.add(newPassword);
 			addTextArea.add(accountDropdown);
 			addTextArea.add(interestTxt);
 			addTextArea.add(limitTxt);
@@ -574,6 +576,11 @@ public class Client {
 			addTextArea.add(backBtn);
 			addTextArea.add(logoutBtn);
 			
+			createCustomerBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					sendCreateCustomerMessage(customerUsername.getText(), newPassword.getText());
+				}
+			});
 			backBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					cardLayout.show(mainPanel, "EMPLOYEE");
