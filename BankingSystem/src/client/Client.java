@@ -571,11 +571,15 @@ public class Client {
 			// --- Add Button Function ---
 			submitBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					Double withdrawlAmount = Double.parseDouble(amountTxt.getText());
-		    		// TODO : change text field to a number or add error checking for parseint & resolve non-serializable issue
-					User user = new User(username,null);
-		    		Transaction withdrawl = new Transaction(withdrawlAmount,TransactionType.Withdrawal,user,Integer.parseInt(bankAccTxt.getText()));
-		    		sendTransactionMessage(withdrawl);
+					try {
+						Double withdrawlAmount = Double.parseDouble(amountTxt.getText());
+						User user = new User(username,null);
+			    		Transaction withdrawl = new Transaction(withdrawlAmount,TransactionType.Withdrawal,user,Integer.parseInt(bankAccTxt.getText()));
+			    		sendTransactionMessage(withdrawl);
+					} catch (NumberFormatException NaN) {
+						doInvalidMessage();
+					}
+					
 				}
 			});
     		mainPanel.add(withdrawlPanel, "WITHDRAWAL");
@@ -601,12 +605,15 @@ public class Client {
 			// --- Add Button Function ---
 			submitBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					Double depositAmount = Double.parseDouble(amountTxt.getText());
-
-		    		// TODO : change text field to a number or add error checking for parseint & resolve non-serializable issue
-					User user = new User(username,null);
-		    		Transaction deposit = new Transaction(depositAmount,TransactionType.Withdrawal,user,Integer.parseInt(bankAccTxt.getText()));
-		    		sendTransactionMessage(deposit);
+					try {
+						Double depositAmount = Double.parseDouble(amountTxt.getText());
+						User user = new User(username,null);
+			    		Transaction deposit = new Transaction(depositAmount,TransactionType.Withdrawal,user,Integer.parseInt(bankAccTxt.getText()));
+			    		sendTransactionMessage(deposit);
+					} catch (NumberFormatException NaN) {
+						doInvalidMessage();
+					}
+					
 				}
 			});
     		
