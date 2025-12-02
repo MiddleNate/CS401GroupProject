@@ -199,6 +199,38 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
+	
+	// minimum is ignored if updating a savings account
+	private static void sendUpdateAccountMessage(int id, AccountType type, double interest, double limit, double minimum) {
+		switch (type) {
+		case AccountType.Checking: {
+			// checking accounts cannot be modified
+			break;
+		}
+		case AccountType.Savings: {
+			SavingsAccount acc = new SavingsAccount(id, interest, limit);
+			Message msg = new Message(MessageType.UpdateAccount, acc);
+			try {
+				out.writeObject(msg);
+				out.flush();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			break;
+		}
+		case AccountType.LineOfCredit: {
+			LOCAccount acc = new LOCAccount(id, limit, interest, minimum);
+			Message msg = new Message(MessageType.UpdateAccount, acc);
+			try {
+				out.writeObject(msg);
+				out.flush();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			break;
+		}
+		}
+	}
 
 	// more methods for sending other message types
 
