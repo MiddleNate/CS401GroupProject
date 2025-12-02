@@ -266,7 +266,7 @@ public class Server {
 							
 							// check that the account specified in the message
 							// is an account that exists
-							if (Server.accounts.containsKey(accountID)) {
+							if (!Server.accounts.containsKey(accountID)) {
 								reply = new Message(MessageType.Fail, "Account does not exist");
 							} else {
 								try {
