@@ -238,6 +238,30 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
+	
+	// parameters that don't apply to the type will be ignored
+	private static void sendOpenAccountMessage(AccountType type, ArrayList<String> owners, 
+			double interest, double limit, double minimum) {
+		Message msg = new Message(MessageType.Invalid);
+		switch (type) {
+		case AccountType.Checking: {
+			CheckingAccount acc = new CheckingAccount(owners);
+			msg = new Message(MessageType.OpenAccount, acc);
+		break;}
+		case AccountType.Savings: {
+			SavingsAccount acc = new SavingsAccount(owners, interest, limit);
+			msg = new Message(MessageType.OpenAccount, acc);
+		break;}
+		case AccountType.LineOfCredit: {
+			LOCAccount acc = new LOCAccount(owners, limit, interest, minimum);
+			msg = new Message(MessageType.OpenAccount, acc);
+		}
+		}
+		try {
+			out.writeObject(msg);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	// more methods for sending other message types
