@@ -236,7 +236,6 @@ public class Client {
 		}
 	}
 	
-	//TODO : Add Parameters
 	private static void sendTransactionMessage(Transaction action) {
 		// create and send a message through the stream
 		try {
@@ -562,10 +561,10 @@ public class Client {
 				}
 			});
 			
-			//TODO: Append methods
+			//TODO: change to two separate buttons, open needs parameters
 			openOrCloseAccountbtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					doBankAccounts();	
+					doBankAccounts();
 				}
 			});
 			seeBankAccountsbtn.addActionListener(new ActionListener() {
@@ -610,7 +609,6 @@ public class Client {
 			JButton submitBtn = new JButton("Submit");
 			JButton backBtn = new JButton("Back");
 
-			// TODO: add to panel
 			withdrawlPanel.add(new JLabel("Enter Withdrawal Amount:"));
 			withdrawlPanel.add(new JLabel("Enter Bank Account Number:"));
 			withdrawlPanel.add(amountTxt);
@@ -643,10 +641,8 @@ public class Client {
 			JTextField amountTxt = new JTextField();
 			JTextField bankAccTxt = new JTextField();
 			JButton submitBtn = new JButton("Submit");
-			// TODO: add to panel
 			depositPanel.add(new JLabel("Enter Deposit Amount:"));
 			depositPanel.add(new JLabel("Enter Bank Account Number:"));
-			// TODO: add to panel
 			depositPanel.add(amountTxt);
 			depositPanel.add(bankAccTxt);
 			depositPanel.add(submitBtn);
