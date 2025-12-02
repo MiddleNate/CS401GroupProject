@@ -431,10 +431,15 @@ public class Client {
 			JTextField accForTransactions = new JTextField("Account number");
 			JButton seeTransHistoryBtn = new JButton("Transaction History");
 			JButton showAccountsBtn = new JButton("Show Accounts");
-			
+			JButton backBtn = new JButton("Back");
 			JButton logoutBtn = new JButton("Log out");
 			
 			// --- Add functions ---
+			backBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					cardLayout.show(mainPanel, "CUSTOMER");
+				}
+			});
 			depositBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					showDeposit(user.getUsername());	
@@ -500,6 +505,8 @@ public class Client {
 			infoRequestBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					sendInfoRequestMessage(customerUsername.getText());
+					cardLayout.show(mainPanel, "UPDATE");
+
 				}
 			});
 
@@ -510,6 +517,8 @@ public class Client {
 			});
 			// --- Add panel to the main panel ---
 			mainPanel.add(employeePanel, "EMPLOYEE");
+			cardLayout.show(mainPanel, "UPDATE");
+
 		}
 		
 		public void updateEmployeeInterface(String acc) {
@@ -520,13 +529,13 @@ public class Client {
 			JScrollPane scrollPane = new JScrollPane(displayCustomerAccounts);
 			JTextField employeeUserNameTxt = new JTextField();
 			displayCustomerAccounts.append(acc + '\n');
-			JTextField customerUsername = new JTextField("Enter customer username");
+			JTextField customerUsername = new JTextField("Enter owner(s) name");
 			JComboBox<AccountType> accountDropdown = new JComboBox<>();		
 			JTextField interestTxt = new JTextField("Enter Interest");
 			JTextField limitTxt = new JTextField("Enter Limit amount");
+			JTextField miniDue = new JTextField("Enter minimum due");
+			JTextField accountId = new JTextField("Enter account Id");
 
-
-			
 			JButton createCustomerBtn = new JButton("Create Customer");
 			JButton withdrawlBtn = new JButton("Withdrawl");
 			JButton depositBtn = new JButton("Deposit");
@@ -536,10 +545,21 @@ public class Client {
 			JButton backBtn = new JButton("Back");
 			JButton logoutBtn = new JButton("Log out");
 			
+			String input = customerUsername.getText();
+			String[] parts = input.split(",");
+
+			ArrayList<String> owners = new ArrayList<>();
+			for(String p : parts) {
+				owners.add(p);
+			}
+			
 			addTextArea.add(displayCustomerAccounts);
 			addTextArea.add(scrollPane);
 			addTextArea.add(customerUsername);
 			addTextArea.add(accountDropdown);
+			addTextArea.add(interestTxt);
+			addTextArea.add(limitTxt);
+			addTextArea.add(accountId);
 			addTextArea.add(createCustomerBtn);
 			addTextArea.add(withdrawlBtn);
 			addTextArea.add(depositBtn);
@@ -551,7 +571,7 @@ public class Client {
 			
 			backBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					cardLayout.show(mainPanel, "CUSTOMER");
+					cardLayout.show(mainPanel, "EMPLOYEE");
 				}
 			});
 			depositBtn.addActionListener(new ActionListener() {
@@ -577,21 +597,22 @@ public class Client {
 			openAccountBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					if(accountDropdown.getSelectedItem() == AccountType.Savings) {
-						sendOpenAccountMessage(AccountType.Savings,customerUsername.getText(),interestTxt.getText(),);	
+
+						sendOpenAccountMessage(AccountType.Savings,owners,Double.parseDouble(interestTxt.getText()),Double.parseDouble(limitTxt.getText()), Double.parseDouble(miniDue.getText()));	
 
 					}
 					else if(accountDropdown.getSelectedItem() == AccountType.LineOfCredit) {
-						sendOpenAccountMessage(AccountType.LineOfCredit,customerUsername.getText());	
+						sendOpenAccountMessage(AccountType.LineOfCredit,owners,Double.parseDouble(interestTxt.getText()),Double.parseDouble(limitTxt.getText()), Double.parseDouble(miniDue.getText()));	
 
 					}
 					else {
-						sendOpenAccountMessage(AccountType.Checking,customerUsername.getText());	
+						sendOpenAccountMessage(AccountType.Checking,owners,Double.parseDouble(interestTxt.getText()),Double.parseDouble(limitTxt.getText()), Double.parseDouble(miniDue.getText()));	
 					}
 				}
 			});
 			closeAccountBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {					
-					sendCloseAccountMessage(accountDropdown.getSelectedItem(),customerUsername.getText());	
+					sendCloseAccountMessage(Integer.parseInt(accountId.getText()));	
 				}
 			});
 		    
