@@ -250,7 +250,7 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
-	
+	;
 	// minimum is ignored if updating a savings account
 	private static void sendUpdateAccountMessage(int id, AccountType type, double interest, double limit, double minimum) {
 		Message msg = new Message(MessageType.Invalid);
@@ -555,6 +555,7 @@ public class Client {
 			JButton seeTransHistoryBtn = new JButton("Transaction History");
 			JButton openAccountBtn = new JButton("Open Account");
 			JButton closeAccountBtn = new JButton("Close Account");
+			JButton modifyAccountBtn = new JButton("Modify Account");
 			JButton backBtn = new JButton("Back");
 			JButton logoutBtn = new JButton("Log out");
 			
@@ -571,8 +572,35 @@ public class Client {
 			addTextArea.add(seeTransHistoryBtn);
 			addTextArea.add(openAccountBtn);
 			addTextArea.add(closeAccountBtn);
+			addTextArea.add(modifyAccountBtn);			
 			addTextArea.add(backBtn);
 			addTextArea.add(logoutBtn);
+			
+			modifyAccountBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					
+					try {
+
+						switch(accountDropdown.getSelectedItem()) {
+						case AccountType.Savings:{
+							sendUpdateAccountMessage(Integer.parseInt(accountId.getText()),(AccountType)accountDropdown.getSelectedItem(),Double.parseDouble(limitTxt.getText()),Double.parseDouble(interestTxt.getText()),0);
+							break;
+						}
+						case AccountType.LineOfCredit:{
+							sendUpdateAccountMessage(Integer.parseInt(accountId.getText()),(AccountType)accountDropdown.getSelectedItem(),Double.parseDouble(limitTxt.getText()),Double.parseDouble(interestTxt.getText()),Double.parseDouble(miniDue.getText()));
+							break;
+						}
+						case AccountType.Checking:{
+							doInvalidMessage();
+							break;
+						}
+						default:
+							break;
+						}
+					} catch (NumberFormatException NaN) {
+						doInvalidMessage();
+					}
+				}});
 			
 			backBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
