@@ -556,6 +556,8 @@ public class Client {
 			JButton seeTransHistoryBtn = new JButton("Transaction History");
 			JButton openAccountBtn = new JButton("Open Account");
 			JButton closeAccountBtn = new JButton("Close Account");
+			JButton addToAccBtn = new JButton("Add to Account");
+			JButton removeFromAccBtn = new JButton("Remove from Account");
 			JButton backBtn = new JButton("Back");
 			JButton logoutBtn = new JButton("Log out");
 			
@@ -573,9 +575,30 @@ public class Client {
 			addTextArea.add(seeTransHistoryBtn);
 			addTextArea.add(openAccountBtn);
 			addTextArea.add(closeAccountBtn);
+			addTextArea.add(addToAccBtn);
+			addTextArea.add(removeFromAccBtn);
 			addTextArea.add(backBtn);
 			addTextArea.add(logoutBtn);
 			
+			
+			addToAccBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					try {
+						sendAddToAccountMessage( Integer.parseInt(accountId.getText()), customerUsername.getText());
+					} catch (NumberFormatException NaN) {
+						doInvalidMessage();
+					}
+				}
+			});
+			removeFromAccBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					try {
+						sendRemoveFromAccountMessage(Integer.parseInt(accountId.getText()), customerUsername.getText());
+					} catch (NumberFormatException NaN) {
+						doInvalidMessage();
+					}
+				}
+			});
 			createCustomerBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					sendCreateCustomerMessage(customerUsername.getText(), newPassword.getText());
