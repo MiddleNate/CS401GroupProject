@@ -29,16 +29,16 @@ public class UserTest {
 	
 	@Test
 	public void testExceptions() throws Exception {
-		User user = new User("User1", "password");
+		User user = new User("username", "password");
 		
 		// test if already logged in
 		user.tryLogin("username", "password");
 		Exception alreadyLoggedException = assertThrows(Exception.class, () -> user.tryLogin("username", "password"));
 		assertEquals("Already logged in", alreadyLoggedException.getMessage());
 		
-		// test for invalid user name and password
+		// test for invalid password
 		user.logout();
-		Exception invalidInfoException = assertThrows(Exception.class, () -> user.tryLogin("user", "pass"));
+		Exception invalidInfoException = assertThrows(Exception.class, () -> user.tryLogin("username", "pass"));
 		assertEquals("Invalid username or password", invalidInfoException.getMessage());
 	}
 }
