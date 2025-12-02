@@ -39,6 +39,7 @@ public class Client {
 	private static boolean exiting = false;
 	private static boolean showTransactions = false;
 	private static int accToCheck = 0;
+	private static User currentUser = null;
 	private static ObjectInputStream in;
 	private static ObjectOutputStream out;
 
@@ -142,10 +143,12 @@ public class Client {
 		if(data instanceof User) {
 			if(response.getUser() instanceof Customer) {
 				SwingUtilities.invokeLater(() ->gui.showCustomerInterface(response.getUser()));
+				currentUser = response.getUser();
 				return;
 			}
 			else if(response.getUser() instanceof Employee) {
 				SwingUtilities.invokeLater(() ->gui.showEmployeeInterface());
+				currentUser = response.getUser();
 				return;
 			}
 			else
@@ -165,19 +168,29 @@ public class Client {
 			break;
 		case Info:
 			if (!showTransactions) {
-				SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(response.getText()));
+				if (currentUser instanceof Customer) {
+					SwingUtilities.invokeLater(() ->gui.updateCustomerInterface(response.getText()));
+				} else if (currentUser instanceof Employee) {
+					SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(response.getText()));
+				}
 			} else {
 				ArrayList<BankAccount> accs = response.getAccounts();
-				BankAccount acc;
+				BankAccount acc = null;
+				final String output;
 				for (int i = 0; i < accs.size(); i++) {
 					if (accs.get(i).getID() == accToCheck) {
 						acc = accs.get(i);
 					}
 				}
 				if (acc == null) {
-					SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface("Account not found for current user"));
+					output = "Account not found for selected user";
 				} else {
-					SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(getAccountTransactions(acc)));
+					output = getAccountTransactions(acc);
+				}
+				if (currentUser instanceof Customer) {
+					SwingUtilities.invokeLater(() ->gui.updateCustomerInterface(output));
+				} else if (currentUser instanceof Employee) {
+					SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(output));
 				}
 				showTransactions = false;
 				accToCheck = 0;
@@ -223,7 +236,6 @@ public class Client {
 		}
 	}
 	
-	//TODO : Add Parameters
 	private static void sendTransactionMessage(Transaction action) {
 		// create and send a message through the stream
 		try {
@@ -417,7 +429,8 @@ public class Client {
 			JButton withdrawlBtn = new JButton("Withdrawal");
 			JButton depositBtn = new JButton("Deposit");
 			JTextField accForTransactions = new JTextField("Account number");
-			JButton seeTransHistoryBtn = new JButton("See Transaction History");
+			JButton seeTransHistoryBtn = new JButton("Transaction History");
+			JButton showAccountsBtn = new JButton("Show Accounts");
 			
 			JButton logoutBtn = new JButton("Log out");
 			
@@ -430,6 +443,11 @@ public class Client {
 			withdrawlBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					showWithdrawl(user.getUsername());	
+				}
+			});
+			showAccountsBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					sendInfoRequestMessage(user.getUsername());
 				}
 			});
 			seeTransHistoryBtn.addActionListener(new ActionListener() {
@@ -576,8 +594,31 @@ public class Client {
 					sendCloseAccountMessage(accountDropdown.getSelectedItem(),customerUsername.getText());	
 				}
 			});
-
-			mainPanel.add(addTextArea,"UPDATE");
+		    
+			logoutBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					sendLogoutMessage();
+				}
+			});
+			// --- Add panel to the main panel ---
+			mainPanel.add(addTextArea, "EMPLOYEE");
+		}
+		
+		public void updateCustomerInterface(String text) {
+			JPanel addResponseText = new JPanel();
+			JTextArea displayText = new JTextArea();
+			displayText.setText(text);
+			mainPanel.add(displayText);
+		}
+		
+		public void updateEmployeeInterface(Message response) {
+			JPanel addTextFields = new JPanel();
+			JTextArea displayCustomerInfo = new JTextArea();
+			displayCustomerInfo.setText(response.getAccount().toString());
+			System.out.println(response.getAccount().toString());
+			addTextFields.add(displayCustomerInfo);
+			
+			mainPanel.add(addTextFields,"UPDATE");
 		}
 		public void showWithdrawl(String username) {
 			doWithdrawl(username);
@@ -590,12 +631,12 @@ public class Client {
 			JButton submitBtn = new JButton("Submit");
 			JButton backBtn = new JButton("Back");
 
-			// TODO: add to panel
 			withdrawlPanel.add(new JLabel("Enter Withdrawal Amount:"));
 			withdrawlPanel.add(new JLabel("Enter Bank Account Number:"));
 			withdrawlPanel.add(amountTxt);
 			withdrawlPanel.add(bankAccTxt);
 			withdrawlPanel.add(submitBtn);
+			withdrawlPanel.add(backBtn);
 			
 			// --- Add Button Function ---
 			submitBtn.addActionListener(new ActionListener() {
@@ -610,6 +651,16 @@ public class Client {
 					}
 				}
 			});
+			backBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					if (currentUser instanceof Customer) {
+						cardLayout.show(mainPanel, "CUSTOMER");
+					} else {
+						cardLayout.show(mainPanel, "EMPLOYEE");
+					}
+				}
+			});
+			
     		mainPanel.add(withdrawlPanel, "WITHDRAWAL");
 		}
 		
@@ -622,13 +673,13 @@ public class Client {
 			JTextField amountTxt = new JTextField();
 			JTextField bankAccTxt = new JTextField();
 			JButton submitBtn = new JButton("Submit");
-			// TODO: add to panel
+			JButton backBtn = new JButton("Back");
 			depositPanel.add(new JLabel("Enter Deposit Amount:"));
 			depositPanel.add(new JLabel("Enter Bank Account Number:"));
-			// TODO: add to panel
 			depositPanel.add(amountTxt);
 			depositPanel.add(bankAccTxt);
 			depositPanel.add(submitBtn);
+			depositPanel.add(backBtn);
 			
 			// --- Add Button Function ---
 			submitBtn.addActionListener(new ActionListener() {
@@ -641,6 +692,15 @@ public class Client {
 					} catch (NumberFormatException NaN) {
 						doInvalidMessage();
 					}	
+				}
+			});
+			backBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					if (currentUser instanceof Customer) {
+						cardLayout.show(mainPanel, "CUSTOMER");
+					} else {
+						cardLayout.show(mainPanel, "EMPLOYEE");
+					}
 				}
 			});
     		
