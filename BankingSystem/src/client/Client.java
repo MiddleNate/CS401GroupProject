@@ -14,6 +14,8 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -36,14 +38,16 @@ import shared.*;
 public class Client {
 	
 	private static Socket connection;
-	private static boolean exiting = false;
-	private static boolean showTransactions = false;
-	private static int accToCheck = 0;
+	private static AtomicBoolean exiting = new AtomicBoolean(false);
+	private static AtomicBoolean showTransactions = new AtomicBoolean(false);
+	private static AtomicInteger accToCheck = new AtomicInteger(0);
 	private static User currentUser = null;
 	private static ObjectInputStream in;
 	private static ObjectOutputStream out;
 
 	public static void main(String[] args) {
+
+		
 		// screen to input port and host
 		JFrame frame = new JFrame("Connect");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -100,7 +104,7 @@ public class Client {
 							frame.dispose();
 							GUI loginGUI = new GUI();
 							loginGUI.run();
-							while (!exiting) {
+							while (!exiting.get()) {
 								Message response = (Message) in.readObject();
 								onResponse(response, loginGUI);
 							}
@@ -167,7 +171,7 @@ public class Client {
 			gui.doInvalidMessage();
 			break;
 		case Info:
-			if (!showTransactions) {
+			if (!showTransactions.get()) {
 				if (currentUser instanceof Customer) {
 					SwingUtilities.invokeLater(() ->gui.updateCustomerInterface(response.getText()));
 				} else if (currentUser instanceof Employee) {
@@ -176,9 +180,9 @@ public class Client {
 			} else {
 				ArrayList<BankAccount> accs = response.getAccounts();
 				BankAccount acc = null;
-				final String output;
+				String output;
 				for (int i = 0; i < accs.size(); i++) {
-					if (accs.get(i).getID() == accToCheck) {
+					if (accs.get(i).getID() == accToCheck.get()) {
 						acc = accs.get(i);
 					}
 				}
@@ -192,8 +196,8 @@ public class Client {
 				} else if (currentUser instanceof Employee) {
 					SwingUtilities.invokeLater(() ->gui.updateEmployeeInterface(output));
 				}
-				showTransactions = false;
-				accToCheck = 0;
+				showTransactions.set(false);
+				accToCheck.set(0);;
 			}
 			break;
 		default:
@@ -216,7 +220,7 @@ public class Client {
 	
 	private static void sendLogoutMessage() {
 		try {
-			exiting = true;
+			exiting.set(true);;
 			Message msg = new Message(MessageType.Logout);
 			out.writeObject(msg);
 			out.flush();
@@ -463,8 +467,8 @@ public class Client {
 			seeTransHistoryBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					try {
-						accToCheck = Integer.parseInt(accForTransactions.getText());
-						showTransactions = true;
+						accToCheck.set(Integer.parseInt(accForTransactions.getText()));
+						showTransactions.set(true);
 						sendInfoRequestMessage(user.getUsername());
 					} catch (NumberFormatException NaN) {
 						doInvalidMessage();
@@ -595,7 +599,8 @@ public class Client {
 			seeTransHistoryBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					try {
-						showTransactions = true;
+						showTransactions.set(true);
+						accToCheck.set(Integer.parseInt(accountId.getText()));
 						sendInfoRequestMessage(customerUsername.getText());
 					} catch (NumberFormatException NaN) {
 						doInvalidMessage();
