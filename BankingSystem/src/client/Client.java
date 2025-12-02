@@ -623,7 +623,8 @@ public class Client {
 				}
 			});
 			// --- Add panel to the main panel ---
-			mainPanel.add(addTextArea, "EMPLOYEE");
+			mainPanel.add(addTextArea, "UPDATE");
+			cardLayout.show(mainPanel, "UPDATE");
 		}
 		
 		public void updateCustomerInterface(String text) {
@@ -642,15 +643,6 @@ public class Client {
 			cardLayout.show(mainPanel, "UPDATE");
 		}
 		
-		public void updateEmployeeInterface(Message response) {
-			JPanel addTextFields = new JPanel();
-			JTextArea displayCustomerInfo = new JTextArea();
-			displayCustomerInfo.setText(response.getAccount().toString());
-			System.out.println(response.getAccount().toString());
-			addTextFields.add(displayCustomerInfo);
-			
-			mainPanel.add(addTextFields,"UPDATE");
-		}
 		public void showWithdrawl(String username) {
 			doWithdrawl(username);
 			cardLayout.show(mainPanel,"WITHDRAWAL");
