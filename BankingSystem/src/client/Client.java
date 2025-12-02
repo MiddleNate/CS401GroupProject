@@ -429,7 +429,7 @@ public class Client {
 			JButton withdrawlBtn = new JButton("Withdrawal");
 			JButton depositBtn = new JButton("Deposit");
 			JTextField accForTransactions = new JTextField("Account number");
-			JButton seeTransHistoryBtn = new JButton("See Transaction History");
+			JButton seeTransHistoryBtn = new JButton("Transaction History");
 			JButton showAccountsBtn = new JButton("Show Accounts");
 			
 			JButton logoutBtn = new JButton("Log out");
@@ -614,6 +614,7 @@ public class Client {
 			withdrawlPanel.add(amountTxt);
 			withdrawlPanel.add(bankAccTxt);
 			withdrawlPanel.add(submitBtn);
+			withdrawlPanel.add(backBtn);
 			
 			// --- Add Button Function ---
 			submitBtn.addActionListener(new ActionListener() {
@@ -629,6 +630,16 @@ public class Client {
 					
 				}
 			});
+			backBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					if (currentUser instanceof Customer) {
+						cardLayout.show(mainPanel, "CUSTOMER");
+					} else {
+						cardLayout.show(mainPanel, "EMPLOYEE");
+					}
+				}
+			});
+			
     		mainPanel.add(withdrawlPanel, "WITHDRAWAL");
 		}
 		
@@ -641,11 +652,13 @@ public class Client {
 			JTextField amountTxt = new JTextField();
 			JTextField bankAccTxt = new JTextField();
 			JButton submitBtn = new JButton("Submit");
+			JButton backBtn = new JButton("Back");
 			depositPanel.add(new JLabel("Enter Deposit Amount:"));
 			depositPanel.add(new JLabel("Enter Bank Account Number:"));
 			depositPanel.add(amountTxt);
 			depositPanel.add(bankAccTxt);
 			depositPanel.add(submitBtn);
+			depositPanel.add(backBtn);
 			
 			// --- Add Button Function ---
 			submitBtn.addActionListener(new ActionListener() {
@@ -659,6 +672,15 @@ public class Client {
 						doInvalidMessage();
 					}
 					
+				}
+			});
+			backBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					if (currentUser instanceof Customer) {
+						cardLayout.show(mainPanel, "CUSTOMER");
+					} else {
+						cardLayout.show(mainPanel, "EMPLOYEE");
+					}
 				}
 			});
     		
