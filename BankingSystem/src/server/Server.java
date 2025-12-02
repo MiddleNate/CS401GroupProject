@@ -436,8 +436,8 @@ public class Server {
 									break; }
 								case AccountType.Savings: {
 									// validate the fields that will be modified
-									double interest = ((LOCAccount) m.getAccount()).getInterest();
-									double limit = ((LOCAccount) m.getAccount()).getLimit();
+									double interest = ((SavingsAccount) m.getAccount()).getInterest();
+									double limit = ((SavingsAccount) m.getAccount()).getWithdrawlLimit();
 									if (interest < 0 || limit < 0) {
 										reply = new Message(MessageType.Fail, "Values must be above zero");
 										break;
